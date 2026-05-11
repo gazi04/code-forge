@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Worlds;
 use App\Filament\Resources\Worlds\Pages\CreateWorld;
 use App\Filament\Resources\Worlds\Pages\EditWorld;
 use App\Filament\Resources\Worlds\Pages\ListWorlds;
+use App\Filament\Resources\Worlds\RelationManagers\CoursesRelationManager;
 use App\Filament\Resources\Worlds\Schemas\WorldForm;
 use App\Filament\Resources\Worlds\Tables\WorldsTable;
 use App\Models\World;
@@ -35,7 +36,7 @@ class WorldResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            CoursesRelationManager::class
         ];
     }
 
