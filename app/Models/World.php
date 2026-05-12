@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,7 @@ use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 
 #[Table('worlds')]
+#[Fillable(['name', 'slug', 'description', 'theme_pack_id', 'layout_template', 'is_published', 'order'])]
 class World extends Model implements Sortable
 {
     use SortableTrait;
@@ -20,7 +22,6 @@ class World extends Model implements Sortable
     ];
 
     protected $casts = [
-        'accent_colors' => 'array',
         'is_published' => 'boolean',
     ];
 
