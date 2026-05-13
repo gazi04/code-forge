@@ -23,6 +23,9 @@ class Course extends Model implements Sortable
 
     protected $casts = [
         'is_published' => 'boolean',
+        'difficulty' => 'integer',
+        'estimated_duration' => 'integer',
+        'sort_order' => 'integer',
     ];
 
     public function world(): BelongsTo
