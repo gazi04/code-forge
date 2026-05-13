@@ -67,6 +67,5 @@ class CoursesTable
                     DeleteBulkAction::make(),
                 ]),
             ]);
-;
     }
 }
