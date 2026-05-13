@@ -28,15 +28,14 @@ class ThemePackForm
                         ->afterStateUpdated(fn (
                             Set $set,
                             ?string $state
-                        ) => $set('identifier', 'theme_' . Str::slug($state, '_'))),
+                        ) => $set('identifier', 'theme_'.Str::slug($state, '_'))),
 
                     TextInput::make('identifier')
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->maxLength(64)
                         ->helperText('Auto-generated from name. Stable internal key — avoid changing after creation.')
-                        ->dehydrateStateUsing(fn (string $state) =>
-                            Str::startsWith($state, 'theme_') ? $state : 'theme_' . $state
+                        ->dehydrateStateUsing(fn (string $state) => Str::startsWith($state, 'theme_') ? $state : 'theme_'.$state
                         ),
                 ]),
 
@@ -78,10 +77,10 @@ class ThemePackForm
                         ->label('Style type')
                         ->required()
                         ->options([
-                            'solid'    => 'Solid color',
+                            'solid' => 'Solid color',
                             'gradient' => 'Gradient',
-                            'pattern'  => 'CSS pattern',
-                            'image'    => 'Background image (URL)',
+                            'pattern' => 'CSS pattern',
+                            'image' => 'Background image (URL)',
                         ])
                         ->live(),
 
@@ -99,11 +98,11 @@ class ThemePackForm
                         ->label('Card style')
                         ->required()
                         ->options([
-                            'flat'        => 'Flat',
-                            'bordered'    => 'Bordered',
-                            'glassy'      => 'Glassy / frosted',
-                            'embossed'    => 'Embossed',
-                            'pixel'       => 'Pixel / retro',
+                            'flat' => 'Flat',
+                            'bordered' => 'Bordered',
+                            'glassy' => 'Glassy / frosted',
+                            'embossed' => 'Embossed',
+                            'pixel' => 'Pixel / retro',
                         ]),
 
                     Select::make('config.ui.border_radius')
@@ -111,9 +110,9 @@ class ThemePackForm
                         ->required()
                         ->options([
                             'none' => 'None (sharp)',
-                            'sm'   => 'Small',
-                            'md'   => 'Medium',
-                            'lg'   => 'Large',
+                            'sm' => 'Small',
+                            'md' => 'Medium',
+                            'lg' => 'Large',
                             'full' => 'Pill / full',
                         ]),
 
@@ -121,10 +120,10 @@ class ThemePackForm
                         ->label('Font personality')
                         ->required()
                         ->options([
-                            'default'    => 'Default (system)',
-                            'monospace'  => 'Monospace (techy)',
-                            'rounded'    => 'Rounded (friendly)',
-                            'medieval'   => 'Medieval / fantasy',
+                            'default' => 'Default (system)',
+                            'monospace' => 'Monospace (techy)',
+                            'rounded' => 'Rounded (friendly)',
+                            'medieval' => 'Medieval / fantasy',
                             'futuristic' => 'Futuristic',
                         ]),
 
@@ -132,7 +131,7 @@ class ThemePackForm
                         ->label('Default map layout')
                         ->required()
                         ->options([
-                            'linear'    => 'Linear path',
+                            'linear' => 'Linear path',
                             'branching' => 'Branching',
                             'hub_spoke' => 'Hub and spoke',
                         ])
@@ -162,10 +161,10 @@ class ThemePackForm
                                 ->label('Role')
                                 ->required()
                                 ->options([
-                                    'mentor'    => 'Mentor',
-                                    'villain'   => 'Villain',
+                                    'mentor' => 'Mentor',
+                                    'villain' => 'Villain',
                                     'companion' => 'Companion',
-                                    'neutral'   => 'Neutral NPC',
+                                    'neutral' => 'Neutral NPC',
                                 ]),
 
                             TextInput::make('sprite_url')

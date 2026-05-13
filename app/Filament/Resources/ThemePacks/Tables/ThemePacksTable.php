@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ThemePacks\Tables;
 
 use App\Models\ThemePack;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -62,8 +63,8 @@ class ThemePacksTable
             ->recordActions([
                 EditAction::make(),
 
-                \Filament\Actions\DeleteAction::make()
-                    ->before(function (ThemePack $record, \Filament\Actions\DeleteAction $action) {
+                DeleteAction::make()
+                    ->before(function (ThemePack $record, DeleteAction $action) {
                         if ($record->worlds()->exists()) {
                             $action->cancel();
                             Notification::make()
