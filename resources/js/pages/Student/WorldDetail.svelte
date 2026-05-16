@@ -4,7 +4,6 @@
 
   export let world;
 
-  // Safe extraction to handle both wrapped and unwrapped Inertia data
   $: worldData = world.data ?? world;
   $: themeData = worldData.theme;
   $: courses = worldData.courses ?? [];
@@ -33,7 +32,7 @@
         <div class="group flex items-center justify-between p-6 rounded-2xl bg-surface border border-white/10 hover:border-primary/50 transition-all">
           <h3 class="text-xl font-semibold group-hover:text-accent transition-colors">{course.name}</h3>
 
-          <Link href="/courses/{course.slug}"
+          <Link href="/course/{course.slug}"
                 class="px-6 py-2 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
             Enter
           </Link>
