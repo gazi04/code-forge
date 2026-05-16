@@ -21,10 +21,7 @@ class WorldResource extends JsonResource
             'description' => $this->description,
             // Pass the ThemePack as a clean object for CSS variables
             'theme' => [
-                'primary_color' => $this->themePack->primary_color,
-                'secondary_color' => $this->themePack->secondary_color,
-                'font_family' => $this->themePack->font_family,
-                'config' => $this->themePack->config, // Sprites and Backgrounds
+                'config' => $this->themePack->config,
             ],
             // Only include courses if they are loaded
             'courses' => CourseResource::collection($this->whenLoaded('courses')),
