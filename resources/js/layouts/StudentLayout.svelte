@@ -1,23 +1,21 @@
 <script>
   import { onMount } from 'svelte';
+  import { Link } from '@inertiajs/svelte';
 
   export let theme = null;
 
-  // Safely extract nested config objects
   $: palette = theme?.config?.palette || {};
   $: ui = theme?.config?.ui || {};
   $: bg = theme?.config?.background || {};
   $: audio = theme?.config?.audio || {};
 
-  // 1. COLORS
-  $: primary = palette.primary || '#3b82f6';
-  $: secondary = palette.secondary || '#0f172a';
+  $: primary = palette.primary || '#8b5cf6';
+  $: secondary = palette.secondary || '#1e1b4b';
   $: accent = palette.accent || '#10b981';
-  $: bgColor = palette.background || '#111827';
-  $: surface = palette.surface || '#1f2937';
-  $: textColor = palette.text || '#ffffff';
+  $: bgColor = palette.background || '#0f172a';
+  $: surface = palette.surface || '#1e293b';
+  $: textColor = palette.text || '#f8fafc';
 
-  // 2. TYPOGRAPHY (ui.font_style)
   const fontStacks = {
     default: 'system-ui, sans-serif',
     monospace: '"Fira Code", Consolas, monospace',
@@ -27,45 +25,31 @@
   };
   $: font = fontStacks[ui.font_style] || fontStacks.default;
 
-  // 3. SHAPE (ui.border_radius)
-  const radii = {
-    none: '0px',
-    sm: '0.25rem',
-    md: '0.5rem',
-    lg: '1rem',
-    full: '9999px'
-  };
+  const radii = { none: '0px', sm: '0.25rem', md: '0.5rem', lg: '1rem', full: '9999px' };
   $: borderRadius = radii[ui.border_radius] || radii.md;
 
-  // 4. CARD STYLES (ui.card_style)
-  // We compute specific CSS properties to feed into our global .bg-surface utility
-  $: cardBorder = ui.card_style === 'bordered' ? `2px solid ${primary}`
+  $: cardBorder = ui.card_style === 'bordered' ? `1px solid ${primary}`
                 : ui.card_style === 'pixel' ? `2px solid ${textColor}`
-                : '1px solid transparent';
+                : '1px solid rgba(255,255,255,0.05)';
 
-  $: cardShadow = ui.card_style === 'embossed' ? `inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.5)`
+  $: cardShadow = ui.card_style === 'embossed' ? `inset 2px 2px 5px rgba(255,255,255,0.05), inset -2px -2px 5px rgba(0,0,0,0.5)`
                 : ui.card_style === 'pixel' ? `4px 4px 0px ${primary}`
-                : '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+                : `0 4px 20px -2px rgba(0, 0, 0, 0.4)`; // Sleeker, darker default shadow
 
-  $: cardBackdrop = ui.card_style === 'glassy' ? 'blur(12px)' : 'none';
+  $: cardBackdrop = ui.card_style === 'glassy' ? 'blur(16px)' : 'none';
 
-  // For glassy, we need to make the surface color semi-transparent
   $: computedSurfaceBg = ui.card_style === 'glassy'
-    ? `color-mix(in srgb, ${surface} 40%, transparent)`
+    ? `color-mix(in srgb, ${surface} 60%, transparent)`
     : surface;
 
-  // 5. BACKGROUND ENGINE (background.style & background.value)
   $: bgType = bg.style || 'solid';
   $: bgVal = bg.value || '';
-
-  // Determine CSS properties based on the type
   $: isImageUrl = bgType === 'image' || bgType === 'pattern';
   $: bgImage = isImageUrl ? `url('${bgVal}')` : (bgType === 'gradient' ? bgVal : 'none');
   $: computedBgColor = bgType === 'solid' ? bgVal : bgColor;
   $: bgSize = bgType === 'pattern' ? 'auto' : 'cover';
   $: bgRepeat = bgType === 'pattern' ? 'repeat' : 'no-repeat';
 
-  // Consolidate into a single style string
   $: cssVariables = `
     --primary-color: ${primary};
     --secondary-color: ${secondary};
@@ -85,17 +69,25 @@
 </script>
 
 {#if audio.background_music_url}
-  <audio
-    id="world-bgm"
-    src={audio.background_music_url}
-    loop
-    autoplay
-    class="hidden"
-  ></audio>
+  <audio id="world-bgm" src={audio.background_music_url} loop autoplay class="hidden"></audio>
 {/if}
 
 <div class="layout-container" style={cssVariables}>
   <div class="environmental-bg"></div>
+
+  <nav class="sticky top-0 z-50 border-b border-white/5 backdrop-blur-xl bg-[var(--bg-color)]/80">
+    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <Link href="/worlds" class="font-bold tracking-widest uppercase text-sm opacity-80 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors">
+          Arcane.dev </Link>
+      </div>
+      <div class="flex items-center gap-4 text-sm font-medium">
+        <div class="px-3 py-1 rounded-md bg-white/5 border border-white/10 flex items-center gap-2">
+          <span class="opacity-50">Lvl</span> <span class="text-[var(--accent-color)]">1</span>
+        </div>
+      </div>
+    </div>
+  </nav>
 
   <main class="content-wrapper">
     <slot />
@@ -108,7 +100,7 @@
     background-color: var(--bg-color);
     font-family: var(--font-main);
     color: var(--text-color);
-    transition: background-color 0.8s ease, font-family 0.3s ease;
+    transition: background-color 0.5s ease;
   }
 
   .environmental-bg {
@@ -116,12 +108,13 @@
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.3; /* Adjust based on how heavy your images are */
+    opacity: 0.15; /* Subdued for professional distraction-free reading */
     background-image: var(--env-bg-image);
     background-size: var(--env-bg-size);
     background-repeat: var(--env-bg-repeat);
     background-position: center;
-    transition: background-image 1s ease-in-out;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 100%);
   }
 
   .content-wrapper {
@@ -129,15 +122,13 @@
     z-index: 10;
     max-width: 80rem;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 2rem 1rem 6rem 1rem;
   }
 
-  /* Structural Global Utilities */
   :global(.text-primary) { color: var(--primary-color); }
   :global(.text-accent) { color: var(--accent-color); }
   :global(.bg-primary) { background-color: var(--primary-color); }
 
-  /* The upgraded surface utility now handles border-radius, glassmorphism, and retro borders */
   :global(.bg-surface) {
     background-color: var(--surface-color);
     border-radius: var(--border-radius);
