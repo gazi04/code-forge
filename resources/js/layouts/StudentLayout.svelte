@@ -4,17 +4,33 @@
 
   export let theme = null;
 
+  // --- 1. GLOBAL SYSTEM THEME (Fallback for outside-world pages) ---
+  const GLOBAL = {
+    primary: '#8b5cf6', // System Purple
+    secondary: '#0f172a',
+    accent: '#10b981',
+    background: '#09090b', // Deep Zinc-950 (Guarantees dark mode)
+    surface: '#18181b',    // Zinc-900
+    text: '#f8fafc',
+    font: 'system-ui, sans-serif'
+  };
+
+  // --- 2. DYNAMIC WORLD THEME (Overrides global if inside a world) ---
   $: palette = theme?.config?.palette || {};
   $: ui = theme?.config?.ui || {};
   $: bg = theme?.config?.background || {};
   $: audio = theme?.config?.audio || {};
 
-  $: primary = palette.primary || '#8b5cf6';
-  $: secondary = palette.secondary || '#1e1b4b';
-  $: accent = palette.accent || '#10b981';
-  $: bgColor = palette.background || '#0f172a';
-  $: surface = palette.surface || '#1e293b';
-  $: textColor = palette.text || '#f8fafc';
+  $: isWorldActive = !!theme;
+
+  $: primary = palette.primary || GLOBAL.primary;
+  $: secondary = palette.secondary || GLOBAL.secondary;
+  $: accent = palette.accent || GLOBAL.accent;
+  $: textColor = palette.text || GLOBAL.text;
+
+  // Safe background calculations
+  $: bgColor = palette.background || GLOBAL.background;
+  $: surface = palette.surface || GLOBAL.surface;
 
   const fontStacks = {
     default: 'system-ui, sans-serif',
@@ -23,30 +39,32 @@
     medieval: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
     futuristic: '"Orbitron", "Jura", sans-serif'
   };
-  $: font = fontStacks[ui.font_style] || fontStacks.default;
+  $: font = fontStacks[ui.font_style] || GLOBAL.font;
 
   const radii = { none: '0px', sm: '0.25rem', md: '0.5rem', lg: '1rem', full: '9999px' };
-  $: borderRadius = radii[ui.border_radius] || radii.md;
+  $: borderRadius = isWorldActive ? (radii[ui.border_radius] || radii.md) : radii.md;
 
-  $: cardBorder = ui.card_style === 'bordered' ? `1px solid ${primary}`
-                : ui.card_style === 'pixel' ? `2px solid ${textColor}`
+  $: cardBorder = isWorldActive && ui.card_style === 'bordered' ? `1px solid ${primary}`
+                : isWorldActive && ui.card_style === 'pixel' ? `2px solid ${textColor}`
                 : '1px solid rgba(255,255,255,0.05)';
 
-  $: cardShadow = ui.card_style === 'embossed' ? `inset 2px 2px 5px rgba(255,255,255,0.05), inset -2px -2px 5px rgba(0,0,0,0.5)`
-                : ui.card_style === 'pixel' ? `4px 4px 0px ${primary}`
-                : `0 4px 20px -2px rgba(0, 0, 0, 0.4)`; // Sleeker, darker default shadow
+  $: cardShadow = isWorldActive && ui.card_style === 'embossed' ? `inset 2px 2px 5px rgba(255,255,255,0.05), inset -2px -2px 5px rgba(0,0,0,0.5)`
+                : isWorldActive && ui.card_style === 'pixel' ? `4px 4px 0px ${primary}`
+                : `0 4px 20px -2px rgba(0, 0, 0, 0.4)`;
 
-  $: cardBackdrop = ui.card_style === 'glassy' ? 'blur(16px)' : 'none';
+  $: cardBackdrop = isWorldActive && ui.card_style === 'glassy' ? 'blur(16px)' : 'none';
 
-  $: computedSurfaceBg = ui.card_style === 'glassy'
+  $: computedSurfaceBg = isWorldActive && ui.card_style === 'glassy'
     ? `color-mix(in srgb, ${surface} 60%, transparent)`
     : surface;
 
   $: bgType = bg.style || 'solid';
   $: bgVal = bg.value || '';
   $: isImageUrl = bgType === 'image' || bgType === 'pattern';
-  $: bgImage = isImageUrl ? `url('${bgVal}')` : (bgType === 'gradient' ? bgVal : 'none');
-  $: computedBgColor = bgType === 'solid' ? bgVal : bgColor;
+
+  // Strictly enforce solid dark background if no world theme is active
+  $: computedBgColor = isWorldActive ? (bgType === 'solid' ? bgVal : bgColor) : GLOBAL.background;
+  $: bgImage = isWorldActive && isImageUrl && bgVal ? `url('${bgVal}')` : (isWorldActive && bgType === 'gradient' ? bgVal : 'none');
   $: bgSize = bgType === 'pattern' ? 'auto' : 'cover';
   $: bgRepeat = bgType === 'pattern' ? 'repeat' : 'no-repeat';
 
@@ -73,17 +91,20 @@
 {/if}
 
 <div class="layout-container" style={cssVariables}>
-  <div class="environmental-bg"></div>
+  {#if isWorldActive && bgImage !== 'none'}
+    <div class="environmental-bg"></div>
+  {/if}
 
   <nav class="sticky top-0 z-50 border-b border-white/5 backdrop-blur-xl bg-[var(--bg-color)]/80">
     <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
       <div class="flex items-center gap-6">
         <Link href="/worlds" class="font-bold tracking-widest uppercase text-sm opacity-80 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors">
-          Arcane.dev </Link>
+          Arcane.dev
+        </Link>
       </div>
       <div class="flex items-center gap-4 text-sm font-medium">
         <div class="px-3 py-1 rounded-md bg-white/5 border border-white/10 flex items-center gap-2">
-          <span class="opacity-50">Lvl</span> <span class="text-[var(--accent-color)]">1</span>
+          <span class="opacity-50">System</span> <span class="text-[var(--accent-color)]">Online</span>
         </div>
       </div>
     </div>
@@ -108,7 +129,7 @@
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.15; /* Subdued for professional distraction-free reading */
+    opacity: 0.15;
     background-image: var(--env-bg-image);
     background-size: var(--env-bg-size);
     background-repeat: var(--env-bg-repeat);
