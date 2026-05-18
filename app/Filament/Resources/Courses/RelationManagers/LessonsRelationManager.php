@@ -33,7 +33,7 @@ class LessonsRelationManager extends RelationManager
     {
         return $schema->components([
             Section::make('Lesson Basics')
-                ->columns(1)
+                ->columnSpanFull()
                 ->schema([
                     TextInput::make('name')
                         ->required()
@@ -62,7 +62,7 @@ class LessonsRelationManager extends RelationManager
                 ]),
 
             Section::make('Rewards & Meta')
-                /* ->columnSpan(1) */
+                ->columnSpanFull()
                 ->schema([
                     Toggle::make('is_boss')
                         ->label('Boss Encounter')
