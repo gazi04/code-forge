@@ -1,21 +1,22 @@
 <script>
   import { onMount } from 'svelte';
   import { Link } from '@inertiajs/svelte';
+  import { fade } from 'svelte/transition'; // Required for the crossfade engine
 
   export let theme = null;
 
-  // --- 1. GLOBAL SYSTEM THEME (Fallback for outside-world pages) ---
+  // --- 1. GLOBAL SYSTEM THEME ---
   const GLOBAL = {
-    primary: '#8b5cf6', // System Purple
+    primary: '#8b5cf6',
     secondary: '#0f172a',
     accent: '#10b981',
-    background: '#09090b', // Deep Zinc-950 (Guarantees dark mode)
-    surface: '#18181b',    // Zinc-900
+    background: '#09090b',
+    surface: '#18181b',
     text: '#f8fafc',
     font: 'system-ui, sans-serif'
   };
 
-  // --- 2. DYNAMIC WORLD THEME (Overrides global if inside a world) ---
+  // --- 2. DYNAMIC WORLD THEME ---
   $: palette = theme?.config?.palette || {};
   $: ui = theme?.config?.ui || {};
   $: bg = theme?.config?.background || {};
@@ -28,7 +29,6 @@
   $: accent = palette.accent || GLOBAL.accent;
   $: textColor = palette.text || GLOBAL.text;
 
-  // Safe background calculations
   $: bgColor = palette.background || GLOBAL.background;
   $: surface = palette.surface || GLOBAL.surface;
 
@@ -62,7 +62,6 @@
   $: bgVal = bg.value || '';
   $: isImageUrl = bgType === 'image' || bgType === 'pattern';
 
-  // Strictly enforce solid dark background if no world theme is active
   $: computedBgColor = isWorldActive ? (bgType === 'solid' ? bgVal : bgColor) : GLOBAL.background;
   $: bgImage = isWorldActive && isImageUrl && bgVal ? `url('${bgVal}')` : (isWorldActive && bgType === 'gradient' ? bgVal : 'none');
   $: bgSize = bgType === 'pattern' ? 'auto' : 'cover';
@@ -80,7 +79,6 @@
     --card-border: ${cardBorder};
     --card-shadow: ${cardShadow};
     --card-backdrop: ${cardBackdrop};
-    --env-bg-image: ${bgImage};
     --env-bg-size: ${bgSize};
     --env-bg-repeat: ${bgRepeat};
   `;
@@ -91,11 +89,17 @@
 {/if}
 
 <div class="layout-container" style={cssVariables}>
+
   {#if isWorldActive && bgImage !== 'none'}
-    <div class="environmental-bg"></div>
+    {#key bgImage}
+      <div class="environmental-bg"
+           style="background-image: {bgImage};"
+           transition:fade={{ duration: 1000 }}>
+      </div>
+    {/key}
   {/if}
 
-  <nav class="sticky top-0 z-50 border-b border-white/5 backdrop-blur-xl bg-[var(--bg-color)]/80">
+  <nav class="sticky top-0 z-50 border-b border-white/10 bg-black/60 backdrop-blur-2xl text-white transition-colors duration-500">
     <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
       <div class="flex items-center gap-6">
         <Link href="/worlds" class="font-bold tracking-widest uppercase text-sm opacity-80 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors">
@@ -104,14 +108,18 @@
       </div>
       <div class="flex items-center gap-4 text-sm font-medium">
         <div class="px-3 py-1 rounded-md bg-white/5 border border-white/10 flex items-center gap-2">
-          <span class="opacity-50">System</span> <span class="text-[var(--accent-color)]">Online</span>
+          <span class="opacity-50">System</span> <span class="text-[var(--accent-color)] transition-colors duration-500">Online</span>
         </div>
       </div>
     </div>
   </nav>
 
   <main class="content-wrapper">
-    <slot />
+    {#key isWorldActive}
+      <div in:fade={{ duration: 400, delay: 150 }} out:fade={{ duration: 300 }}>
+        <slot />
+      </div>
+    {/key}
   </main>
 </div>
 
@@ -121,7 +129,8 @@
     background-color: var(--bg-color);
     font-family: var(--font-main);
     color: var(--text-color);
-    transition: background-color 0.5s ease;
+    transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .environmental-bg {
@@ -130,7 +139,6 @@
     z-index: 0;
     pointer-events: none;
     opacity: 0.15;
-    background-image: var(--env-bg-image);
     background-size: var(--env-bg-size);
     background-repeat: var(--env-bg-repeat);
     background-position: center;
@@ -146,9 +154,19 @@
     padding: 2rem 1rem 6rem 1rem;
   }
 
-  :global(.text-primary) { color: var(--primary-color); }
-  :global(.text-accent) { color: var(--accent-color); }
-  :global(.bg-primary) { background-color: var(--primary-color); }
+  /* Structural classes universally tied to an 0.8s ease to prevent shape/color snapping */
+  :global(.text-primary) {
+    color: var(--primary-color);
+    transition: color 0.8s ease;
+  }
+  :global(.text-accent) {
+    color: var(--accent-color);
+    transition: color 0.8s ease;
+  }
+  :global(.bg-primary) {
+    background-color: var(--primary-color);
+    transition: background-color 0.8s ease;
+  }
 
   :global(.bg-surface) {
     background-color: var(--surface-color);
@@ -157,5 +175,6 @@
     box-shadow: var(--card-shadow);
     backdrop-filter: var(--card-backdrop);
     -webkit-backdrop-filter: var(--card-backdrop);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 </style>

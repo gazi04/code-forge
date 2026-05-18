@@ -22,7 +22,7 @@
         {@const cardColor = world.theme?.config?.palette?.primary || '#8b5cf6'}
 
         <Link href="/worlds/{world.slug}"
-              class="group relative flex flex-col h-[280px] bg-[#18181b] rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]"
+              class="group relative flex flex-col h-[280px] bg-[#18181b] rounded-2xl overflow-hidden border border-white/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]"
               style="--hover-color: {cardColor};">
 
           <div class="absolute top-0 left-0 right-0 h-1 bg-white/10 group-hover:bg-[var(--hover-color)] transition-colors duration-500"></div>
@@ -31,10 +31,9 @@
                style="background: radial-gradient(circle at 50% 0%, var(--hover-color) 0%, transparent 60%);"></div>
 
           <div class="p-8 flex flex-col h-full relative z-10">
-
             <div class="flex justify-between items-start mb-6">
-              <div class="w-12 h-12 rounded-xl bg-black/40 border border-white/10 flex items-center justify-center shadow-inner group-hover:border-[var(--hover-color)]/50 transition-colors">
-                <span class="text-xl opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all drop-shadow-[0_0_8px_var(--hover-color)]">
+              <div class="w-12 h-12 rounded-xl bg-black/40 border border-white/10 flex items-center justify-center shadow-inner group-hover:border-[var(--hover-color)]/50 transition-colors duration-500">
+                <span class="text-xl opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 drop-shadow-[0_0_8px_var(--hover-color)]">
                   {world.icon || '🌌'}
                 </span>
               </div>
@@ -44,7 +43,7 @@
               </div>
             </div>
 
-            <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-[var(--hover-color)] transition-colors">
+            <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-[var(--hover-color)] transition-colors duration-500">
               {world.name}
             </h2>
             <p class="text-sm text-white/40 leading-relaxed line-clamp-3">
