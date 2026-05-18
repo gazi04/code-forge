@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Lessons\Schemas;
 
 use Filament\Forms\Components\Builder;
-use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -32,7 +32,7 @@ class LessonForm
                                     Builder\Block::make('narrative')
                                         ->icon('heroicon-o-book-open')
                                         ->schema([
-                                            RichEditor::make('content')
+                                            MarkdownEditor::make('content')
                                                 ->label('Story/Instruction')
                                                 ->extraInputAttributes(['style' => 'min-height: 400px'])
                                                 ->required(),

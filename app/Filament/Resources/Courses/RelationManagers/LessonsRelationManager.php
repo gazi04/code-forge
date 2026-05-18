@@ -12,11 +12,10 @@ use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\CodeEditor;
-use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -49,7 +48,7 @@ class LessonsRelationManager extends RelationManager
                         ->blocks([
                             Builder\Block::make('text_content')
                                 ->schema([
-                                    RichEditor::make('content')->required(),
+                                    MarkdownEditor::make('content')->required(),
                                 ]),
                             Builder\Block::make('code_challenge')
                                 ->schema([
