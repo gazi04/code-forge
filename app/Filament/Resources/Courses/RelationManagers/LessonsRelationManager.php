@@ -13,6 +13,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\CodeEditor;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -46,18 +47,23 @@ class LessonsRelationManager extends RelationManager
                     // The "Core Architectural Decision": The Blocks Builder
                     Builder::make('blocks')
                         ->blocks([
-                            Builder\Block::make('text_content')
+                            Builder\Block::make('narrative')
+                                ->icon('heroicon-o-book-open')
                                 ->schema([
-                                    MarkdownEditor::make('content')->required(),
+                                    MarkdownEditor::make('content')
+                                        ->label('Story/Instruction')
+                                        ->required(),
                                 ]),
                             Builder\Block::make('code_challenge')
+                                ->icon('heroicon-o-code-bracket')
                                 ->schema([
-                                    TextInput::make('language')->default('python'),
-                                    CodeEditor::make('initial_code'),
+                                    TextInput::make('language')->default('javascript'),
+                                    Textarea::make('instruction')->rows(10),
                                 ]),
                         ])
-                        ->columnSpanFull()
-                        ->collapsible(),
+                        ->collapsible()
+                        ->cloneable()
+                        ->columnSpanFull(),
                 ]),
 
             Section::make('Rewards & Meta')
