@@ -34,7 +34,6 @@ class LessonForm
                                         ->schema([
                                             MarkdownEditor::make('content')
                                                 ->label('Story/Instruction')
-                                                ->extraInputAttributes(['style' => 'min-height: 400px'])
                                                 ->required(),
                                         ]),
                                     Builder\Block::make('code_challenge')
