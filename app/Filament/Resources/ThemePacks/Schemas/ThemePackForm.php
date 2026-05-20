@@ -145,7 +145,7 @@ class ThemePackForm
                     Repeater::make('config.sprites')
                         ->label('Sprites')
                         ->addActionLabel('Add sprite')
-                        ->minItems(1)
+                        ->minItems(0)
                         ->maxItems(8)
                         ->collapsible()
                         ->itemLabel(fn (array $state) => $state['name'] ?? 'Unnamed sprite')
