@@ -48,7 +48,7 @@
               </div>
 
               <div class="flex-1 {isBranching ? '' : 'ml-2'}">
-                <h3 class="font-bold text-lg text-[var(--text-color)] opacity-90 group-hover:opacity-100 transition-opacity leading-tight">{lesson.title}</h3>
+                <h3 class="font-bold text-lg text-[var(--text-color)] opacity-90 group-hover:opacity-100 transition-opacity leading-tight">{lesson.name}</h3>
                 <div class="text-xs font-mono text-[var(--text-color)] opacity-40 mt-1 uppercase tracking-wider">Quest Active</div>
               </div>
             </Link>
