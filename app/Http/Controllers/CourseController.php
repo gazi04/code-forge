@@ -14,7 +14,7 @@ class CourseController extends Controller
             ->with([
                 'world.themePack',
                 'lessons' => function ($query) {
-                    $query->orderBy('order_column', 'asc');
+                    $query->orderBy('sort_order', 'asc');
                 }
             ])
             ->firstOrFail();
