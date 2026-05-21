@@ -11,7 +11,7 @@ use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 
 #[Table('courses')]
-#[Fillable(['world_id', 'name', 'slug', 'description', 'age_tier', 'difficulty', 'estimated_duration', 'prerequisite_course_id', 'order', 'sort_order', 'is_published'])]
+#[Fillable(['world_id', 'name', 'slug', 'description', 'age_tier', 'difficulty', 'estimated_duration', 'prerequisite_course_id', 'is_published'])]
 class Course extends Model implements Sortable
 {
     use SortableTrait;
@@ -35,7 +35,7 @@ class Course extends Model implements Sortable
 
     public function lessons(): HasMany
     {
-        return $this->hasMany(Lesson::class)->orderBy('order');
+        return $this->hasMany(Lesson::class)->orderBy('sort_order');
     }
 
     public function prerequisite(): BelongsTo
