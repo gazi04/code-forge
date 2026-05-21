@@ -17,7 +17,7 @@
 <Layout {theme}>
   <header class="sticky top-14 z-40 -mx-4 px-4 py-4 mb-8 backdrop-blur-md bg-[color-mix(in_srgb,var(--bg-color)_90%,transparent)] border-b border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors duration-800">
     <div class="flex items-center gap-4">
-      <Link href="/courses/{course_slug}" class="w-10 h-10 rounded-md bg-surface flex items-center justify-center border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-inner hover:border-[var(--primary-color)] transition-colors group">
+      <Link href="/course/{course_slug}" class="w-10 h-10 rounded-md bg-surface flex items-center justify-center border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-inner hover:border-[var(--primary-color)] transition-colors group">
         <span class="text-xl group-hover:scale-110 transition-transform">↩️</span>
       </Link>
       <div>
@@ -81,7 +81,7 @@
         </Link>
       {:else}
         <Link
-          href="/courses/{course_slug}"
+          href="/course/{course_slug}"
           class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-sm font-black uppercase tracking-widest text-zinc-950 shadow-[0_4px_25px_rgba(245,158,11,0.4)] hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center gap-2 border border-amber-300 animate-pulse"
         >
           🏆 Finish Quest
