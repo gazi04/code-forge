@@ -133,7 +133,7 @@ class ThemePackForm
                         ->options([
                             'linear' => 'Linear path',
                             'branching' => 'Branching',
-                            'hub_spoke' => 'Hub and spoke',
+                            'road' => 'Road',
                         ])
                         ->helperText('Worlds using this theme default to this layout. Overrideable per world.'),
                 ]),
