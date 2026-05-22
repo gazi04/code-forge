@@ -31,7 +31,7 @@ class LessonForm
                                 ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
                             Builder::make('blocks')
                                 ->blocks([
-                                    Builder\Block::make('narrative')
+                                    Builder\Block::make('text_content')
                                         ->icon('heroicon-o-book-open')
                                         ->schema([
                                             MarkdownEditor::make('content')

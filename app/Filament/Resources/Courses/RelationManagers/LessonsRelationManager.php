@@ -49,7 +49,7 @@ class LessonsRelationManager extends RelationManager
                     // The "Core Architectural Decision": The Blocks Builder
                     Builder::make('blocks')
                         ->blocks([
-                            Builder\Block::make('narrative')
+                            Builder\Block::make('text_content')
                                 ->icon('heroicon-o-book-open')
                                 ->schema([
                                     MarkdownEditor::make('content')
