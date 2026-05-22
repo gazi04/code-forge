@@ -11,10 +11,8 @@
 
   let testResults = $state(data.test_cases?.map(tc => ({ ...tc, passed: null })) || []);
 
-  // 1. Initialize Pyodide on component mount
   onMount(async () => {
     if (data.language === 'python') {
-      // Dynamically load the Pyodide script
       const script = document.createElement('script');
       script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
       script.onload = async () => {
@@ -23,59 +21,60 @@
       };
       document.head.appendChild(script);
     } else {
-      pyodideReady = true; // For JS, it's natively ready
+      pyodideReady = true;
     }
   });
 
-  // 2. The Execution Engine
   async function runCode() {
     isExecuting = true;
-    terminalOutput = '> Initializing spell sequence...\n';
+    terminalOutput = '> Initializing validation sequence...\n\n';
 
     if (data.language === 'python') {
-      try {
-        // Redirect Python's stdout (print statements) to our JavaScript variable
-        pyodideInstance.runPython(`
-          import sys
-          import io
-          sys.stdout = io.StringIO()
-        `);
+      let allTestsPassed = true;
 
-        // Run the student's code
-        await pyodideInstance.runPythonAsync(userCode);
+      for (let i = 0; i < testResults.length; i++) {
+        const test = testResults[i];
 
-        // Fetch the captured output
-        let rawOutput = pyodideInstance.runPython("sys.stdout.getvalue()");
-        terminalOutput += rawOutput;
+        try {
+          pyodideInstance.runPython(`
+            import sys
+            import io
+            sys.stdout = io.StringIO()
+          `);
 
-        // Run against test cases
-        validateTestCases(rawOutput.trim());
+          const scriptToRun = `${userCode}\n\n${test.setup_code || ''}`;
 
-      } catch (err) {
-        terminalOutput += `\n[ERROR]: ${err.message}`;
+          await pyodideInstance.runPythonAsync(scriptToRun);
+
+          let actualOutput = pyodideInstance.runPython("sys.stdout.getvalue()").trim();
+
+          const expected = test.expected_output.trim();
+          const passed = actualOutput === expected;
+
+          testResults[i].passed = passed;
+
+          if (passed) {
+            terminalOutput += `✅ [${test.name}]: Passed! (Captured: "${actualOutput}")\n`;
+          } else {
+            allTestsPassed = false;
+            terminalOutput += `❌ [${test.name}]: Failed.\n   Expected: "${expected}"\n   Got: "${actualOutput}"\n`;
+          }
+
+        } catch (err) {
+          allTestsPassed = false;
+          testResults[i].passed = false;
+          terminalOutput += `💥 [${test.name}] Runtime Error: ${err.message}\n`;
+        }
+      }
+
+      if (allTestsPassed && testResults.length > 0) {
+        terminalOutput += '\n✨ QUEST COMPLETE! All validations passed. ✨';
+      } else {
+        terminalOutput += '\n❌ Some objectives have failed. Adjust your scrolls and try again.';
       }
     }
 
     isExecuting = false;
-  }
-
-  // 3. Validation Logic
-  function validateTestCases(actualOutput) {
-    let allPassed = true;
-
-    testResults = testResults.map(test => {
-      // In a real scenario, you might run test.setup_code here.
-      // For this MVP, we just check if their output matches expected output.
-      const passed = actualOutput === test.expected_output.trim();
-      if (!passed) allPassed = false;
-
-      return { ...test, passed };
-    });
-
-    if (allPassed && testResults.length > 0) {
-      terminalOutput += '\n\n✨ QUEST COMPLETE! All validations passed. ✨';
-      // Here you could trigger an event to unlock the "Advance" button
-    }
   }
 </script>
 
