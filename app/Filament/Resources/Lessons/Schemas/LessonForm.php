@@ -26,7 +26,7 @@ class LessonForm
                             ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
 
                         Builder::make('blocks')->blocks(LessonBlocks::all())
-                            ->collapsible()
+                            ->collapsed(true)
                             ->cloneable()
                             ->columnSpanFull(),
                     ]),

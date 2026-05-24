@@ -43,7 +43,7 @@ class LessonsRelationManager extends RelationManager
                         ->unique('lessons', 'slug', ignoreRecord: true),
 
                     Builder::make('blocks')->blocks(LessonBlocks::all())
-                        ->collapsible()
+                        ->collapsed(true)
                         ->cloneable()
                         ->columnSpanFull(),
                 ]),
