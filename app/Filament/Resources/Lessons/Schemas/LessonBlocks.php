@@ -184,6 +184,64 @@ class LessonBlocks
             ]);
     }
 
+    public static function sortingChallenge(): Builder\Block
+    {
+        return Builder\Block::make('sequence_challenge')
+            ->label('Universal Sequence Challenge')
+            ->icon('heroicon-o-bars-arrow-down')
+            ->schema([
+                Grid::make(2)->schema([
+                    TextInput::make('game_title')
+                        ->label('Game Title / Context')
+                        ->default('The Magic Alignment')
+                        ->required(),
+
+                    TextInput::make('game_icon')
+                        ->label('Display Emoji Icon')
+                        ->default('📜')
+                        ->placeholder('e.g., 🧪, ⚔️, 🪵')
+                        ->required(),
+                ]),
+
+                Textarea::make('instructions')
+                    ->label('Instructions for Students')
+                    ->default('Arrange the components below into the correct logical order.')
+                    ->rows(2)
+                    ->required(),
+
+                Toggle::make('is_required')
+                    ->label('Mandatory Encounter')
+                    ->default(false),
+
+                // The Core Engine Data: Admin inputs the items in perfect sequential order
+                Repeater::make('correct_sequence')
+                    ->label('Correct Sequence Layout')
+                    ->helperText('Add items in their exact CORRECT order. The engine will automatically shuffle them for students.')
+                    ->schema([
+                        TextInput::make('value')
+                            ->label('Line / Item Value')
+                            ->required(),
+                    ])
+                    ->minItems(2)
+                    ->createItemButtonLabel('Add Sequence Step')
+                    ->columnSpanFull(),
+
+                Grid::make(2)->schema([
+                    TextInput::make('xp_reward')
+                        ->label('Bonus XP')
+                        ->numeric()
+                        ->default(120)
+                        ->prefix('✨'),
+
+                    TextInput::make('coin_reward')
+                        ->label('Bonus Coins')
+                        ->numeric()
+                        ->default(60)
+                        ->prefix('💰'),
+                ]),
+            ]);
+    }
+
     public static function all(): array
     {
         return [
@@ -191,6 +249,7 @@ class LessonBlocks
             static::codeChallenge(),
             static::quiz(),
             static::labyrinthGame(),
+            static::sortingChallenge(),
         ];
     }
 }
