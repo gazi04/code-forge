@@ -242,6 +242,97 @@ class LessonBlocks
             ]);
     }
 
+    public static function bugHunting(): Builder\Block
+    {
+        return Builder\Block::make('bughunt_challenge')
+            ->label('Bug Hunt (Code Debugger)')
+            ->icon('heroicon-o-bug-ant')
+            ->schema([
+                Grid::make(2)->schema([
+                    TextInput::make('game_title')
+                        ->label('Game Title / Context')
+                        ->default('The Corrupted Spellbook')
+                        ->required(),
+
+                    TextInput::make('game_icon')
+                        ->label('Display Emoji Icon')
+                        ->default('🐛')
+                        ->placeholder('e.g., 🐛, ⚡, 🛑')
+                        ->required(),
+                ]),
+
+                Textarea::make('instructions')
+                    ->label('Instructions for Students')
+                    ->default('Analyze the code block below. Click on lines containing syntax or logical errors, then select the proper fix.')
+                    ->rows(2)
+                    ->required(),
+
+                Toggle::make('is_required')
+                    ->label('Mandatory Encounter')
+                    ->default(false),
+
+                // Core Engine: Line-by-line editor interface
+                Repeater::make('code_lines')
+                    ->label('Code Snippet Configuration')
+                    ->helperText('Build the code line-by-line. Mark broken lines as "Buggy Line" to set up choice selections.')
+                    ->schema([
+                        Grid::make(3)->schema([
+                            Select::make('type')
+                                ->options([
+                                    'clean' => '🟢 Clean Line',
+                                    'buggy' => '🔴 Buggy Line',
+                                ])
+                                ->default('clean')
+                                ->required()
+                                ->reactive(),
+
+                            TextInput::make('displayed_text')
+                                ->label('Initial Code Line Text')
+                                ->helperText('The line exactly as it appears to the student initially.')
+                                ->required()
+                                ->columnSpan(2),
+                        ]),
+
+                        Grid::make(3)->schema([
+                            TextInput::make('correct_text')
+                                ->label('Correct Replacement Text')
+                                ->helperText('The absolute correct string matching the fix.')
+                                ->required()
+                                ->hidden(fn (callable $get) => $get('type') !== 'buggy'),
+
+                            TextInput::make('decoy_1')
+                                ->label('Decoy Option 1')
+                                ->helperText('Wrong alternative choice.')
+                                ->required()
+                                ->hidden(fn (callable $get) => $get('type') !== 'buggy'),
+
+                            TextInput::make('decoy_2')
+                                ->label('Decoy Option 2')
+                                ->helperText('Wrong alternative choice.')
+                                ->required()
+                                ->hidden(fn (callable $get) => $get('type') !== 'buggy'),
+                        ]),
+                    ])
+                    ->createItemButtonLabel('Add Code Line')
+                    ->minItems(1)
+                    ->columnSpanFull(),
+
+                Grid::make(2)->schema([
+                    TextInput::make('xp_reward')
+                        ->label('Bonus XP')
+                        ->numeric()
+                        ->default(130)
+                        ->prefix('✨'),
+
+                    TextInput::make('coin_reward')
+                        ->label('Bonus Coins')
+                        ->numeric()
+                        ->default(65)
+                        ->prefix('💰'),
+                ]),
+            ]);
+    }
+
     public static function all(): array
     {
         return [
@@ -250,6 +341,7 @@ class LessonBlocks
             static::quiz(),
             static::labyrinthGame(),
             static::sortingChallenge(),
+            static::bugHunting(),
         ];
     }
 }

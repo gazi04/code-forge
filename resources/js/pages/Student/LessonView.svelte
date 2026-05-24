@@ -5,6 +5,7 @@
   import QuizBlock from '../../components/Blocks/QuizBlock.svelte';
   import TextBlock from '../../components/Blocks/TextBlock.svelte';
   import SequenceBlock from '../../components/Blocks/SequenceBlock.svelte';
+  import BugHuntBlock from '../../components/Blocks/BugHuntBlock.svelte';
   import Layout from '../../layouts/StudentLayout.svelte';
 
   export let lesson;
@@ -20,6 +21,7 @@
       quiz: QuizBlock,
       labyrinth_challenge: LabyrinthBlock,
       sequence_challenge: SequenceBlock,
+      bughunt_challenge: BugHuntBlock,
   };
   $: blocks = actualLesson?.blocks || [];
 </script>
