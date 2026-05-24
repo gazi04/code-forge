@@ -1,6 +1,6 @@
 <script>
-  import Layout from '../../layouts/StudentLayout.svelte';
   import { Link } from '@inertiajs/svelte';
+  import Layout from '../../layouts/StudentLayout.svelte';
 
   export let world;
   $: worldData = world.data ?? world;

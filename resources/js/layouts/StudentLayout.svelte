@@ -1,6 +1,6 @@
 <script>
-  import { onMount } from 'svelte';
   import { Link } from '@inertiajs/svelte';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition'; // Required for the crossfade engine
 
   export let theme = null;

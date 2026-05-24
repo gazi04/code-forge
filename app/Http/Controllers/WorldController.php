@@ -13,7 +13,7 @@ class WorldController extends Controller
         $worlds = World::with('themePack', 'courses')->get();
 
         return Inertia::render('Student/WorldMap', [
-            'worlds' => WorldResource::collection($worlds)
+            'worlds' => WorldResource::collection($worlds),
         ]);
     }
 
@@ -23,7 +23,7 @@ class WorldController extends Controller
         $world->load(['themePack', 'courses']);
 
         return Inertia::render('Student/WorldDetail', [
-            'world' => new WorldResource($world)
+            'world' => new WorldResource($world),
         ]);
     }
 }

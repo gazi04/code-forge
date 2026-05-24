@@ -16,7 +16,7 @@ class LessonForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema ->components([
+        return $schema->components([
             Grid::make(1)->schema([
                 Section::make('Lesson Content')
                     ->schema([

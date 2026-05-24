@@ -83,7 +83,7 @@ class LessonsRelationManager extends RelationManager
             ->defaultSort('sort_order')
             ->columns([
                 TextColumn::make('name')
-                    ->description(fn($record) => $record->is_boss ? '🔥 Boss Level' : null),
+                    ->description(fn ($record) => $record->is_boss ? '🔥 Boss Level' : null),
 
                 TextColumn::make('xp_reward')
                     ->label('XP')
