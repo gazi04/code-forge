@@ -1,8 +1,9 @@
 <script>
   import { Link } from '@inertiajs/svelte';
-  import TextBlock from '../../components/Blocks/TextBlock.svelte';
+  import LabyrinthBlock from '../../components/Blocks/LabyrinthBlock.svelte';
   import CodeChallengeBlock from '../../components/Blocks/CodeChallengeBlock.svelte';
   import QuizBlock from '../../components/Blocks/QuizBlock.svelte';
+  import TextBlock from '../../components/Blocks/TextBlock.svelte';
   import Layout from '../../layouts/StudentLayout.svelte';
 
   export let lesson;
@@ -15,7 +16,8 @@
   const blockRegistry = {
       text_content: TextBlock,
       code_challenge: CodeChallengeBlock,
-      quiz: QuizBlock
+      quiz: QuizBlock,
+      labyrinth_challenge: LabyrinthBlock
   };
   $: blocks = actualLesson?.blocks || [];
 </script>

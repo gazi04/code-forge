@@ -137,12 +137,60 @@ class LessonBlocks
             ]);
     }
 
+    public static function labyrinthGame(): Builder\Block
+    {
+        return Builder\Block::make('labyrinth_challenge')
+            ->label('Labyrinth of Logic (Grid Challenge)')
+            ->icon('heroicon-o-map')
+            ->schema([
+                Grid::make(2)->schema([
+                    Toggle::make('is_required')
+                        ->label('Mandatory Encounter')
+                        ->default(false),
+
+                    TextInput::make('max_commands')
+                        ->label('Max Command Limit')
+                        ->helperText('Leave empty for unlimited. Setting a limit forces efficient code!')
+                        ->numeric(),
+                ]),
+
+                Textarea::make('map_layout')
+                    ->label('Dungeon Grid Map Layout')
+                    ->helperText('Draw your map! S = Start, E = End, # = Wall, . = Path. Separate rows with lines.')
+                    ->rows(6)
+                    ->default(
+                        "S . . # .\n" .
+                            "# # . # .\n" .
+                            ". . . . .\n" .
+                            ". # # # .\n" .
+                            ". . . . E"
+                    )
+                    ->required()
+                    ->columnSpanFull(),
+
+                Grid::make(2)->schema([
+                    TextInput::make('xp_reward')
+                        ->label('Bonus XP')
+                        ->numeric()
+                        ->default(150)
+                        ->prefix('✨'),
+
+                    TextInput::make('coin_reward')
+                        ->label('Bonus Coins')
+                        ->numeric()
+                        ->default(75)
+                        ->prefix('💰'),
+                ]),
+            ]);
+    }
+
     public static function all(): array
     {
         return [
             static::textContent(),
             static::codeChallenge(),
             static::quiz(),
+            static::labyrinthGame(),
         ];
     }
 }
