@@ -127,6 +127,18 @@ class ThemePackForm
                             'futuristic' => 'Futuristic',
                         ]),
 
+                    Select::make('config.ui.course_layout')
+                        ->label('World Map Navigation Grid Layout')
+                        ->required()
+                        ->options([
+                            'grid' => '🎴 Tactical Grid (Multi-Column Blocks)',
+                            'carousel' => '🎠 Story Archive (Horizontal Scroll Carousel)',
+                            'asymmetrical' => '🗺️ Adventure Path (Alternating Trail Map)',
+                            'cinematic' => '🎬 Cinematic Focus (Full-Page Scroll Snap)',
+                        ])
+                        ->default('grid')
+                        ->helperText('Worlds using this theme default to this layout. Determines how courses are visually presented to the student.'),
+
                     Select::make('config.ui.map_layout')
                         ->label('Default map layout')
                         ->required()
