@@ -333,6 +333,72 @@ class LessonBlocks
             ]);
     }
 
+    public static function variableMatching(): Builder\Block
+    {
+        return Builder\Block::make('variable_matching_challenge')
+            ->label('Variable Matching (Pair Connector)')
+            ->icon('heroicon-o-link')
+            ->schema([
+                Grid::make(2)->schema([
+                    TextInput::make('game_title')
+                        ->label('Game Title / Context')
+                        ->default('The Core Matrix Linkage')
+                        ->required(),
+
+                    TextInput::make('game_icon')
+                        ->label('Display Emoji Icon')
+                        ->default('🔗')
+                        ->placeholder('e.g., 🔗, 🧪, 🔮')
+                        ->required(),
+                ]),
+
+                Textarea::make('instructions')
+                    ->label('Instructions for Students')
+                    ->default('Connect each entity on the left side with its corresponding counterpart on the right side.')
+                    ->rows(2)
+                    ->required(),
+
+                Toggle::make('is_required')
+                    ->label('Mandatory Encounter')
+                    ->default(false),
+
+                // Core Engine Schema: Defines the explicit matching bonds
+                Repeater::make('pairs')
+                    ->label('Define Association Pairs')
+                    ->helperText('Input pairs exactly as they should correspond. The engine will automatically isolate and scramble both columns for the user.')
+                    ->schema([
+                        Grid::make(2)->schema([
+                            TextInput::make('left_item')
+                                ->label('Left Key Entity')
+                                ->placeholder('e.g., standard_price or 80')
+                                ->required(),
+
+                            TextInput::make('right_item')
+                                ->label('Right Match Partner')
+                                ->placeholder('e.g., Float or HTTP Success')
+                                ->required(),
+                        ]),
+                    ])
+                    ->minItems(2)
+                    ->createItemButtonLabel('Add New Correlation Pair')
+                    ->columnSpanFull(),
+
+                Grid::make(2)->schema([
+                    TextInput::make('xp_reward')
+                        ->label('Bonus XP')
+                        ->numeric()
+                        ->default(110)
+                        ->prefix('✨'),
+
+                    TextInput::make('coin_reward')
+                        ->label('Bonus Coins')
+                        ->numeric()
+                        ->default(55)
+                        ->prefix('💰'),
+                ]),
+            ]);
+    }
+
     public static function all(): array
     {
         return [
@@ -342,6 +408,7 @@ class LessonBlocks
             static::labyrinthGame(),
             static::sortingChallenge(),
             static::bugHunting(),
+            static::variableMatching(),
         ];
     }
 }

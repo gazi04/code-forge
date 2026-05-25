@@ -6,6 +6,7 @@
   import TextBlock from '../../components/Blocks/TextBlock.svelte';
   import SequenceBlock from '../../components/Blocks/SequenceBlock.svelte';
   import BugHuntBlock from '../../components/Blocks/BugHuntBlock.svelte';
+  import VariableMatchingBlock from '../../components/Blocks/VariableMatchingBlock.svelte';
   import Layout from '../../layouts/StudentLayout.svelte';
 
   export let lesson;
@@ -22,6 +23,7 @@
       labyrinth_challenge: LabyrinthBlock,
       sequence_challenge: SequenceBlock,
       bughunt_challenge: BugHuntBlock,
+      variable_matching_challenge: VariableMatchingBlock
   };
   $: blocks = actualLesson?.blocks || [];
 </script>
