@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Lessons\Schemas;
 
+use App\Filament\Forms\Components\DungeonGridBuilder;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\CodeEditor;
 use Filament\Forms\Components\MarkdownEditor;
@@ -154,18 +155,8 @@ class LessonBlocks
                         ->numeric(),
                 ]),
 
-                Textarea::make('map_layout')
-                    ->label('Dungeon Grid Map Layout')
-                    ->helperText('Draw your map! S = Start, E = End, # = Wall, . = Path. Separate rows with lines.')
-                    ->rows(6)
-                    ->default(
-                        "S . . # .\n" .
-                            "# # . # .\n" .
-                            ". . . . .\n" .
-                            ". # # # .\n" .
-                            ". . . . E"
-                    )
-                    ->required()
+                DungeonGridBuilder::make('map_layout')
+                    ->label('Dungeon Grid Map Canvas Workbench')
                     ->columnSpanFull(),
 
                 Grid::make(2)->schema([
