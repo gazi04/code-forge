@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\WorldResource;
 use App\Models\Course;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 
 class CourseController extends Controller
 {
+    use AuthorizesRequests;
+
     public function show($slug)
     {
         $course = Course::where('slug', $slug)
@@ -18,6 +21,8 @@ class CourseController extends Controller
                 },
             ])
             ->firstOrFail();
+
+        $this->authorize('view', $course);
 
         return Inertia::render('Student/CourseDetail', [
             'course' => $course,
