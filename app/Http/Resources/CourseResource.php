@@ -19,6 +19,7 @@ class CourseResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
+            'min_level_requirement' => $this->min_level_requirement,
             'lessons' => LessonResource::collection($this->whenLoaded('lessons')),
         ];
     }

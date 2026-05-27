@@ -11,7 +11,7 @@ use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 
 #[Table('courses')]
-#[Fillable(['world_id', 'name', 'slug', 'description', 'age_tier', 'difficulty', 'estimated_duration', 'prerequisite_course_id', 'is_published'])]
+#[Fillable(['world_id', 'name', 'slug', 'description', 'age_tier', 'difficulty', 'min_level_requirement', 'estimated_duration', 'prerequisite_course_id', 'is_published'])]
 class Course extends Model implements Sortable
 {
     use SortableTrait;

@@ -42,6 +42,13 @@ class CourseForm
                         ->required()
                         ->label('Difficulty (1-5)')
                         ->native(false),
+
+                    TextInput::make('min_level_requirement')
+                        ->label('Min Level Requirement')
+                        ->numeric()
+                        ->minValue(1)
+                        ->default(1)
+                        ->required(),
                 ]),
 
             Section::make('Configuration')
