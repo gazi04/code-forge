@@ -2,20 +2,15 @@
 
 namespace App\Filament\Resources\Worlds\RelationManagers;
 
+use App\Filament\Resources\Courses\Schemas\CourseForm;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class CoursesRelationManager extends RelationManager
 {
@@ -23,46 +18,7 @@ class CoursesRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-
-                TextInput::make('slug')
-                    ->required()
-                    ->unique('courses', 'slug', ignoreRecord: true),
-
-                Select::make('age_tier')
-                    ->options([
-                        'explorer' => 'Explorer',
-                        'builder' => 'Builder',
-                        'coder' => 'Coder',
-                    ])
-                    ->required(),
-
-                Select::make('difficulty')
-                    ->options(array_combine(range(1, 5), range(1, 5)))
-                    ->required()
-                    ->label('Difficulty (1-5)'),
-
-                TextInput::make('estimated_duration')
-                    ->numeric()
-                    ->label('Duration (minutes)')
-                    ->required(),
-
-                Select::make('prerequisite_course_id')
-                    ->relationship('prerequisite', 'name')
-                    ->placeholder('None'),
-
-                Textarea::make('description')
-                    ->columnSpanFull(),
-
-                Toggle::make('is_published')
-                    ->label('Published')
-                    ->default(false),
-            ]);
+        return CourseForm::configure($schema);
     }
 
     public function table(Table $table): Table
