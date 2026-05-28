@@ -126,13 +126,15 @@ class ActivitiesRelationManager extends RelationManager
                     TextEntry::make('created_at')
                         ->label('Timestamp')
                         ->dateTime(),
-                ]),
+                ])
+                ->columnSpanFull(),
 
             TextEntry::make('description')
                 ->columnSpanFull(),
 
             Section::make('State Changes (Old → New)')
                 ->description('Exact property-level diff captured at execution time.')
+                ->columnSpanFull()
                 ->schema([
                     // Pointed directly to your custom attribute_changes column
                     TextEntry::make('attribute_changes')
