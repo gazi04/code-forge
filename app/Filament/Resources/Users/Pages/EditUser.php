@@ -42,7 +42,7 @@ class EditUser extends EditRecord
                         ])
                     ->log('Account progression parameters manually forced to defaults by Administrator.');
 
-                    $this->record->update([
+                    $this->record->updateQuietly([
                         'level' => 1,
                         'xp' => 0,
                         'coins' => 0,
