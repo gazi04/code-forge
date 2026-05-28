@@ -28,12 +28,17 @@ class EditUser extends EditRecord
                         ->performedOn($this->record)
                         ->causedBy(auth()->user())
                         ->event('admin.reset')
-                        ->withProperties([
+                        ->withChanges([
+                            'attribute' => [
+                                'level' => '1',
+                                'xp' => '0',
+                                'coins' => '0',
+                            ],
                             'old' => [
                                 'level' => $this->record->level,
                                 'xp' => $this->record->xp,
                                 'coins' => $this->record->coins,
-                            ]
+                            ],
                         ])
                     ->log('Account progression parameters manually forced to defaults by Administrator.');
 
