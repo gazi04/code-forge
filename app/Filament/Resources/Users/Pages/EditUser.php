@@ -24,6 +24,19 @@ class EditUser extends EditRecord
                 ->modalDescription('This will completely wipe out this student\'s level, current XP, and wallet balance back to baseline defaults. This action is destructive.')
                 ->visible(fn () => $this->record->role === 'student')
                 ->action(function () {
+                    activity()
+                        ->performedOn($this->record)
+                        ->causedBy(auth()->user())
+                        ->event('admin.reset')
+                        ->withProperties([
+                            'old' => [
+                                'level' => $this->record->level,
+                                'xp' => $this->record->xp,
+                                'coins' => $this->record->coins,
+                            ]
+                        ])
+                    ->log('Account progression parameters manually forced to defaults by Administrator.');
+
                     $this->record->update([
                         'level' => 1,
                         'xp' => 0,
