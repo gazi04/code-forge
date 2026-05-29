@@ -23,7 +23,7 @@ class EditUser extends EditRecord
                 ->modalHeading('Reset Student Progression?')
                 ->modalDescription('This will completely wipe out this student\'s level, current XP, and wallet balance back to baseline defaults. This action is destructive.')
                 ->visible(fn () => $this->record->role === 'student')
-                ->action(function () {
+                ->action(function (): void {
                     activity()
                         ->performedOn($this->record)
                         ->causedBy(auth()->user())
@@ -40,7 +40,7 @@ class EditUser extends EditRecord
                                 'coins' => $this->record->coins,
                             ],
                         ])
-                    ->log('Account progression parameters manually forced to defaults by Administrator.');
+                        ->log('Account progression parameters manually forced to defaults by Administrator.');
 
                     $this->record->updateQuietly([
                         'level' => 1,
@@ -51,7 +51,7 @@ class EditUser extends EditRecord
                     $this->refreshFormData([
                         'level',
                         'xp',
-                        'coins'
+                        'coins',
                     ]);
 
                     Notification::make()

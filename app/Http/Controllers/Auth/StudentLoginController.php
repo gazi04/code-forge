@@ -9,9 +9,11 @@ use Inertia\Inertia;
 
 class StudentLoginController extends Controller
 {
-    public function show(Request $request) {
+    public function show(Request $request)
+    {
         return Inertia::render('Student/Login');
     }
+
     public function store(Request $request)
     {
         $credentials = $request->validate([
@@ -23,6 +25,7 @@ class StudentLoginController extends Controller
 
             if (Auth::user()->role !== 'student') {
                 Auth::logout();
+
                 return back()->withErrors(['email' => 'Admins must log in through the admin portal.']);
             }
 

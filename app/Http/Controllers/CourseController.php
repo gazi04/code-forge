@@ -16,7 +16,7 @@ class CourseController extends Controller
         $course = Course::where('slug', $slug)
             ->with([
                 'world.themePack',
-                'lessons' => function ($query) {
+                'lessons' => function ($query): void {
                     $query->orderBy('sort_order', 'asc');
                 },
             ])

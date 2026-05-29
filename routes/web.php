@@ -1,19 +1,19 @@
 <?php
 
+use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\WorldController;
-use App\Http\Controllers\Auth\StudentLoginController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function(){
-    return "hi";
+Route::get('/', function () {
+    return 'hi';
 })->name('home');
 
 Route::get('/login', [StudentLoginController::class, 'show'])->name('login');
 Route::post('/login/student', [StudentLoginController::class, 'store'])->name('student.login.submit');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function (): void {
 
     Route::get('/worlds', [WorldController::class, 'index'])->name('student.worlds.index');
     Route::get('/worlds/{world:slug}', [WorldController::class, 'show'])->name('student.worlds.show');

@@ -25,11 +25,11 @@ class ActivityLogsTable
                 TextColumn::make('event')
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
-                        'created'     => 'success',
-                        'deleted'     => 'danger',
-                        'updated'     => 'warning',
+                        'created' => 'success',
+                        'deleted' => 'danger',
+                        'updated' => 'warning',
                         'admin.reset' => 'danger',
-                        default       => 'gray',
+                        default => 'gray',
                     })
                     ->placeholder('system')
                     ->searchable(),

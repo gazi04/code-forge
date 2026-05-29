@@ -10,6 +10,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 
 class ActivitiesRelationManager extends RelationManager
 {
@@ -24,19 +25,25 @@ class ActivitiesRelationManager extends RelationManager
     protected static function eventColor(?string $event): string
     {
         return match ($event) {
-            'created'     => 'success',
-            'deleted'     => 'danger',
-            'updated'     => 'warning',
+            'created' => 'success',
+            'deleted' => 'danger',
+            'updated' => 'warning',
             'admin.reset' => 'danger',
-            default       => 'gray',
+            default => 'gray',
         };
     }
 
     protected static function formatPropertyValue(mixed $value): string
     {
-        if (is_null($value))  return '—';
-        if (is_bool($value))  return $value ? 'true' : 'false';
-        if (is_array($value)) return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if (is_null($value)) {
+            return '—';
+        }
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if (is_array($value)) {
+            return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
 
         return (string) $value;
     }
@@ -52,15 +59,15 @@ class ActivitiesRelationManager extends RelationManager
         }
 
         $sensitiveKeys = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'];
-        $trackedKeys   = array_diff(
+        $trackedKeys = array_diff(
             array_unique(array_merge(array_keys($oldData), array_keys($newData))),
             $sensitiveKeys,
         );
 
         $rows = '';
         foreach ($trackedKeys as $key) {
-            $oldVal    = static::formatPropertyValue($oldData[$key] ?? null);
-            $newVal    = static::formatPropertyValue($newData[$key] ?? null);
+            $oldVal = static::formatPropertyValue($oldData[$key] ?? null);
+            $newVal = static::formatPropertyValue($newData[$key] ?? null);
             $unchanged = $oldVal === $newVal;
 
             $rowClass = $unchanged
@@ -68,12 +75,12 @@ class ActivitiesRelationManager extends RelationManager
                 : 'bg-amber-50/40 dark:bg-amber-950/10';
 
             $oldCell = $unchanged
-                ? '<td class="p-3 font-mono text-xs text-gray-400 dark:text-gray-500">' . e($oldVal) . '</td>'
-                : '<td class="p-3 font-mono text-xs text-danger-700 dark:text-danger-400 bg-danger-50/60 dark:bg-danger-950/20">' . e($oldVal) . '</td>';
+                ? '<td class="p-3 font-mono text-xs text-gray-400 dark:text-gray-500">'.e($oldVal).'</td>'
+                : '<td class="p-3 font-mono text-xs text-danger-700 dark:text-danger-400 bg-danger-50/60 dark:bg-danger-950/20">'.e($oldVal).'</td>';
 
             $newCell = $unchanged
-                ? '<td class="p-3 font-mono text-xs text-gray-400 dark:text-gray-500">' . e($newVal) . '</td>'
-                : '<td class="p-3 font-mono text-xs text-success-700 dark:text-success-400 bg-success-50/60 dark:bg-success-950/20 font-semibold">' . e($newVal) . '</td>';
+                ? '<td class="p-3 font-mono text-xs text-gray-400 dark:text-gray-500">'.e($newVal).'</td>'
+                : '<td class="p-3 font-mono text-xs text-success-700 dark:text-success-400 bg-success-50/60 dark:bg-success-950/20 font-semibold">'.e($newVal).'</td>';
 
             $rows .= sprintf(
                 '<tr class="%s border-b border-gray-100 dark:border-gray-800 last:border-0">
@@ -101,7 +108,7 @@ class ActivitiesRelationManager extends RelationManager
                             <th class="p-3 font-semibold text-success-600 dark:text-success-400 border-b border-gray-200 dark:border-gray-700">New Value</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-900">' . $rows . '</tbody>
+                    <tbody class="bg-white dark:bg-gray-900">'.$rows.'</tbody>
                 </table>
             </div>';
     }
@@ -144,7 +151,7 @@ class ActivitiesRelationManager extends RelationManager
                         ->state(function ($record): string {
                             $changes = $record->attribute_changes;
 
-                            if ($changes instanceof \Illuminate\Support\Collection) {
+                            if ($changes instanceof Collection) {
                                 $changes = $changes->toArray();
                             } elseif (is_string($changes)) {
                                 $changes = json_decode($changes, true) ?? [];
@@ -152,7 +159,7 @@ class ActivitiesRelationManager extends RelationManager
                                 $changes = (array) $changes;
                             }
 
-                            if (empty($changes) || (!isset($changes['old']) && !isset($changes['attributes']) && !isset($changes['attribute']))) {
+                            if (empty($changes) || (! isset($changes['old']) && ! isset($changes['attributes']) && ! isset($changes['attribute']))) {
                                 return '<p class="text-sm italic text-gray-400 dark:text-gray-500">No property changes recorded for this event.</p>';
                             }
 

@@ -64,7 +64,7 @@ class ThemePacksTable
                 EditAction::make(),
 
                 DeleteAction::make()
-                    ->before(function (ThemePack $record, DeleteAction $action) {
+                    ->before(function (ThemePack $record, DeleteAction $action): void {
                         if ($record->worlds()->exists()) {
                             $action->cancel();
                             Notification::make()
