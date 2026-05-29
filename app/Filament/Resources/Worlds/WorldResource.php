@@ -19,7 +19,7 @@ class WorldResource extends Resource
 {
     protected static ?string $model = World::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::GlobeEuropeAfrica;
 
     protected static ?string $recordTitleAttribute = 'World';
 
