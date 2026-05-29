@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('streak_count')->default(0);
+            $table->timestamp('last_active_at')->nullable();
+            $table->integer('streak_freezes')->default(0);
+            $table->integer('rested_xp_balance')->default(0);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn([
+                'streak_count',
+                'last_active_at',
+                'streak_freezes',
+                'rested_xp_balance',
+            ]);
+        });
+    }
+};
