@@ -7,7 +7,9 @@
         remember: false,
     });
 
-    function submitLogin() {
+    function submitLogin(e) {
+        e.preventDefault();
+
         form.post('/login/student', {
             preserveScroll: true,
         });
