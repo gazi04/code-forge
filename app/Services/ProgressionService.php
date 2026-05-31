@@ -113,10 +113,9 @@ class ProgressionService
 
             $user->save();
 
-            // We will hook this up in Phase 3!
-            // if ($leveledUp) {
-            //     event(new \App\Events\UserLeveledUp($user, $startingLevel));
-            // }
+            if ($leveledUp) {
+                event(new \App\Events\UserLeveledUp($user, $startingLevel, $user->level));
+            }
 
             // Return the payload formatted perfectly for Svelte
             return [
