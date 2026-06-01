@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\UserLeveledUp;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +11,9 @@ class ProgressionService
 {
     public function getXpRequiredForLevel(int $level): int
     {
-        if ($level <= 1) return 0;
+        if ($level <= 1) {
+            return 0;
+        }
 
         // Fast, highly-controlled pacing for the first 10 levels
         $earlyLevels = [
@@ -46,11 +49,11 @@ class ProgressionService
             $lastActive = $user->last_active_at ? Carbon::parse($user->last_active_at)->startOfDay() : null;
 
             // --- A. Streak & Daily Login Logic ---
-            if (!$lastActive || $lastActive->isBefore($today)) {
+            if (! $lastActive || $lastActive->isBefore($today)) {
                 if ($lastActive && $lastActive->isYesterday()) {
                     // Standard consecutive day
                     $user->streak_count++;
-                } else if ($lastActive && $lastActive->diffInDays($today) > 1) {
+                } elseif ($lastActive && $lastActive->diffInDays($today) > 1) {
                     // The user broke their streak!
                     if ($user->streak_freezes > 0) {
                         // Mechanic: Consume a freeze to save the streak
@@ -66,8 +69,8 @@ class ProgressionService
                         $user->rested_xp_balance += 200;
                     }
                 } else {
-                     // First time ever playing
-                     $user->streak_count = 1;
+                    // First time ever playing
+                    $user->streak_count = 1;
                 }
 
                 // Update their last active timestamp to right now
@@ -114,7 +117,7 @@ class ProgressionService
             $user->save();
 
             if ($leveledUp) {
-                event(new \App\Events\UserLeveledUp($user, $startingLevel, $user->level));
+                event(new UserLeveledUp($user, $startingLevel, $user->level));
             }
 
             // Return the payload formatted perfectly for Svelte

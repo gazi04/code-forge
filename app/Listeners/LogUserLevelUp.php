@@ -27,8 +27,8 @@ class LogUserLevelUp
             'properties' => [
                 'old_level' => $event->oldLevel,
                 'new_level' => $event->newLevel,
-                'bonus_coins' => $coinBonus
-            ]
+                'bonus_coins' => $coinBonus,
+            ],
         ]);
     }
 }
