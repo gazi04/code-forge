@@ -1,180 +1,371 @@
 <script>
-  import { Link } from '@inertiajs/svelte';
-  import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition'; // Required for the crossfade engine
+    import { Link, page } from '@inertiajs/svelte';
+    import { onMount } from 'svelte';
+    import { fade } from 'svelte/transition';
+    import confetti from 'canvas-confetti';
 
-  export let theme = null;
+    // Prop declaration in Svelte 5 format
+    let { theme = null, children } = $props();
 
-  // --- 1. GLOBAL SYSTEM THEME ---
-  const GLOBAL = {
-    primary: '#8b5cf6',
-    secondary: '#0f172a',
-    accent: '#10b981',
-    background: '#09090b',
-    surface: '#18181b',
-    text: '#f8fafc',
-    font: 'system-ui, sans-serif'
-  };
+    // Reactively watch Inertia's flash data
+    let flash = $derived(page.props.flash);
+    let user = $derived(page.props.auth.user);
 
-  // --- 2. DYNAMIC WORLD THEME ---
-  $: palette = theme?.config?.palette || {};
-  $: ui = theme?.config?.ui || {};
-  $: bg = theme?.config?.background || {};
-  $: audio = theme?.config?.audio || {};
+    // Local state for the modal
+    let showLevelUpModal = $state(false);
+    let newLevel = $state(0);
+    let coinBonus = $state(0);
 
-  $: isWorldActive = !!theme;
+    // Watch for a level up in the flashed session data
+    $effect(() => {
+        if (flash?.game_result?.leveled_up) {
+            newLevel = flash.game_result.new_level;
+            coinBonus = 50;
+            showLevelUpModal = true;
+            triggerConfetti();
+        }
+    });
 
-  $: primary = palette.primary || GLOBAL.primary;
-  $: secondary = palette.secondary || GLOBAL.secondary;
-  $: accent = palette.accent || GLOBAL.accent;
-  $: textColor = palette.text || GLOBAL.text;
+    function triggerConfetti() {
+        const duration = 3000;
+        const animationEnd = Date.now() + duration;
+        const defaults = {
+            startVelocity: 30,
+            spread: 360,
+            ticks: 60,
+            zIndex: 10000,
+        };
 
-  $: bgColor = palette.background || GLOBAL.background;
-  $: surface = palette.surface || GLOBAL.surface;
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
 
-  const fontStacks = {
-    default: 'system-ui, sans-serif',
-    monospace: '"Fira Code", Consolas, monospace',
-    rounded: '"Quicksand", "Nunito", sans-serif',
-    medieval: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
-    futuristic: '"Orbitron", "Jura", sans-serif'
-  };
-  $: font = fontStacks[ui.font_style] || GLOBAL.font;
+        const interval = setInterval(function () {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
 
-  const radii = { none: '0px', sm: '0.25rem', md: '0.5rem', lg: '1rem', full: '9999px' };
-  $: borderRadius = isWorldActive ? (radii[ui.border_radius] || radii.md) : radii.md;
+            const particleCount = 50 * (timeLeft / duration);
 
-  $: cardBorder = isWorldActive && ui.card_style === 'bordered' ? `1px solid ${primary}`
-                : isWorldActive && ui.card_style === 'pixel' ? `2px solid ${textColor}`
-                : '1px solid rgba(255,255,255,0.05)';
+            confetti(
+                Object.assign({}, defaults, {
+                    particleCount,
+                    origin: {
+                        x: randomInRange(0.1, 0.3),
+                        y: Math.random() - 0.2,
+                    },
+                }),
+            );
+            confetti(
+                Object.assign({}, defaults, {
+                    particleCount,
+                    origin: {
+                        x: randomInRange(0.7, 0.9),
+                        y: Math.random() - 0.2,
+                    },
+                }),
+            );
+        }, 250);
+    }
 
-  $: cardShadow = isWorldActive && ui.card_style === 'embossed' ? `inset 2px 2px 5px rgba(255,255,255,0.05), inset -2px -2px 5px rgba(0,0,0,0.5)`
-                : isWorldActive && ui.card_style === 'pixel' ? `4px 4px 0px ${primary}`
-                : `0 4px 20px -2px rgba(0, 0, 0, 0.4)`;
+    function getTitle(level) {
+        if (level < 5) return 'The Novice';
+        if (level < 10) return 'Apprentice Coder';
+        if (level < 20) return 'Logic Adept';
+        return 'Master Hacker';
+    }
 
-  $: cardBackdrop = isWorldActive && ui.card_style === 'glassy' ? 'blur(16px)' : 'none';
+    function closeModal() {
+        showLevelUpModal = false;
+    }
 
-  $: computedSurfaceBg = isWorldActive && ui.card_style === 'glassy'
-    ? `color-mix(in srgb, ${surface} 60%, transparent)`
-    : surface;
+    // --- 1. GLOBAL SYSTEM THEME ---
+    const GLOBAL = {
+        primary: '#8b5cf6',
+        secondary: '#0f172a',
+        accent: '#10b981',
+        background: '#09090b',
+        surface: '#18181b',
+        text: '#f8fafc',
+        font: 'system-ui, sans-serif',
+    };
 
-  $: bgType = bg.style || 'solid';
-  $: bgVal = bg.value || '';
-  $: isImageUrl = bgType === 'image' || bgType === 'pattern';
+    // --- 2. DYNAMIC WORLD THEME (Migrated perfectly to $derived runes) ---
+    let palette = $derived(theme?.config?.palette || {});
+    let ui = $derived(theme?.config?.ui || {});
+    let bg = $derived(theme?.config?.background || {});
+    let audio = $derived(theme?.config?.audio || {});
+    let isWorldActive = $derived(!!theme);
 
-  $: computedBgColor = isWorldActive ? (bgType === 'solid' ? bgVal : bgColor) : GLOBAL.background;
-  $: bgImage = isWorldActive && isImageUrl && bgVal ? `url('${bgVal}')` : (isWorldActive && bgType === 'gradient' ? bgVal : 'none');
-  $: bgSize = bgType === 'pattern' ? 'auto' : 'cover';
-  $: bgRepeat = bgType === 'pattern' ? 'repeat' : 'no-repeat';
+    let primary = $derived(palette.primary || GLOBAL.primary);
+    let secondary = $derived(palette.secondary || GLOBAL.secondary);
+    let accent = $derived(palette.accent || GLOBAL.accent);
+    let textColor = $derived(palette.text || GLOBAL.text);
+    let surface = $derived(palette.surface || GLOBAL.surface);
+    let bgColor = $derived(palette.background || GLOBAL.background);
 
-  $: cssVariables = `
-    --primary-color: ${primary};
-    --secondary-color: ${secondary};
-    --accent-color: ${accent};
-    --bg-color: ${computedBgColor};
-    --surface-color: ${computedSurfaceBg};
-    --text-color: ${textColor};
-    --font-main: ${font};
-    --border-radius: ${borderRadius};
-    --card-border: ${cardBorder};
-    --card-shadow: ${cardShadow};
-    --card-backdrop: ${cardBackdrop};
-    --env-bg-size: ${bgSize};
-    --env-bg-repeat: ${bgRepeat};
-  `;
+    const fontStacks = {
+        default: 'system-ui, sans-serif',
+        monospace: '"Fira Code", Consolas, monospace',
+        rounded: '"Quicksand", "Nunito", sans-serif',
+        medieval: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
+        futuristic: '"Orbitron", "Jura", sans-serif',
+    };
+    let font = $derived(fontStacks[ui.font_style] || GLOBAL.font);
+
+    const radii = {
+        none: '0px',
+        sm: '0.25rem',
+        md: '0.5rem',
+        lg: '1rem',
+        full: '9999px',
+    };
+    let borderRadius = $derived(
+        isWorldActive ? radii[ui.border_radius] || radii.md : radii.md,
+    );
+
+    let cardBorder = $derived(
+        isWorldActive && ui.card_style === 'bordered'
+            ? `1px solid ${primary}`
+            : isWorldActive && ui.card_style === 'pixel'
+              ? `2px solid ${textColor}`
+              : '1px solid rgba(255,255,255,0.05)',
+    );
+
+    let cardShadow = $derived(
+        isWorldActive && ui.card_style === 'embossed'
+            ? `inset 2px 2px 5px rgba(255,255,255,0.05), inset -2px -2px 5px rgba(0,0,0,0.5)`
+            : isWorldActive && ui.card_style === 'pixel'
+              ? `4px 4px 0px ${primary}`
+              : `0 4px 20px -2px rgba(0, 0, 0, 0.4)`,
+    );
+
+    let cardBackdrop = $derived(
+        isWorldActive && ui.card_style === 'glassy' ? 'blur(16px)' : 'none',
+    );
+    let computedSurfaceBg = $derived(
+        isWorldActive && ui.card_style === 'glassy'
+            ? `color-mix(in srgb, ${surface} 60%, transparent)`
+            : surface,
+    );
+
+    let bgType = $derived(bg.style || 'solid');
+    let bgVal = $derived(bg.value || '');
+    let isImageUrl = $derived(bgType === 'image' || bgType === 'pattern');
+
+    let computedBgColor = $derived(
+        isWorldActive
+            ? bgType === 'solid'
+                ? bgVal
+                : bgColor
+            : GLOBAL.background,
+    );
+    let bgImage = $derived(
+        isWorldActive && isImageUrl && bgVal
+            ? `url('${bgVal}')`
+            : isWorldActive && bgType === 'gradient'
+              ? bgVal
+              : 'none',
+    );
+    let bgSize = $derived(bgType === 'pattern' ? 'auto' : 'cover');
+    let bgRepeat = $derived(bgType === 'pattern' ? 'repeat' : 'no-repeat');
+
+    let cssVariables = $derived(`
+        --primary-color: ${primary};
+        --secondary-color: ${secondary};
+        --accent-color: ${accent};
+        --bg-color: ${computedBgColor};
+        --surface-color: ${computedSurfaceBg};
+        --text-color: ${textColor};
+        --font-main: ${font};
+        --border-radius: ${borderRadius};
+        --card-border: ${cardBorder};
+        --card-shadow: ${cardShadow};
+        --card-backdrop: ${cardBackdrop};
+        --env-bg-size: ${bgSize};
+        --env-bg-repeat: ${bgRepeat};
+    `);
 </script>
 
 {#if audio.background_music_url}
-  <audio id="world-bgm" src={audio.background_music_url} loop autoplay class="hidden"></audio>
+    <audio
+        id="world-bgm"
+        src={audio.background_music_url}
+        loop
+        autoplay
+        class="hidden"
+    ></audio>
 {/if}
 
 <div class="layout-container" style={cssVariables}>
+    {#if isWorldActive && bgImage !== 'none'}
+        {#key bgImage}
+            <div
+                class="environmental-bg"
+                style="background-image: {bgImage};"
+                transition:fade={{ duration: 1000 }}
+            ></div>
+        {/key}
+    {/if}
 
-  {#if isWorldActive && bgImage !== 'none'}
-    {#key bgImage}
-      <div class="environmental-bg"
-           style="background-image: {bgImage};"
-           transition:fade={{ duration: 1000 }}>
-      </div>
-    {/key}
-  {/if}
-
-  <nav class="sticky top-0 z-50 border-b border-white/10 bg-black/60 backdrop-blur-2xl text-white transition-colors duration-500">
-    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-      <div class="flex items-center gap-6">
-        <Link href="/worlds" class="font-bold tracking-widest uppercase text-sm opacity-80 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors">
-          Arcane.dev
-        </Link>
-      </div>
-      <div class="flex items-center gap-4 text-sm font-medium">
-        <div class="px-3 py-1 rounded-md bg-white/5 border border-white/10 flex items-center gap-2">
-          <span class="opacity-50">System</span> <span class="text-[var(--accent-color)] transition-colors duration-500">Online</span>
+    <nav
+        class="sticky top-0 z-50 border-b border-white/10 bg-black/60 backdrop-blur-2xl text-white transition-colors duration-500"
+    >
+        <div
+            class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between"
+        >
+            <div class="flex items-center gap-6">
+                <Link
+                    href="/worlds"
+                    class="font-bold tracking-widest uppercase text-sm opacity-80 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors"
+                >
+                    Arcane.dev
+                </Link>
+            </div>
+            <div class="flex items-center gap-4 text-sm font-medium">
+                <div
+                    class="px-3 py-1 rounded-md bg-white/5 border border-white/10 flex items-center gap-2"
+                >
+                    <span class="opacity-50">System</span>
+                    <span
+                        class="text-[var(--accent-color)] transition-colors duration-500"
+                        >Online</span
+                    >
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </nav>
+    </nav>
 
-  <main class="content-wrapper">
-    {#key isWorldActive}
-      <div in:fade={{ duration: 400, delay: 150 }} out:fade={{ duration: 300 }}>
-        <slot />
-      </div>
-    {/key}
-  </main>
+    <main class="content-wrapper">
+        {#key isWorldActive}
+            <div
+                in:fade={{ duration: 400, delay: 150 }}
+                out:fade={{ duration: 300 }}
+            >
+                <slot />
+            </div>
+        {/key}
+    </main>
 </div>
 
+{#if showLevelUpModal}
+    <div
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-all"
+    >
+        <div
+            class="bg-[#150b2e] border-4 border-yellow-400 rounded-3xl p-10 max-w-md w-full text-center shadow-[0_0_50px_rgba(250,204,21,0.4)] animate-bounce-in"
+        >
+            <h2
+                class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-orange-500 mb-2 drop-shadow-lg"
+            >
+                LEVEL UP!
+            </h2>
+
+            <div
+                class="w-32 h-32 mx-auto my-6 bg-indigo-900 border-4 border-yellow-400 rounded-full flex items-center justify-center shadow-inner"
+            >
+                <span class="text-6xl font-black text-white">{newLevel}</span>
+            </div>
+
+            <h3 class="text-2xl font-bold text-white mb-1">
+                {getTitle(newLevel)}
+            </h3>
+            <p class="text-indigo-300 mb-8 font-mono text-sm">
+                Your logical reasoning has expanded.<br />
+                <span class="text-yellow-400 font-bold block mt-2"
+                    >+ {coinBonus} Gold Coins</span
+                >
+            </p>
+
+            <button
+                onclick={closeModal}
+                class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_15px_rgba(250,204,21,0.5)] transition-all transform hover:scale-105 active:scale-95"
+            >
+                Continue Journey
+            </button>
+        </div>
+    </div>
+{/if}
+
 <style>
-  .layout-container {
-    min-height: 100vh;
-    background-color: var(--bg-color);
-    font-family: var(--font-main);
-    color: var(--text-color);
-    transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-                color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+    .layout-container {
+        min-height: 100vh;
+        background-color: var(--bg-color);
+        font-family: var(--font-main);
+        color: var(--text-color);
+        transition:
+            background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+            color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-  .environmental-bg {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.15;
-    background-size: var(--env-bg-size);
-    background-repeat: var(--env-bg-repeat);
-    background-position: center;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 100%);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 100%);
-  }
+    .environmental-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.15;
+        background-size: var(--env-bg-size);
+        background-repeat: var(--env-bg-repeat);
+        background-position: center;
+        mask-image: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 0.2) 100%
+        );
+        -webkit-mask-image: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 0.2) 100%
+        );
+    }
 
-  .content-wrapper {
-    position: relative;
-    z-index: 10;
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 2rem 1rem 6rem 1rem;
-  }
+    .content-wrapper {
+        position: relative;
+        z-index: 10;
+        max-width: 80rem;
+        margin: 0 auto;
+        padding: 2rem 1rem 6rem 1rem;
+    }
 
-  /* Structural classes universally tied to an 0.8s ease to prevent shape/color snapping */
-  :global(.text-primary) {
-    color: var(--primary-color);
-    transition: color 0.8s ease;
-  }
-  :global(.text-accent) {
-    color: var(--accent-color);
-    transition: color 0.8s ease;
-  }
-  :global(.bg-primary) {
-    background-color: var(--primary-color);
-    transition: background-color 0.8s ease;
-  }
+    /* Structural classes universally tied to an 0.8s ease to prevent shape/color snapping */
+    :global(.text-primary) {
+        color: var(--primary-color);
+        transition: color 0.8s ease;
+    }
+    :global(.text-accent) {
+        color: var(--accent-color);
+        transition: color 0.8s ease;
+    }
+    :global(.bg-primary) {
+        background-color: var(--primary-color);
+        transition: background-color 0.8s ease;
+    }
 
-  :global(.bg-surface) {
-    background-color: var(--surface-color);
-    border-radius: var(--border-radius);
-    border: var(--card-border);
-    box-shadow: var(--card-shadow);
-    backdrop-filter: var(--card-backdrop);
-    -webkit-backdrop-filter: var(--card-backdrop);
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+    :global(.bg-surface) {
+        background-color: var(--surface-color);
+        border-radius: var(--border-radius);
+        border: var(--card-border);
+        box-shadow: var(--card-shadow);
+        backdrop-filter: var(--card-backdrop);
+        -webkit-backdrop-filter: var(--card-backdrop);
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .animate-bounce-in {
+        animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+
+    @keyframes bounce-in {
+        0% {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.05);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
 </style>
