@@ -1,18 +1,18 @@
 <script>
-    import { Link } from '@inertiajs/svelte';
+    import { Link, page } from '@inertiajs/svelte';
     import Layout from '../../layouts/StudentLayout.svelte';
     import AsymmetricalLayout from '../../layouts/World/AsymmetricalLayout.svelte';
     import CarouselLayout from '../../layouts/World/CarouselLayout.svelte';
     import CinematicLayout from '../../layouts/World/CinematicLayout.svelte';
     import GridLayout from '../../layouts/World/GridLayout.svelte';
 
-    export let world;
-    $: worldData = world.data ?? world;
-    $: themeData = worldData.theme;
-    $: courses = worldData.courses ?? [];
+    let { world } = $props();
+    let worldData = $derived(world.data ?? world);
+    let themeData = $derived(worldData.theme);
+    let courses = $derived(worldData.courses ?? []);
 
-    // Safely extract the layout preference, defaulting to 'grid'
-    $: layoutPreference = themeData?.config?.ui?.course_layout || 'grid';
+    let layoutPreference = $derived(themeData?.config?.ui?.course_layout || 'grid');
+    let userLevel = $derived(page.props.auth.user?.level || 1);
 
     const layoutRegistry = {
         grid: GridLayout,
@@ -66,6 +66,7 @@
                 <svelte:component
                     this={layoutRegistry[layoutPreference]}
                     {courses}
+                    {userLevel}
                 />
             {/if}
         </div>
