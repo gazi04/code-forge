@@ -7,6 +7,7 @@ use App\Models\Lesson;
 use App\Models\LessonSubmission;
 use App\Models\User;
 use App\Services\ProgressionService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
