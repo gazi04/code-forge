@@ -32,6 +32,9 @@ Route::middleware(['auth'])->name('student.')->group(function (): void {
 
         Route::post('/lessons/{lesson:slug}/submit', [LessonController::class, 'submitClaim'])
             ->name('submit');
+
+        Route::post('/lessons/{lesson:slug}/blocks/{blockIndex}/claim', [LessonController::class, 'submitBlockClaim'])
+            ->name('block.claim');
     });
 
 });

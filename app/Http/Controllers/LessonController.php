@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LessonResource;
+use App\Models\BlockSubmission;
 use App\Models\Lesson;
 use App\Models\LessonSubmission;
 use App\Models\User;
@@ -92,6 +93,56 @@ class LessonController extends Controller
         ]);
 
         // 5. Flash the result payload to the session for Svelte to intercept
+        return back()->with('game_result', $result);
+    }
+
+    public function submitBlockClaim(Request $request, Lesson $lesson, int $blockIndex)
+    {
+        $user = Auth::user();
+
+        // 1. Anti-Cheat: Did they already get the reward for this specific quiz/challenge?
+        $alreadySubmitted = BlockSubmission::where('user_id', $user->id)
+            ->where('lesson_id', $lesson->id)
+            ->where('block_index', $blockIndex)
+            ->exists();
+
+        if ($alreadySubmitted) {
+            // Return silently with an already_completed status so the frontend knows to unlock the next step without giving double XP
+            return back()->with([
+                'game_result' => [
+                    'status' => 'already_completed',
+                    'leveled_up' => false,
+                ],
+            ]);
+        }
+
+        // 2. Dynamic Rewards: Extract how much this specific block is worth.
+        // If your JSON blocks have an explicit 'xp_reward' set, use it. Otherwise, give a standard micro-reward.
+        $blocks = $lesson->blocks ?? [];
+        $blockData = $blocks[$blockIndex]['data'] ?? [];
+
+        $xpReward = $blockData['xp_reward'] ?? 15; // 15 XP default for mini-tasks
+        $coinReward = $blockData['coin_reward'] ?? 5; // 5 Coins default
+
+        // 3. Engine Processing: Run the math
+        $result = $this->progressionService->processVictory(
+            $user,
+            $xpReward,
+            $coinReward
+        );
+
+        // 4. Ledger Record: Save it so they can't farm it
+        BlockSubmission::create([
+            'user_id' => $user->id,
+            'lesson_id' => $lesson->id,
+            'block_index' => $blockIndex,
+            'xp_rewarded' => $result['total_xp_earned'],
+            'coins_rewarded' => $result['coins_earned'],
+        ]);
+
+        // 5. Intercept & Celebrate:
+        // Flashing this data means if this 15 XP pushes them over the edge,
+        // your layout will pause the lesson, fire confetti, and show the Level Up modal!
         return back()->with('game_result', $result);
     }
 }
