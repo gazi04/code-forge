@@ -13,16 +13,27 @@ Route::get('/', function () {
 Route::get('/login', [StudentLoginController::class, 'show'])->name('login');
 Route::post('/login/student', [StudentLoginController::class, 'store'])->name('student.login.submit');
 
-Route::middleware(['auth'])->group(function (): void {
+Route::middleware(['auth'])->name('student.')->group(function (): void {
 
-    Route::get('/worlds', [WorldController::class, 'index'])->name('student.worlds.index');
-    Route::get('/worlds/{world:slug}', [WorldController::class, 'show'])->name('student.worlds.show');
+    Route::name('world.')->group(function (): void {
+        Route::get('/worlds', [WorldController::class, 'index'])
+            ->name('index');
 
-    Route::get('/course/{course:slug}', [CourseController::class, 'show'])->name('student.course.show');
+        Route::get('/worlds/{world:slug}', [WorldController::class, 'show'])
+            ->name('show');
+    });
 
-    Route::get('/lessons/{lesson:slug}', [LessonController::class, 'show'])->name('student.lessons.show');
+    Route::get('/course/{course:slug}', [CourseController::class, 'show'])
+        ->name('course.show');
 
-    Route::post('/lessons/{lesson:slug}/submit', [LessonController::class, 'submitClaim'])->name('student.lessons.submit');
+    Route::name('lessons.')->group(function (): void {
+        Route::get('/lessons/{lesson:slug}', [LessonController::class, 'show'])
+            ->name('show');
+
+        Route::post('/lessons/{lesson:slug}/submit', [LessonController::class, 'submitClaim'])
+            ->name('submit');
+    });
+
 });
 
 require __DIR__.'/settings.php';
