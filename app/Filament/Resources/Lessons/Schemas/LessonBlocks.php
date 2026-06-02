@@ -69,6 +69,20 @@ class LessonBlocks
                     ])
                     ->collapsible()
                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? null),
+
+                Grid::make(2)->schema([
+                    TextInput::make('xp_reward')
+                        ->label('Bonus XP')
+                        ->numeric()
+                        ->default(50)
+                        ->prefix('✨'),
+
+                    TextInput::make('coin_reward')
+                        ->label('Bonus Coins')
+                        ->numeric()
+                        ->default(10)
+                        ->prefix('💰'),
+                ]),
             ]);
     }
 
@@ -126,13 +140,13 @@ class LessonBlocks
                     TextInput::make('xp_reward')
                         ->label('Bonus XP')
                         ->numeric()
-                        ->default(0)
+                        ->default(50)
                         ->prefix('✨'),
 
                     TextInput::make('coin_reward')
                         ->label('Bonus Coins')
                         ->numeric()
-                        ->default(0)
+                        ->default(10)
                         ->prefix('💰'),
                 ]),
             ]);
@@ -163,13 +177,13 @@ class LessonBlocks
                     TextInput::make('xp_reward')
                         ->label('Bonus XP')
                         ->numeric()
-                        ->default(150)
+                        ->default(50)
                         ->prefix('✨'),
 
                     TextInput::make('coin_reward')
                         ->label('Bonus Coins')
                         ->numeric()
-                        ->default(75)
+                        ->default(10)
                         ->prefix('💰'),
                 ]),
             ]);
@@ -221,13 +235,13 @@ class LessonBlocks
                     TextInput::make('xp_reward')
                         ->label('Bonus XP')
                         ->numeric()
-                        ->default(120)
+                        ->default(50)
                         ->prefix('✨'),
 
                     TextInput::make('coin_reward')
                         ->label('Bonus Coins')
                         ->numeric()
-                        ->default(60)
+                        ->default(10)
                         ->prefix('💰'),
                 ]),
             ]);
@@ -312,13 +326,13 @@ class LessonBlocks
                     TextInput::make('xp_reward')
                         ->label('Bonus XP')
                         ->numeric()
-                        ->default(130)
+                        ->default(50)
                         ->prefix('✨'),
 
                     TextInput::make('coin_reward')
                         ->label('Bonus Coins')
                         ->numeric()
-                        ->default(65)
+                        ->default(10)
                         ->prefix('💰'),
                 ]),
             ]);
@@ -378,13 +392,13 @@ class LessonBlocks
                     TextInput::make('xp_reward')
                         ->label('Bonus XP')
                         ->numeric()
-                        ->default(110)
+                        ->default(50)
                         ->prefix('✨'),
 
                     TextInput::make('coin_reward')
                         ->label('Bonus Coins')
                         ->numeric()
-                        ->default(55)
+                        ->default(10)
                         ->prefix('💰'),
                 ]),
             ]);
