@@ -39,12 +39,26 @@
     function handleAdvanceOrFinish() {
         claimForm.post(`/lessons/${actualLesson.slug}/submit`, {
             preserveScroll: true,
-            onSuccess: () => {
-                // Once backend finishes granting XP/Coins, seamlessly route the student forward
-                if (next_lesson_slug) {
-                    router.visit(`/lessons/${next_lesson_slug}`);
+            onSuccess: (page) => {
+                // Define the routing behavior
+                const navigateForward = () => {
+                    if (next_lesson_slug) {
+                        router.visit(`/lessons/${next_lesson_slug}`);
+                    } else {
+                        router.visit(`/course/${course_slug}`);
+                    }
+                };
+
+                // Check if the backend flagged a level up
+                if (page.props.flash?.game_result?.leveled_up) {
+                    // Pause navigation and wait for the modal to close
+                    window.addEventListener('levelUpClosed', function handler() {
+                        window.removeEventListener('levelUpClosed', handler);
+                        navigateForward();
+                    });
                 } else {
-                    router.visit(`/course/${course_slug}`);
+                    // No level up occurred, seamlessly move to the next sector instantly
+                    navigateForward();
                 }
             },
         });

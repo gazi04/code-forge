@@ -76,6 +76,7 @@
 
     function closeModal() {
         showLevelUpModal = false;
+        window.dispatchEvent(new CustomEvent('levelUpClosed'));
     }
 
     // --- 1. GLOBAL SYSTEM THEME ---
