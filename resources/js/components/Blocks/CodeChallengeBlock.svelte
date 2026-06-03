@@ -92,7 +92,7 @@
             if (allTestsPassed && testResults.length > 0) {
                 terminalOutput +=
                     '\n✨ QUEST COMPLETE! All validations passed. ✨';
-                claimedRewards();
+                claimMicroReward();
             } else {
                 terminalOutput +=
                     '\n❌ Some objectives have failed. Adjust your scrolls and try again.';
