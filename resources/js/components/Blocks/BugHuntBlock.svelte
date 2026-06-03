@@ -1,6 +1,9 @@
 <script>
+    import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
-    let { data, index } = $props();
+
+    let { data, index, lessonSlug } = $props();
+    let claimedRewards = $state(null);
 
     // State Management via Svelte 5 Runes
     let processedLines = $state([]);
@@ -15,6 +18,21 @@
     onMount(() => {
         initializeChallenge();
     });
+
+    function claimMicroReward() {
+        router.post(`/lessons/${lessonSlug}/blocks/${index}/claim`, {}, {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                const res = page.props.flash?.game_result;
+                if (res && res.status !== 'already_completed') {
+                    claimedRewards = {
+                        xp: res.total_xp_earned || 15,
+                        coins: res.coins_earned || 5
+                    };
+                }
+            }
+        });
+    }
 
     function initializeChallenge() {
         let internalBugs = 0;
@@ -112,6 +130,7 @@
             feedbackMsg =
                 '🎉 Integrity Restored! All hidden compilation anomalies have been purged successfully.';
             feedbackStatus = 'success';
+            claimMicroReward();
         } else {
             feedbackMsg = `Patch deployed. Remaining runtime exceptions tracking count: ${bugsRemaining}.`;
             feedbackStatus = 'info';

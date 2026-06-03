@@ -1,5 +1,8 @@
 <script>
-    let { data, index } = $props();
+    import { router } from '@inertiajs/svelte';
+
+    let { data, index, lessonSlug } = $props();
+    let claimedRewards = $state(null);
 
     let selectedIndexes = $state([]);
     let isSubmitted = $state(false);
@@ -7,6 +10,21 @@
     let feedbackMessages = $state([]);
 
     const isMultiple = data.question_type === 'multiple';
+
+    function claimMicroReward() {
+        router.post(`/lessons/${lessonSlug}/blocks/${index}/claim`, {}, {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                const res = page.props.flash?.game_result;
+                if (res && res.status !== 'already_completed') {
+                    claimedRewards = {
+                        xp: res.total_xp_earned || 15,
+                        coins: res.coins_earned || 5
+                    };
+                }
+            }
+        });
+    }
 
     function toggleSelection(ansIndex) {
         // Prevent changing answers after a correct submission
@@ -48,6 +66,7 @@
 
         if (passed) {
             isCorrect = true;
+            claimMicroReward();
             feedbackMessages.push({
                 text: 'Correct! You may proceed.',
                 type: 'success',
@@ -106,8 +125,7 @@
         {#if (data.xp_reward > 0 || data.coin_reward > 0) && !isCorrect}
             <div class="flex gap-2 text-xs font-mono opacity-70">
                 {#if data.xp_reward > 0}<span>✨ +{data.xp_reward}</span>{/if}
-                {#if data.coin_reward > 0}<span>💰 +{data.coin_reward}</span
-                    >{/if}
+                {#if data.coin_reward > 0}<span>💰 +{data.coin_reward}</span>{/if}
             </div>
         {:else if isCorrect && (data.xp_reward > 0 || data.coin_reward > 0)}
             <div
@@ -184,6 +202,12 @@
                             {msg.text}
                         </span>
                     {/each}
+                </div>
+            {/if}
+
+            {#if claimedRewards}
+                <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs font-bold text-amber-400 animate-bounce-in">
+                    ✨ +{claimedRewards.xp} XP & +{claimedRewards.coins} Coins Secured!
                 </div>
             {/if}
         </div>

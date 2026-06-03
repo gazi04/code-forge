@@ -1,6 +1,9 @@
 <script>
+    import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
-    let { data, index } = $props();
+
+    let { data, index, lessonSlug } = $props();
+    let claimedRewards = $state(null);
 
     // Extract values from filament schema structure
     const correctOrder = data.correct_sequence.map((item) => item.value);
@@ -32,6 +35,21 @@
 
         dynamicList = shuffled;
     });
+
+    function claimMicroReward() {
+        router.post(`/lessons/${lessonSlug}/blocks/${index}/claim`, {}, {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                const res = page.props.flash?.game_result;
+                if (res && res.status !== 'already_completed') {
+                    claimedRewards = {
+                        xp: res.total_xp_earned || 15,
+                        coins: res.coins_earned || 5
+                    };
+                }
+            }
+        });
+    }
 
     function selectItem(idx) {
         if (isCleared) {
@@ -65,6 +83,7 @@
             isCleared = true;
             gameFeedback = `🎉 Order Restored! You aligned the sequence perfectly in ${attemptsCount} interactions.`;
             feedbackStatus = 'success';
+            claimMicroReward();
         } else {
             gameFeedback =
                 'Sequence adjusted. The sequence matrix is still unstable—keep sorting!';

@@ -1,6 +1,9 @@
 <script>
+    import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
-    let { data, index } = $props();
+
+    let { data, index, lessonSlug } = $props();
+    let claimedRewards = $state(null);
 
     // State Trackers via Svelte 5 Runes
     let leftNodes = $state([]);
@@ -19,6 +22,21 @@
     onMount(() => {
         initializeMatrix();
     });
+
+    function claimMicroReward() {
+        router.post(`/lessons/${lessonSlug}/blocks/${index}/claim`, {}, {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                const res = page.props.flash?.game_result;
+                if (res && res.status !== 'already_completed') {
+                    claimedRewards = {
+                        xp: res.total_xp_earned || 15,
+                        coins: res.coins_earned || 5
+                    };
+                }
+            }
+        });
+    }
 
     function initializeMatrix() {
         // Break relationships down into independent structures mapped with a common relational ID
@@ -100,6 +118,7 @@
             isCleared = true;
             networkFeedback = `🎉 Matrix Synchronization Complete! All relational data layers anchored flawlessly in ${movesCount} actions.`;
             feedbackStatus = 'success';
+            claimMicroReward();
         }
     }
 </script>
@@ -131,7 +150,7 @@
             <span
                 class="px-3 py-1 rounded-full text-[10px] font-bold bg-purple-900/30 text-purple-300 border border-purple-700/50 uppercase tracking-widest"
             >
-                Required Module
+                Required
             </span>
         {/if}
     </div>
