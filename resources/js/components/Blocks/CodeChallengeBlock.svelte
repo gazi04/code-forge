@@ -104,23 +104,42 @@
 </script>
 
 <div
-    class="bg-surface rounded-2xl overflow-hidden border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-xl mt-8"
+    class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
 >
     <div
-        class="bg-[color-mix(in_srgb,var(--bg-color)_50%,transparent)] px-4 py-3 border-b border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] flex justify-between items-center"
+        class="bg-[#150b2e] px-6 py-4 border-b border-indigo-900/50 flex justify-between items-center"
     >
-        <div class="flex items-center gap-2">
-            <span class="text-[var(--primary-color)]">⚡</span>
-            <span
-                class="font-mono text-sm font-bold text-[var(--text-color)] opacity-80 uppercase tracking-widest"
+        <div class="flex items-center gap-4">
+            <div
+                class="w-10 h-10 rounded-full bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(99,102,241,0.2)]"
             >
-                Arcane Terminal ({data.language})
-            </span>
+                {data.game_icon || '🖥️'}
+            </div>
+            <div>
+                <h4
+                    class="font-serif font-bold text-indigo-100 text-lg tracking-wide"
+                >
+                    Arcane Terminal ({data.language})
+                </h4>
+
+                <p class="text-xs text-indigo-300/60 font-mono mt-0.5">
+                    instructions
+                </p>
+
+                {#if data.is_required}
+                    <span
+                        class="px-2 py-0.5 rounded text-[10px] uppercase font-black bg-red-500/20 text-red-400 border border-red-500/30"
+                    >
+                        Required
+                    </span>
+                {/if}
+            </div>
         </div>
+
 
         {#if !pyodideReady}
             <span class="text-xs font-mono text-amber-400 animate-pulse"
-                >Summoning Interpreter...</span
+            >Summoning Interpreter...</span
             >
         {/if}
 
@@ -209,7 +228,7 @@
                                     <span
                                         class="font-mono opacity-80"
                                         class:opacity-40={test.passed === null}
-                                        >{test.name}</span
+                                    >{test.name}</span
                                     >
                                 </div>
                             {/if}

@@ -100,28 +100,39 @@
 </script>
 
 <div
-    class="bg-surface rounded-2xl border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-lg mt-8 overflow-hidden"
+    class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
 >
     <!-- Quiz Header -->
     <div
-        class="bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] px-6 py-4 border-b border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] flex justify-between items-start sm:items-center"
+        class="bg-[#150b2e] px-6 py-4 border-b border-indigo-900/50 flex justify-between items-center"
     >
-        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+        <div class="flex items-center gap-4">
             <div
-                class="flex items-center gap-2 text-[var(--primary-color)] font-bold tracking-wider uppercase text-sm"
+                class="w-10 h-10 rounded-full bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(99,102,241,0.2)]"
             >
-                <span>🛡️</span> Encounter
+                {data.game_icon || '💡'}
             </div>
-            {#if data.is_required}
-                <span
-                    class="px-2 py-0.5 rounded text-[10px] uppercase font-black bg-red-500/20 text-red-400 border border-red-500/30"
+            <div>
+                <h4
+                    class="font-serif font-bold text-indigo-100 text-lg tracking-wide"
                 >
-                    Required
-                </span>
-            {/if}
+                    Quiz Time
+                </h4>
+
+                <p class="text-xs text-indigo-300/60 font-mono mt-0.5">
+                    no instructions
+                </p>
+
+                {#if data.is_required}
+                    <span
+                        class="px-2 py-0.5 rounded text-[10px] uppercase font-black bg-red-500/20 text-red-400 border border-red-500/30"
+                    >
+                        Required
+                    </span>
+                {/if}
+            </div>
         </div>
 
-        <!-- Bonus Rewards Display -->
         {#if (data.xp_reward > 0 || data.coin_reward > 0) && !isCorrect}
             <div class="flex gap-2 text-xs font-mono opacity-70">
                 {#if data.xp_reward > 0}<span>✨ +{data.xp_reward}</span>{/if}
