@@ -3,19 +3,17 @@
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
 
-    let { data, index, lessonSlug } = $props();
+    let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
 
     let userCode = $state(data.initial_code || '');
-    let terminalOutput = $state('');
+    let terminalOutput = $state(isAlreadyCleared ? '> Validation sequence secure. All test cases passed successfully.\n' : '');
     let isExecuting = $state(false);
+    let testResults = $state(data.test_cases?.map((tc) => ({ ...tc, passed: isAlreadyCleared ? true : null })) || []);
+    let isCorrect = $derived(isAlreadyCleared || (testResults.length > 0 && testResults.every(t => t.passed === true)));
+
     let pyodideReady = $state(false);
     let pyodideInstance = null;
-
-    let testResults = $state(
-        data.test_cases?.map((tc) => ({ ...tc, passed: null })) || [],
-    );
-    let isCorrect = $derived(testResults.length > 0 && testResults.every(t => t.passed === true));
 
     onMount(async () => {
         if (data.language === 'python') {

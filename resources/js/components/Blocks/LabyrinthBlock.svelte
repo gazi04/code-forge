@@ -2,8 +2,13 @@
     import { router } from '@inertiajs/svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
 
-    let { data, index, lessonSlug } = $props();
+    let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
+
+    let statusMessage = $state(isAlreadyCleared ? '✨ Sector cleared! Your instruction routine is fully optimized.' : 'Build your instructions queue.');
+    let statusType = $state(isAlreadyCleared ? 'success' : 'info');
+    let levelCleared = $state(isAlreadyCleared);
+    let isCorrect = $derived(levelCleared);
 
     const rawRows = data.map_layout.trim().split('\n');
     const grid = rawRows.map((row) => row.trim().split(/\s+/));
@@ -27,12 +32,6 @@
     let commandQueue = $state([]);
     let isExecuting = $state(false);
     let activeCommandIndex = $state(-1);
-    let statusMessage = $state(
-        'Build your instructions queue and execute the routine!',
-    );
-    let statusType = $state('info');
-    let levelCleared = $state(false);
-    let isCorrect = $derived(levelCleared);
 
     const directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
 

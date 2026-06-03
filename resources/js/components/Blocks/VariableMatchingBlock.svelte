@@ -3,23 +3,22 @@
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
 
-    let { data, index, lessonSlug } = $props();
+    let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
 
-    // State Trackers via Svelte 5 Runes
     let leftNodes = $state([]);
     let rightNodes = $state([]);
+    let matchedIds = $state(isAlreadyCleared ? data.pairs.map((_, idx) => idx) : []);
+    let isCleared = $state(isAlreadyCleared);
+    let networkFeedback = $state(isAlreadyCleared ? '✨ All node alignments secured and stable.' : 'Select a node from the left matrix...');
+    let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
+    let isCorrect = $derived(isCleared);
+
+    // State Trackers via Svelte 5 Runes
     let selectedLeftId = $state(null);
-    let matchedIds = $state([]); // Stores paired relational IDs that are successfully completed
 
     let totalPairsCount = data.pairs.length;
     let movesCount = $state(0);
-    let isCleared = $state(false);
-    let networkFeedback = $state(
-        'Select a node from the left matrix, then find its matching anchor on the right.',
-    );
-    let feedbackStatus = $state('info'); // info, error, success
-    let isCorrect = $derived(isCleared);
 
     onMount(() => {
         initializeMatrix();

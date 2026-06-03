@@ -2,13 +2,17 @@
     import { router } from '@inertiajs/svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
 
-    let { data, index, lessonSlug } = $props();
+    let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
 
-    let selectedIndexes = $state([]);
-    let isSubmitted = $state(false);
-    let isCorrect = $state(false);
-    let feedbackMessages = $state([]);
+    const correctIndexes = data.answers
+        .map((ans, idx) => (ans.is_correct ? idx : null))
+        .filter((idx) => idx !== null);
+
+    let selectedIndexes = $state(isAlreadyCleared ? correctIndexes : []);
+    let isSubmitted = $state(isAlreadyCleared);
+    let isCorrect = $state(isAlreadyCleared);
+    let feedbackMessages = $state(isAlreadyCleared ? [{ type: 'success', text: 'Sector cleared in a previous run.' }] : []);
 
     const isMultiple = data.question_type === 'multiple';
 

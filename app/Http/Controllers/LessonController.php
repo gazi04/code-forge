@@ -23,8 +23,14 @@ class LessonController extends Controller
 
     public function show(Lesson $lesson)
     {
+        $user = Auth::user();
         $lesson->load('course.world.themePack');
         $course = $lesson->course;
+
+        $clearedBlockIndices = BlockSubmission::where('user_id', $user->id)
+            ->where('lesson_id', $lesson->id)
+            ->pluck('block_index')
+            ->toArray();
 
         $previousLesson = Lesson::where('course_id', $course->id)
             ->where('sort_order', '<', $lesson->sort_order)
@@ -42,6 +48,7 @@ class LessonController extends Controller
             'course_slug' => $course->slug,
             'previous_lesson_slug' => $previousLesson?->slug,
             'next_lesson_slug' => $nextLesson?->slug,
+            'cleared_block_indices' => $clearedBlockIndices,
         ]);
     }
 

@@ -3,18 +3,15 @@
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
 
-    let { data, index, lessonSlug } = $props();
+    let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
 
-    // State Management via Svelte 5 Runes
     let processedLines = $state([]);
     let activeLineIdx = $state(null);
-    let bugsRemaining = $state(0);
-    let isCleared = $state(false);
-    let feedbackMsg = $state(
-        'Inspect the codebase thoroughly. Click any line to analyze its state.',
-    );
-    let feedbackStatus = $state('info'); // info, success, warning
+    let bugsRemaining = $state(isAlreadyCleared ? 0 : data.code_lines.filter(l => l.type === 'buggy').length);
+    let isCleared = $state(isAlreadyCleared);
+    let feedbackMsg = $state(isAlreadyCleared ? '✨ Codebase verified. Hotfixes are fully integrated.' : 'Inspect the codebase thoroughly.');
+    let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
     let isCorrect = $derived(isCleared);
 
     onMount(() => {
@@ -66,9 +63,9 @@
                 type: line.type,
                 initialText: line.displayed_text,
                 correctText: isBuggy ? line.correct_text : line.displayed_text,
-                currentText: line.displayed_text,
+                currentText: isAlreadyCleared && isBuggy ? line.correct_text : line.displayed_text,
                 choices: options,
-                isFixed: !isBuggy,
+                isFixed: isAlreadyCleared ? true : !isBuggy,
             };
         });
 

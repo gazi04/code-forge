@@ -3,25 +3,25 @@
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
 
-    let { data, index, lessonSlug } = $props();
+    let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
 
-    // Extract values from filament schema structure
     const correctOrder = data.correct_sequence.map((item) => item.value);
-
-    // State Management via Svelte 5 Runes
     let dynamicList = $state([]);
-    let selectedIndex = $state(null);
-    let attemptsCount = $state(0);
-    let isCleared = $state(false);
-    let gameFeedback = $state(
-        'Click an item to select it, then click another to swap their positions.',
-    );
-    let feedbackStatus = $state('info'); // info, success, error
+    let isCleared = $state(isAlreadyCleared);
+    let gameFeedback = $state(isAlreadyCleared ? '✨ Sequence fully restored and verified.' : 'Click an item to select it...');
+    let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
     let isCorrect = $derived(isCleared);
 
-    // Deterministic/Random shuffle execution upon mount sequence
+    let selectedIndex = $state(null);
+    let attemptsCount = $state(0);
+
     onMount(() => {
+        if (isAlreadyCleared) {
+            dynamicList = [...correctOrder];
+            return;
+        }
+
         let shuffled = [...correctOrder];
 
         // Keep shuffling until it doesn't match the correct answer by absolute accident
