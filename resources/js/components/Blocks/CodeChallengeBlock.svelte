@@ -14,6 +14,7 @@
     let testResults = $state(
         data.test_cases?.map((tc) => ({ ...tc, passed: null })) || [],
     );
+    let isCorrect = $derived(testResults.length > 0 && testResults.every(t => t.passed === true));
 
     onMount(async () => {
         if (data.language === 'python') {
@@ -122,6 +123,20 @@
                 >Summoning Interpreter...</span
             >
         {/if}
+
+        {#if (data.xp_reward > 0 || data.coin_reward > 0) && !isCorrect}
+            <div class="flex gap-2 text-xs font-mono opacity-70">
+                {#if data.xp_reward > 0}<span>✨ +{data.xp_reward}</span>{/if}
+                {#if data.coin_reward > 0}<span>💰 +{data.coin_reward}</span>{/if}
+            </div>
+        {:else if isCorrect && (data.xp_reward > 0 || data.coin_reward > 0)}
+            <div
+                class="text-xs font-mono text-[var(--primary-color)] animate-bounce"
+            >
+                Loot Acquired!
+            </div>
+        {/if}
+
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2">

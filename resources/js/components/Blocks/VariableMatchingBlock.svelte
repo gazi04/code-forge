@@ -18,6 +18,7 @@
         'Select a node from the left matrix, then find its matching anchor on the right.',
     );
     let feedbackStatus = $state('info'); // info, error, success
+    let isCorrect = $derived(isCleared);
 
     onMount(() => {
         initializeMatrix();
@@ -146,6 +147,21 @@
                 </p>
             </div>
         </div>
+
+        <!-- Bonus Rewards Display -->
+        {#if (data.xp_reward > 0 || data.coin_reward > 0) && !isCorrect}
+            <div class="flex gap-2 text-xs font-mono opacity-70">
+                {#if data.xp_reward > 0}<span>✨ +{data.xp_reward}</span>{/if}
+                {#if data.coin_reward > 0}<span>💰 +{data.coin_reward}</span>{/if}
+            </div>
+        {:else if isCorrect && (data.xp_reward > 0 || data.coin_reward > 0)}
+            <div
+                class="text-xs font-mono text-[var(--primary-color)] animate-bounce"
+            >
+                Loot Acquired!
+            </div>
+        {/if}
+
         {#if data.is_required && !isCleared}
             <span
                 class="px-3 py-1 rounded-full text-[10px] font-bold bg-purple-900/30 text-purple-300 border border-purple-700/50 uppercase tracking-widest"

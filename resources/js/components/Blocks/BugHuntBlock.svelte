@@ -14,6 +14,7 @@
         'Inspect the codebase thoroughly. Click any line to analyze its state.',
     );
     let feedbackStatus = $state('info'); // info, success, warning
+    let isCorrect = $derived(isCleared);
 
     onMount(() => {
         initializeChallenge();
@@ -167,6 +168,20 @@
             >
                 Required Quest
             </span>
+        {/if}
+
+        <!-- Bonus Rewards Display -->
+        {#if (data.xp_reward > 0 || data.coin_reward > 0) && !isCorrect}
+            <div class="flex gap-2 text-xs font-mono opacity-70">
+                {#if data.xp_reward > 0}<span>✨ +{data.xp_reward}</span>{/if}
+                {#if data.coin_reward > 0}<span>💰 +{data.coin_reward}</span>{/if}
+            </div>
+        {:else if isCorrect && (data.xp_reward > 0 || data.coin_reward > 0)}
+            <div
+                class="text-xs font-mono text-[var(--primary-color)] animate-bounce"
+            >
+                Loot Acquired!
+            </div>
         {/if}
     </div>
 
