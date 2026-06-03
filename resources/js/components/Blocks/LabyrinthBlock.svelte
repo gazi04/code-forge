@@ -1,5 +1,6 @@
 <script>
     import { router } from '@inertiajs/svelte';
+    import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
 
     let { data, index, lessonSlug } = $props();
     let claimedRewards = $state(null);
@@ -31,6 +32,7 @@
     );
     let statusType = $state('info');
     let levelCleared = $state(false);
+    let isCorrect = $derived(levelCleared);
 
     const directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
 
@@ -196,34 +198,15 @@
 <div
     class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
 >
-    <div
-        class="bg-[#150b2e] px-6 py-4 border-b border-indigo-900/50 flex justify-between items-center"
-    >
-        <div class="flex items-center gap-4">
-            <div
-                class="w-10 h-10 rounded-full bg-indigo-900/40 border border-indigo-500/30 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-            >
-                🗺️
-            </div>
-            <div>
-                <h4
-                    class="font-serif font-bold text-indigo-100 text-lg tracking-wide"
-                >
-                    The Labyrinth of Logic
-                </h4>
-                <p class="text-xs text-indigo-300/60 font-mono mt-0.5">
-                    Program your hero's steps to locate the ancient relics.
-                </p>
-            </div>
-        </div>
-        {#if data.is_required && !levelCleared}
-            <span
-                class="px-3 py-1 rounded-full text-[10px] font-bold bg-purple-900/30 text-purple-300 border border-purple-700/50 uppercase tracking-widest"
-            >
-                Required
-            </span>
-        {/if}
-    </div>
+    <BlockHeader
+        icon={data.game_icon || '🏃'}
+        title={data.game_title || 'Labyrinth Navigation'}
+        instructions={data.instructions || 'Build your instructions queue and execute.'}
+        isRequired={data.is_required}
+        isCorrect={isCorrect}
+        xpReward={data.xp_reward}
+        coinReward={data.coin_reward}
+    />
 
     <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
         <div class="lg:col-span-5 flex flex-col w-full">
@@ -239,7 +222,7 @@
                             {@const isPlayer = playerX === c && playerY === r}
                             <div
                                 class="w-12 h-12 rounded-md flex items-center justify-center text-xl select-none relative transition-colors duration-300
-                {cell === '#'
+                                {cell === '#'
                                     ? 'bg-[#1a1528] border border-[#2d2442]'
                                     : 'bg-[#130a2a] border border-indigo-900/30'}"
                             >
@@ -248,7 +231,7 @@
                                 {:else if cell === 'E'}
                                     <span
                                         class="drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
-                                        >🏆</span
+                                    >🏆</span
                                     >
                                 {:else if cell === 'S' && !isPlayer}
                                     <span class="opacity-30">🏰</span>
@@ -258,8 +241,8 @@
                                     <div
                                         class="absolute inset-0 flex items-center justify-center transition-transform duration-200 z-10 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]"
                                         style="transform: rotate({dirRotation[
-                                            playerDir
-                                        ]});"
+                                        playerDir
+                                    ]});"
                                     >
                                         ⚔️
                                     </div>
@@ -272,13 +255,13 @@
 
             <div
                 class="w-full mt-4 p-3 rounded-lg text-xs font-mono text-center
-        {statusType === 'success'
+                {statusType === 'success'
                     ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/50'
                     : ''}
-        {statusType === 'error'
+                {statusType === 'error'
                     ? 'bg-rose-950/40 text-rose-400 border border-rose-800/50'
                     : ''}
-        {statusType === 'info'
+                {statusType === 'info'
                     ? 'bg-indigo-950/40 text-indigo-300 border border-indigo-900/50'
                     : ''}"
             >
@@ -291,12 +274,12 @@
                 <div class="flex justify-between items-center mb-3">
                     <span
                         class="text-[10px] text-indigo-300/70 uppercase font-bold tracking-widest font-mono"
-                        >1. Available Commands</span
+                    >1. Available Commands</span
                     >
                     {#if data.max_commands}
                         <span
                             class="text-[10px] font-mono px-2 py-1 bg-[#150b2e] border border-indigo-900/50 text-indigo-300 rounded-md"
-                            >Memory: {commandQueue.length}/{data.max_commands}</span
+                        >Memory: {commandQueue.length}/{data.max_commands}</span
                         >
                     {/if}
                 </div>
@@ -328,7 +311,7 @@
                 <div class="mt-8">
                     <span
                         class="text-[10px] text-indigo-300/70 uppercase font-bold tracking-widest font-mono block mb-3"
-                        >2. Execution Stack</span
+                    >2. Execution Stack</span
                     >
                     <div
                         class="bg-[#0a0515] border border-indigo-950/80 rounded-xl p-4 min-h-[120px] flex flex-wrap gap-2 items-start content-start shadow-inner"
@@ -346,18 +329,18 @@
                             <div
                                 onclick={() => removeCommand(idx)}
                                 class="px-3 py-2 bg-[#150b2e] hover:bg-rose-950/40 hover:border-rose-800/60 hover:text-rose-300 border text-xs font-mono rounded-lg flex items-center gap-2 cursor-pointer transition-all
-                  {isActive
+                                {isActive
                                     ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105'
                                     : 'border-indigo-900/50 text-indigo-200'}"
                             >
                                 <span class="opacity-50 text-[10px]"
-                                    >{idx + 1}:</span
+                                >{idx + 1}:</span
                                 >
                                 {cmd === 'FORWARD'
                                     ? '🏃 FWD'
                                     : cmd === 'TURN_LEFT'
-                                      ? '↩️ LFT'
-                                      : '↪️ RGT'}
+                                        ? '↩️ LFT'
+                                        : '↪️ RGT'}
                             </div>
                         {/each}
                     </div>
@@ -371,16 +354,16 @@
                         isExecuting ||
                         levelCleared}
                     class="flex-1 py-3.5 rounded-xl font-bold uppercase tracking-widest text-[11px] transition-all
-            {levelCleared
+                    {levelCleared
                         ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
                         : 'bg-indigo-600 text-white hover:bg-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]'}
-            disabled:opacity-40 disabled:hover:bg-indigo-600 disabled:hover:shadow-none"
+                    disabled:opacity-40 disabled:hover:bg-indigo-600 disabled:hover:shadow-none"
                 >
                     {isExecuting
                         ? '⚡ Compiling...'
                         : levelCleared
-                          ? '✨ Mastered'
-                          : '▶️ Execute Stack'}
+                            ? '✨ Mastered'
+                            : '▶️ Execute Stack'}
                 </button>
 
                 <button

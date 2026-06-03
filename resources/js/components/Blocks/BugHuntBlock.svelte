@@ -1,6 +1,7 @@
 <script>
     import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
+    import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
 
     let { data, index, lessonSlug } = $props();
     let claimedRewards = $state(null);
@@ -142,48 +143,15 @@
 <div
     class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
 >
-    <div
-        class="bg-[#150b2e] px-6 py-4 border-b border-indigo-900/50 flex justify-between items-center"
-    >
-        <div class="flex items-center gap-4">
-            <div
-                class="w-10 h-10 rounded-full bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-            >
-                {data.game_icon || '🐛'}
-            </div>
-            <div>
-                <h4
-                    class="font-serif font-bold text-indigo-100 text-lg tracking-wide"
-                >
-                    {data.game_title}
-                </h4>
-                <p class="text-xs text-indigo-300/60 font-mono mt-0.5">
-                    {data.instructions}
-                </p>
-            </div>
-        </div>
-        {#if data.is_required && !isCleared}
-            <span
-                class="px-3 py-1 rounded-full text-[10px] font-bold bg-purple-900/30 text-purple-300 border border-purple-700/50 uppercase tracking-widest"
-            >
-                Required Quest
-            </span>
-        {/if}
-
-        <!-- Bonus Rewards Display -->
-        {#if (data.xp_reward > 0 || data.coin_reward > 0) && !isCorrect}
-            <div class="flex gap-2 text-xs font-mono opacity-70">
-                {#if data.xp_reward > 0}<span>✨ +{data.xp_reward}</span>{/if}
-                {#if data.coin_reward > 0}<span>💰 +{data.coin_reward}</span>{/if}
-            </div>
-        {:else if isCorrect && (data.xp_reward > 0 || data.coin_reward > 0)}
-            <div
-                class="text-xs font-mono text-[var(--primary-color)] animate-bounce"
-            >
-                Loot Acquired!
-            </div>
-        {/if}
-    </div>
+    <BlockHeader
+        icon={data.game_icon || '🐛'}
+        title={data.game_title || 'Bug Hunt'}
+        instructions={data.instructions || 'Identify and patch the anomalies.'}
+        isRequired={data.is_required}
+        isCorrect={isCorrect}
+        xpReward={data.xp_reward}
+        coinReward={data.coin_reward}
+    />
 
     <div class="p-6 w-full">
         <div class="flex justify-between items-center mb-4 text-xs font-mono">
