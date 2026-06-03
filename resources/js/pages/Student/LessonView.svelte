@@ -128,7 +128,8 @@
                         <svelte:component
                             this={blockRegistry[block.type]}
                             data={block.data}
-                            {index}
+                            index={index}
+                            lessonSlug={actualLesson.slug}
                         />
                     {:else}
                         <div
