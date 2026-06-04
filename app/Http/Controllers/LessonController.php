@@ -64,6 +64,22 @@ class LessonController extends Controller
             ]);
         }
 
+        $requiredBlockIndices = collect($lesson->blocks ?? [])
+            ->filter(fn (array $block): bool => ($block['data']['is_required'] ?? false) === true)
+            ->keys();
+
+        if ($requiredBlockIndices->isNotEmpty()) {
+            $clearedBlockIndices = BlockSubmission::where('user_id', $user->id)
+                ->where('lesson_id', $lesson->id)
+                ->pluck('block_index');
+
+            if ($requiredBlockIndices->diff($clearedBlockIndices)->isNotEmpty()) {
+                return back()->withErrors([
+                    'error' => 'You must complete all mandatory encounters before advancing.',
+                ]);
+            }
+        }
+
         // 2. Anti-Cheat: Prevent harvesting duplicate XP for the same lesson
         $alreadySubmitted = LessonSubmission::where('user_id', $user->id)
             ->where('lesson_id', $lesson->slug)
