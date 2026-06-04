@@ -187,7 +187,7 @@
 </script>
 
 <div
-    class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
+    class="w-full bg-[var(--bg-color)] rounded-2xl border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-2xl mt-8 overflow-hidden font-sans"
 >
     <BlockHeader
         icon={data.game_icon || '🏃'}
@@ -203,7 +203,7 @@
     <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
         <div class="lg:col-span-5 flex flex-col w-full">
             <div
-                class="flex-1 flex items-center justify-center bg-[#0a0515] rounded-xl p-6 border border-indigo-950/80 shadow-inner overflow-x-auto"
+                class="flex-1 flex items-center justify-center bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] rounded-xl p-6 border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner overflow-x-auto"
             >
                 <div
                     style="display: grid; grid-template-columns: repeat({width}, 3rem); grid-template-rows: repeat({height}, 3rem); gap: 0.35rem;"
@@ -215,8 +215,8 @@
                             <div
                                 class="w-12 h-12 rounded-md flex items-center justify-center text-xl select-none relative transition-colors duration-300
                                 {cell === '#'
-                                    ? 'bg-[#1a1528] border border-[#2d2442]'
-                                    : 'bg-[#130a2a] border border-indigo-900/30'}"
+                                    ? 'bg-[color-mix(in_srgb,var(--surface-color)_80%,black)] border border-[color-mix(in_srgb,var(--text-color)_15%,transparent)]'
+                                    : 'bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]'}"
                             >
                                 {#if cell === '#'}
                                     <span class="opacity-40 text-sm">🧱</span>
@@ -231,7 +231,7 @@
 
                                 {#if isPlayer}
                                     <div
-                                        class="absolute inset-0 flex items-center justify-center transition-transform duration-200 z-10 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]"
+                                        class="absolute inset-0 flex items-center justify-center transition-transform duration-200 z-10 drop-shadow-[0_0_10px_color-mix(in_srgb,var(--primary-color)_80%,transparent)]"
                                         style="transform: rotate({dirRotation[
                                             playerDir
                                         ]});"
@@ -254,7 +254,7 @@
                     ? 'bg-rose-950/40 text-rose-400 border border-rose-800/50'
                     : ''}
                 {statusType === 'info'
-                    ? 'bg-indigo-950/40 text-indigo-300 border border-indigo-900/50'
+                    ? 'bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)]'
                     : ''}"
             >
                 {statusMessage}
@@ -265,12 +265,12 @@
             <div>
                 <div class="flex justify-between items-center mb-3">
                     <span
-                        class="text-[10px] text-indigo-300/70 uppercase font-bold tracking-widest font-mono"
+                        class="text-[10px] text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] uppercase font-bold tracking-widest font-mono"
                         >1. Available Commands</span
                     >
                     {#if data.max_commands}
                         <span
-                            class="text-[10px] font-mono px-2 py-1 bg-[#150b2e] border border-indigo-900/50 text-indigo-300 rounded-md"
+                            class="text-[10px] font-mono px-2 py-1 bg-[var(--surface-color)] border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] rounded-md"
                             >Memory: {commandQueue.length}/{data.max_commands}</span
                         >
                     {/if}
@@ -280,21 +280,21 @@
                     <button
                         onclick={() => addCommand('FORWARD')}
                         disabled={isExecuting || levelCleared}
-                        class="p-3 bg-[#130a2a] hover:bg-[#1a0e3a] disabled:opacity-30 disabled:hover:bg-[#130a2a] rounded-xl text-xs text-indigo-200 font-medium flex flex-col items-center gap-2 border border-indigo-900/50 hover:border-indigo-500/50 transition-all"
+                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
                     >
                         <span class="text-xl">🏃</span> Move Fwd
                     </button>
                     <button
                         onclick={() => addCommand('TURN_LEFT')}
                         disabled={isExecuting || levelCleared}
-                        class="p-3 bg-[#130a2a] hover:bg-[#1a0e3a] disabled:opacity-30 disabled:hover:bg-[#130a2a] rounded-xl text-xs text-indigo-200 font-medium flex flex-col items-center gap-2 border border-indigo-900/50 hover:border-indigo-500/50 transition-all"
+                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
                     >
                         <span class="text-xl">↩️</span> Turn Left
                     </button>
                     <button
                         onclick={() => addCommand('TURN_RIGHT')}
                         disabled={isExecuting || levelCleared}
-                        class="p-3 bg-[#130a2a] hover:bg-[#1a0e3a] disabled:opacity-30 disabled:hover:bg-[#130a2a] rounded-xl text-xs text-indigo-200 font-medium flex flex-col items-center gap-2 border border-indigo-900/50 hover:border-indigo-500/50 transition-all"
+                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
                     >
                         <span class="text-xl">↪️</span> Turn Right
                     </button>
@@ -302,15 +302,15 @@
 
                 <div class="mt-8">
                     <span
-                        class="text-[10px] text-indigo-300/70 uppercase font-bold tracking-widest font-mono block mb-3"
+                        class="text-[10px] text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] uppercase font-bold tracking-widest font-mono block mb-3"
                         >2. Execution Stack</span
                     >
                     <div
-                        class="bg-[#0a0515] border border-indigo-950/80 rounded-xl p-4 min-h-[120px] flex flex-wrap gap-2 items-start content-start shadow-inner"
+                        class="bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] rounded-xl p-4 min-h-[120px] flex flex-wrap gap-2 items-start content-start shadow-inner"
                     >
                         {#if commandQueue.length === 0}
                             <p
-                                class="text-xs text-indigo-500/30 font-mono w-full text-center mt-6 pointer-events-none select-none"
+                                class="text-xs text-[color-mix(in_srgb,var(--text-color)_20%,transparent)] font-mono w-full text-center mt-6 pointer-events-none select-none"
                             >
                                 Stack is empty. Awaiting instructions...
                             </p>
@@ -320,10 +320,10 @@
                             {@const isActive = activeCommandIndex === idx}
                             <div
                                 onclick={() => removeCommand(idx)}
-                                class="px-3 py-2 bg-[#150b2e] hover:bg-rose-950/40 hover:border-rose-800/60 hover:text-rose-300 border text-xs font-mono rounded-lg flex items-center gap-2 cursor-pointer transition-all
+                                class="px-3 py-2 bg-[var(--surface-color)] hover:bg-rose-950/40 hover:border-rose-800/60 hover:text-rose-300 border text-xs font-mono rounded-lg flex items-center gap-2 cursor-pointer transition-all
                                 {isActive
-                                    ? 'bg-indigo-600 text-white border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)] scale-105'
-                                    : 'border-indigo-900/50 text-indigo-200'}"
+                                    ? 'bg-[var(--primary-color)] text-[var(--bg-color)] border-[color-mix(in_srgb,var(--primary-color)_70%,transparent)] shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_50%,transparent)] scale-105'
+                                    : 'border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-[color-mix(in_srgb,var(--text-color)_80%,transparent)]'}"
                             >
                                 <span class="opacity-50 text-[10px]"
                                     >{idx + 1}:</span
@@ -339,7 +339,7 @@
                 </div>
             </div>
 
-            <div class="mt-6 pt-5 border-t border-indigo-900/30 flex gap-4">
+            <div class="mt-6 pt-5 border-t border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] flex gap-4">
                 <button
                     onclick={runProgram}
                     disabled={commandQueue.length === 0 ||
@@ -348,8 +348,8 @@
                     class="flex-1 py-3.5 rounded-xl font-bold uppercase tracking-widest text-[11px] transition-all
                     {levelCleared
                         ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
-                        : 'bg-indigo-600 text-white hover:bg-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]'}
-                    disabled:opacity-40 disabled:hover:bg-indigo-600 disabled:hover:shadow-none"
+                        : 'bg-[var(--primary-color)] text-[var(--bg-color)] hover:bg-[color-mix(in_srgb,var(--primary-color)_80%,white)] hover:shadow-[0_0_20px_color-mix(in_srgb,var(--primary-color)_40%,transparent)]'}
+                    disabled:opacity-40 disabled:hover:bg-[var(--primary-color)] disabled:hover:shadow-none"
                 >
                     {isExecuting
                         ? '⚡ Compiling...'
@@ -361,7 +361,7 @@
                 <button
                     onclick={clearQueue}
                     disabled={isExecuting || levelCleared}
-                    class="px-6 py-3.5 bg-transparent border border-indigo-900/50 hover:bg-[#150b2e] hover:border-indigo-500/50 text-indigo-300 text-[11px] font-bold rounded-xl disabled:opacity-30 uppercase tracking-widest transition-all"
+                    class="px-6 py-3.5 bg-transparent border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:bg-[var(--surface-color)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] text-[11px] font-bold rounded-xl disabled:opacity-30 uppercase tracking-widest transition-all"
                 >
                     Clear
                 </button>

@@ -109,7 +109,7 @@
 </script>
 
 <div
-    class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
+    class="w-full bg-[var(--bg-color)] rounded-2xl border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-2xl mt-8 overflow-hidden font-sans"
 >
     <BlockHeader
         icon={data.game_icon || '📜'}
@@ -125,9 +125,9 @@
     <div class="p-6 w-full">
         <div class="flex justify-between items-center mb-4 text-xs font-mono">
             <div
-                class="px-3 py-1.5 bg-[#150b2e] border border-indigo-900/50 text-indigo-300 rounded-md"
+                class="px-3 py-1.5 bg-[var(--surface-color)] border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] rounded-md"
             >
-                Swaps Made: <span class="font-bold text-white"
+                Swaps Made: <span class="font-bold text-[var(--text-color)]"
                     >{attemptsCount}</span
                 >
             </div>
@@ -135,14 +135,14 @@
             <button
                 onclick={resetSequence}
                 disabled={isCleared}
-                class="text-[10px] uppercase tracking-widest font-bold text-indigo-300/70 hover:text-indigo-200 transition-colors disabled:opacity-30"
+                class="text-[10px] uppercase tracking-widest font-bold text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] hover:text-[color-mix(in_srgb,var(--text-color)_70%,transparent)] transition-colors disabled:opacity-30"
             >
                 ↺ Reset Order
             </button>
         </div>
 
         <div
-            class="w-full bg-[#0a0515] rounded-xl p-4 border border-indigo-950/80 shadow-inner flex flex-col gap-2"
+            class="w-full bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] rounded-xl p-4 border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner flex flex-col gap-2"
         >
             {#each dynamicList as elementValue, idx (elementValue + '-' + idx)}
                 {@const isCurrentSelection = selectedIndex === idx}
@@ -151,13 +151,13 @@
                     onclick={() => selectItem(idx)}
                     class="w-full p-4 rounded-xl border font-mono text-sm transition-all duration-200 flex items-center gap-4 select-none cursor-pointer
             {isCleared
-                        ? 'bg-emerald-950/30 border-emerald-800/80 text-emerald-300 shadow-[0_0_10px_rgba(168,85,247,0.05)]'
+                        ? 'bg-emerald-950/30 border-emerald-800/80 text-emerald-300 shadow-[0_0_10px_color-mix(in_srgb,var(--primary-color)_5%,transparent)]'
                         : isCurrentSelection
-                          ? 'bg-[#1e1145] border-purple-500 text-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.35)] scale-[1.01]'
-                          : 'bg-[#110924] border-indigo-950 text-indigo-200 hover:border-indigo-700/50 hover:bg-[#150b2e]'}"
+                          ? 'bg-[color-mix(in_srgb,var(--primary-color)_20%,var(--bg-color))] border-[var(--primary-color)] text-[var(--primary-color)] shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_35%,transparent)] scale-[1.01]'
+                          : 'bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_40%,transparent)] hover:bg-[var(--surface-color)]'}"
                 >
                     <div
-                        class="w-6 h-6 rounded-md bg-black/40 border border-indigo-900/40 flex items-center justify-center text-[11px] font-bold text-indigo-400/70"
+                        class="w-6 h-6 rounded-md bg-black/40 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] flex items-center justify-center text-[11px] font-bold text-[color-mix(in_srgb,var(--text-color)_40%,transparent)]"
                     >
                         {idx + 1}
                     </div>
@@ -171,8 +171,8 @@
             {isCleared
                             ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]'
                             : isCurrentSelection
-                              ? 'bg-purple-500 shadow-[0_0_8px_#a855f7]'
-                              : 'bg-indigo-950'}"
+                              ? 'bg-[var(--primary-color)] shadow-[0_0_8px_var(--primary-color)]'
+                              : 'bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)]'}"
                     ></div>
                 </div>
             {/each}
@@ -182,7 +182,7 @@
             class="w-full mt-4 p-3 rounded-lg text-xs font-mono text-center border transition-all
       {feedbackStatus === 'success'
                 ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/50'
-                : 'bg-indigo-950/40 text-indigo-300 border-indigo-900/50'}"
+                : 'bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)]'}"
         >
             {gameFeedback}
         </div>

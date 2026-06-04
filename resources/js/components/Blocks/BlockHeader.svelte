@@ -11,22 +11,22 @@
 </script>
 
 <div
-    class="bg-[#150b2e] px-6 py-4 border-b border-indigo-900/50 flex justify-between items-center"
+    class="bg-[var(--surface-color)] px-6 py-4 border-b border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] flex justify-between items-center"
 >
     <div class="flex items-center gap-4">
         <div
-            class="w-10 h-10 rounded-full bg-indigo-900/40 border border-indigo-500/30 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+            class="w-10 h-10 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] flex items-center justify-center text-xl shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_20%,transparent)]"
         >
             {icon}
         </div>
         <div>
             <h4
-                class="font-serif font-bold text-indigo-100 text-lg tracking-wide"
+                class="font-serif font-bold text-[var(--text-color)] text-lg tracking-wide"
             >
                 {title}
             </h4>
 
-            <p class="text-xs text-indigo-300/60 font-mono mt-0.5">
+            <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono mt-0.5">
                 {instructions}
             </p>
 

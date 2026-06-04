@@ -119,7 +119,7 @@
 </script>
 
 <div
-    class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
+    class="w-full bg-[var(--bg-color)] rounded-2xl border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-2xl mt-8 overflow-hidden font-sans"
 >
     <BlockHeader
         icon={data.game_icon || '🔗'}
@@ -135,9 +135,9 @@
     <div class="p-6 w-full">
         <div class="flex justify-between items-center mb-6 text-xs font-mono">
             <div
-                class="px-3 py-1.5 bg-[#150b2e] border border-indigo-900/50 text-indigo-300 rounded-md"
+                class="px-3 py-1.5 bg-[var(--surface-color)] border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] rounded-md"
             >
-                Bonds Connected: <span class="font-bold text-white"
+                Bonds Connected: <span class="font-bold text-[var(--text-color)]"
                     >{matchedIds.length} / {totalPairsCount}</span
                 >
             </div>
@@ -145,22 +145,22 @@
             <button
                 onclick={initializeMatrix}
                 disabled={isCleared}
-                class="text-[10px] uppercase tracking-widest font-bold text-indigo-300/70 hover:text-indigo-200 transition-colors disabled:opacity-30"
+                class="text-[10px] uppercase tracking-widest font-bold text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] hover:text-[color-mix(in_srgb,var(--text-color)_70%,transparent)] transition-colors disabled:opacity-30"
             >
                 ↺ Desynchronize Matrix
             </button>
         </div>
 
         <div
-            class="grid grid-cols-1 md:grid-cols-2 gap-8 relative w-full bg-[#0a0515] p-6 rounded-xl border border-indigo-950/80 shadow-inner"
+            class="grid grid-cols-1 md:grid-cols-2 gap-8 relative w-full bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] p-6 rounded-xl border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner"
         >
             <div
-                class="hidden md:block absolute top-6 bottom-6 left-1/2 -translate-x-1/2 w-px bg-indigo-950/40 border-dashed border-l border-indigo-900/20"
+                class="hidden md:block absolute top-6 bottom-6 left-1/2 -translate-x-1/2 w-px bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)] border-dashed border-l border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]"
             ></div>
 
             <div class="flex flex-col gap-3">
                 <span
-                    class="text-[10px] text-indigo-500 font-mono uppercase tracking-widest font-bold block mb-1 px-1"
+                    class="text-[10px] text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono uppercase tracking-widest font-bold block mb-1 px-1"
                     >Source Relic Matrices</span
                 >
                 {#each leftNodes as leftItem (leftItem.id)}
@@ -173,8 +173,8 @@
               {isAlreadyMatched
                             ? 'bg-emerald-950/20 border-emerald-900/50 text-emerald-400/60 opacity-50 cursor-default pointer-events-none'
                             : isSelected
-                              ? 'bg-[#1e1145] border-purple-500 text-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)] scale-[1.01]'
-                              : 'bg-[#110924] border-indigo-950 text-indigo-200 hover:border-indigo-700/50 hover:bg-[#150b2e]'}"
+                              ? 'bg-[color-mix(in_srgb,var(--primary-color)_20%,var(--bg-color))] border-[var(--primary-color)] text-[var(--primary-color)] shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_30%,transparent)] scale-[1.01]'
+                              : 'bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_40%,transparent)] hover:bg-[var(--surface-color)]'}"
                     >
                         <div class="flex justify-between items-center">
                             <span class="tracking-wide font-bold"
@@ -187,7 +187,7 @@
                                 >
                             {:else if isSelected}
                                 <span
-                                    class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping"
+                                    class="w-1.5 h-1.5 rounded-full bg-[var(--primary-color)] animate-ping"
                                 ></span>
                             {/if}
                         </div>
@@ -197,7 +197,7 @@
 
             <div class="flex flex-col gap-3">
                 <span
-                    class="text-[10px] text-indigo-500 font-mono uppercase tracking-widest font-bold block mb-1 px-1"
+                    class="text-[10px] text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono uppercase tracking-widest font-bold block mb-1 px-1"
                     >Anchor Alignment Deck</span
                 >
                 {#each rightNodes as rightItem (rightItem.id)}
@@ -213,8 +213,8 @@
               {isAlreadyMatched
                             ? 'bg-emerald-950/20 border-emerald-900/50 text-emerald-400/60 opacity-50 pointer-events-none'
                             : isInteractable
-                              ? 'bg-[#110924] border-indigo-800 text-indigo-100 hover:border-purple-400 hover:bg-[#180d33] cursor-pointer hover:shadow-[0_0_10px_rgba(147,51,234,0.15)]'
-                              : 'bg-[#110924] border-indigo-950 text-indigo-300/40 opacity-40 cursor-not-allowed'}"
+                              ? 'bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border-[color-mix(in_srgb,var(--primary-color)_60%,transparent)] text-[var(--text-color)] hover:border-[color-mix(in_srgb,var(--primary-color)_70%,transparent)] hover:bg-[color-mix(in_srgb,var(--primary-color)_10%,var(--bg-color))] cursor-pointer hover:shadow-[0_0_10px_color-mix(in_srgb,var(--primary-color)_15%,transparent)]'
+                              : 'bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] text-[color-mix(in_srgb,var(--text-color)_30%,transparent)] opacity-40 cursor-not-allowed'}"
                     >
                         <div class="flex justify-between items-center">
                             <span class="tracking-wide">{rightItem.text}</span>
@@ -238,7 +238,7 @@
                 ? 'bg-rose-950/40 text-rose-400 border-rose-800/50 animate-shake'
                 : ''}
       {feedbackStatus === 'info'
-                ? 'bg-indigo-950/40 text-indigo-300 border-indigo-900/50'
+                ? 'bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)]'
                 : ''}"
         >
             {networkFeedback}

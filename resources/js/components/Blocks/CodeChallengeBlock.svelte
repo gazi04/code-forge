@@ -104,7 +104,7 @@
 </script>
 
 <div
-    class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
+    class="w-full bg-[var(--bg-color)] rounded-2xl border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-2xl mt-8 overflow-hidden font-sans"
 >
     <BlockHeader
         icon={data.game_icon || '🖥️'}
@@ -118,7 +118,7 @@
 
     {#if data.description}
         <div
-            class="px-6 py-4 bg-[#0a0518] border-b border-indigo-900/50 text-sm text-indigo-200/80 leading-relaxed whitespace-pre-wrap"
+            class="px-6 py-4 bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] border-b border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-sm text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] leading-relaxed whitespace-pre-wrap"
         >
             {data.description}
         </div>
@@ -150,9 +150,9 @@
         </div>
 
         <div class="flex flex-col h-[400px]">
-            <div class="flex-1 p-6 bg-[#0a0a0a] overflow-y-auto">
+            <div class="flex-1 p-6 bg-[color-mix(in_srgb,var(--bg-color)_70%,black)] overflow-y-auto">
                 <div
-                    class="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-2"
+                    class="font-mono text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest mb-2"
                 >
                     Standard Output
                 </div>
@@ -165,7 +165,7 @@
                     class="h-1/2 p-6 bg-[color-mix(in_srgb,var(--bg-color)_30%,transparent)] border-t border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] overflow-y-auto"
                 >
                     <div
-                        class="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-4"
+                        class="font-mono text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest mb-4"
                     >
                         Quest Objectives
                     </div>
@@ -176,7 +176,7 @@
                                 <div class="flex items-center gap-3 text-sm">
                                     {#if test.passed === null}
                                         <div
-                                            class="w-5 h-5 rounded-full border-2 border-zinc-700"
+                                            class="w-5 h-5 rounded-full border-2 border-[color-mix(in_srgb,var(--text-color)_20%,transparent)]"
                                         ></div>
                                     {:else if test.passed}
                                         <div

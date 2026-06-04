@@ -137,7 +137,7 @@
 </script>
 
 <div
-    class="w-full bg-[#0d071d] rounded-2xl border border-indigo-900/50 shadow-2xl mt-8 overflow-hidden font-sans"
+    class="w-full bg-[var(--bg-color)] rounded-2xl border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-2xl mt-8 overflow-hidden font-sans"
 >
     <BlockHeader
         icon={data.game_icon || '🐛'}
@@ -152,9 +152,9 @@
     <div class="p-6 w-full">
         <div class="flex justify-between items-center mb-4 text-xs font-mono">
             <div
-                class="px-3 py-1.5 bg-[#150b2e] border border-indigo-900/50 text-indigo-300 rounded-md"
+                class="px-3 py-1.5 bg-[var(--surface-color)] border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] rounded-md"
             >
-                Anomalies Found: <span class="font-bold text-white"
+                Anomalies Found: <span class="font-bold text-[var(--text-color)]"
                     >{isCleared ? '0' : bugsRemaining}</span
                 >
             </div>
@@ -162,14 +162,14 @@
             <button
                 onclick={initializeChallenge}
                 disabled={isCleared}
-                class="text-[10px] uppercase tracking-widest font-bold text-indigo-300/70 hover:text-indigo-200 transition-colors disabled:opacity-30"
+                class="text-[10px] uppercase tracking-widest font-bold text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] hover:text-[color-mix(in_srgb,var(--text-color)_70%,transparent)] transition-colors disabled:opacity-30"
             >
                 ↺ Reload Original Sandbox
             </button>
         </div>
 
         <div
-            class="w-full bg-[#05020a] rounded-xl border border-indigo-950/80 shadow-inner p-4 overflow-hidden flex flex-col font-mono text-sm leading-relaxed"
+            class="w-full bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] rounded-xl border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner p-4 overflow-hidden flex flex-col font-mono text-sm leading-relaxed"
         >
             {#each processedLines as line, idx (line.id)}
                 {@const isLineActive = activeLineIdx === idx}
@@ -180,11 +180,11 @@
                     onclick={() => handleLineClick(idx)}
                     class="group w-full flex items-start cursor-pointer transition-colors border-l-2 py-0.5
             {isLineActive
-                        ? 'bg-indigo-950/20 border-indigo-500'
-                        : 'border-transparent hover:bg-indigo-950/10'}"
+                        ? 'bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] border-[var(--primary-color)]'
+                        : 'border-transparent hover:bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)]'}"
                 >
                     <div
-                        class="w-10 select-none text-right pr-4 text-indigo-950 group-hover:text-indigo-700/50 transition-colors font-bold text-xs pt-0.5"
+                        class="w-10 select-none text-right pr-4 text-[color-mix(in_srgb,var(--bg-color)_50%,black)] group-hover:text-[color-mix(in_srgb,var(--text-color)_30%,transparent)] transition-colors font-bold text-xs pt-0.5"
                     >
                         {idx + 1}
                     </div>
@@ -194,8 +194,8 @@
             {line.type === 'buggy' && line.isFixed
                             ? 'text-emerald-400'
                             : isLineBuggyAndUnresolved
-                              ? 'text-indigo-100 group-hover:text-purple-300'
-                              : 'text-indigo-300/80'}"
+                              ? 'text-[var(--text-color)] group-hover:text-[var(--primary-color)]'
+                              : 'text-[color-mix(in_srgb,var(--text-color)_50%,transparent)]'}"
                     >
                         {line.currentText}
                     </div>
@@ -213,19 +213,19 @@
 
                 {#if isLineActive && line.type === 'buggy' && !line.isFixed}
                     <div
-                        class="w-full pl-10 pr-4 py-3 bg-[#0d071d]/60 border-y border-indigo-950 flex flex-col gap-2 my-1 animate-fadeIn"
+                        class="w-full pl-10 pr-4 py-3 bg-[color-mix(in_srgb,var(--bg-color)_60%,transparent)] border-y border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] flex flex-col gap-2 my-1 animate-fadeIn"
                     >
                         <span
-                            class="text-[10px] text-purple-400 uppercase tracking-widest font-bold block mb-1"
+                            class="text-[10px] text-[var(--primary-color)] uppercase tracking-widest font-bold block mb-1"
                             >Select Patch Modification:</span
                         >
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {#each line.choices as option}
                                 <button
                                     onclick={() => applyHotfix(idx, option)}
-                                    class="w-full text-left p-2.5 rounded-lg border text-xs transition-all bg-[#0a0515] font-mono text-indigo-200 border-indigo-950 hover:border-purple-500/60 hover:bg-[#150b2e]
+                                    class="w-full text-left p-2.5 rounded-lg border text-xs transition-all bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] font-mono text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_60%,transparent)] hover:bg-[var(--surface-color)]
                     {line.currentText === option
-                                        ? 'border-purple-500 bg-[#150b2e] text-purple-300'
+                                        ? 'border-[var(--primary-color)] bg-[var(--surface-color)] text-[color-mix(in_srgb,var(--primary-color)_80%,white)]'
                                         : ''}"
                                 >
                                     {option}
@@ -246,7 +246,7 @@
                 ? 'bg-amber-950/40 text-amber-400 border-amber-800/50'
                 : ''}
       {feedbackStatus === 'info'
-                ? 'bg-indigo-950/40 text-indigo-300 border-indigo-900/50'
+                ? 'bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)]'
                 : ''}"
         >
             {feedbackMsg}
