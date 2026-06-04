@@ -42,17 +42,29 @@
                 </Link>
             </div>
         {:else}
-            <div class="h-full w-full snap-center shrink-0 flex items-center justify-center p-8 md:p-16 relative overflow-hidden bg-black/30 mix-blend-luminosity opacity-50 cursor-not-allowed">
-                <div class="absolute inset-0 bg-gradient-to-br from-red-950/10 to-transparent opacity-40"></div>
+            <div
+                class="h-full w-full snap-center shrink-0 flex items-center justify-center p-8 md:p-16 relative overflow-hidden bg-black/30 mix-blend-luminosity opacity-50 cursor-not-allowed"
+            >
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-red-950/10 to-transparent opacity-40"
+                ></div>
 
-                <div class="relative z-10 w-full max-w-3xl text-center flex flex-col items-center">
-                    <span class="text-5xl md:text-6xl mb-4 select-none filter drop-shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+                <div
+                    class="relative z-10 w-full max-w-3xl text-center flex flex-col items-center"
+                >
+                    <span
+                        class="text-5xl md:text-6xl mb-4 select-none filter drop-shadow-[0_0_10px_rgba(239,68,68,0.3)]"
+                    >
                         🔒
                     </span>
-                    <h3 class="text-4xl md:text-5xl font-black text-[var(--text-color)] opacity-20 mb-4 tracking-tight">
+                    <h3
+                        class="text-4xl md:text-5xl font-black text-[var(--text-color)] opacity-20 mb-4 tracking-tight"
+                    >
                         {course.name}
                     </h3>
-                    <p class="text-sm font-mono uppercase tracking-widest text-red-500/80 font-bold max-w-md bg-red-950/20 border border-red-900/30 px-6 py-2 rounded-xl backdrop-blur-sm">
+                    <p
+                        class="text-sm font-mono uppercase tracking-widest text-red-500/80 font-bold max-w-md bg-red-950/20 border border-red-900/30 px-6 py-2 rounded-xl backdrop-blur-sm"
+                    >
                         Access Denied: Requires Level {course.min_level_requirement}
                     </p>
                 </div>
@@ -62,11 +74,11 @@
 </div>
 
 <style>
-.hide-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-.hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 </style>

@@ -51,13 +51,19 @@
                 <div
                     class="ml-16 md:ml-0 w-[calc(100%-4rem)] md:w-[45%] relative p-6 bg-black/40 border border-red-900/20 rounded-2xl grayscale opacity-60 cursor-not-allowed"
                 >
-                    <div class="text-[10px] font-black uppercase tracking-widest text-red-500/70 mb-2 flex items-center gap-1.5">
+                    <div
+                        class="text-[10px] font-black uppercase tracking-widest text-red-500/70 mb-2 flex items-center gap-1.5"
+                    >
                         🔒 Sector Locked
                     </div>
-                    <h3 class="text-lg font-bold text-[var(--text-color)] opacity-40 mb-2">
+                    <h3
+                        class="text-lg font-bold text-[var(--text-color)] opacity-40 mb-2"
+                    >
                         {course.name}
                     </h3>
-                    <p class="text-xs text-[var(--text-color)] opacity-30 line-clamp-2">
+                    <p
+                        class="text-xs text-[var(--text-color)] opacity-30 line-clamp-2"
+                    >
                         Requires Access Clearance: Level {course.min_level_requirement}
                     </p>
                 </div>

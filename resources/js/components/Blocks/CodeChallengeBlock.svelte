@@ -8,10 +8,23 @@
     let claimedRewards = $state(null);
 
     let userCode = $state(data.initial_code || '');
-    let terminalOutput = $state(isAlreadyCleared ? '> Validation sequence secure. All test cases passed successfully.\n' : '');
+    let terminalOutput = $state(
+        isAlreadyCleared
+            ? '> Validation sequence secure. All test cases passed successfully.\n'
+            : '',
+    );
     let isExecuting = $state(false);
-    let testResults = $state(data.test_cases?.map((tc) => ({ ...tc, passed: isAlreadyCleared ? true : null })) || []);
-    let isCorrect = $derived(isAlreadyCleared || (testResults.length > 0 && testResults.every(t => t.passed === true)));
+    let testResults = $state(
+        data.test_cases?.map((tc) => ({
+            ...tc,
+            passed: isAlreadyCleared ? true : null,
+        })) || [],
+    );
+    let isCorrect = $derived(
+        isAlreadyCleared ||
+            (testResults.length > 0 &&
+                testResults.every((t) => t.passed === true)),
+    );
 
     let pyodideReady = $state(false);
     let pyodideInstance = null;
@@ -98,7 +111,7 @@
         title={data.game_title || `Arcane Terminal (${data.language})`}
         instructions={data.instructions || 'Write your execution routine here.'}
         isRequired={data.is_required}
-        isCorrect={isCorrect}
+        {isCorrect}
         xpReward={data.xp_reward}
         coinReward={data.coin_reward}
     />
@@ -173,7 +186,7 @@
                                     <span
                                         class="font-mono opacity-80"
                                         class:opacity-40={test.passed === null}
-                                    >{test.name}</span
+                                        >{test.name}</span
                                     >
                                 </div>
                             {/if}

@@ -9,9 +9,15 @@
 
     let leftNodes = $state([]);
     let rightNodes = $state([]);
-    let matchedIds = $state(isAlreadyCleared ? data.pairs.map((_, idx) => idx) : []);
+    let matchedIds = $state(
+        isAlreadyCleared ? data.pairs.map((_, idx) => idx) : [],
+    );
     let isCleared = $state(isAlreadyCleared);
-    let networkFeedback = $state(isAlreadyCleared ? '✨ All node alignments secured and stable.' : 'Select a node from the left matrix...');
+    let networkFeedback = $state(
+        isAlreadyCleared
+            ? '✨ All node alignments secured and stable.'
+            : 'Select a node from the left matrix...',
+    );
     let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
     let isCorrect = $derived(isCleared);
 
@@ -118,9 +124,10 @@
     <BlockHeader
         icon={data.game_icon || '🔗'}
         title={data.game_title || 'Neural Mapping'}
-        instructions={data.instructions || 'Match the variables to their core definitions.'}
+        instructions={data.instructions ||
+            'Match the variables to their core definitions.'}
         isRequired={data.is_required}
-        isCorrect={isCorrect}
+        {isCorrect}
         xpReward={data.xp_reward}
         coinReward={data.coin_reward}
     />

@@ -9,9 +9,17 @@
 
     let processedLines = $state([]);
     let activeLineIdx = $state(null);
-    let bugsRemaining = $state(isAlreadyCleared ? 0 : data.code_lines.filter(l => l.type === 'buggy').length);
+    let bugsRemaining = $state(
+        isAlreadyCleared
+            ? 0
+            : data.code_lines.filter((l) => l.type === 'buggy').length,
+    );
     let isCleared = $state(isAlreadyCleared);
-    let feedbackMsg = $state(isAlreadyCleared ? '✨ Codebase verified. Hotfixes are fully integrated.' : 'Inspect the codebase thoroughly.');
+    let feedbackMsg = $state(
+        isAlreadyCleared
+            ? '✨ Codebase verified. Hotfixes are fully integrated.'
+            : 'Inspect the codebase thoroughly.',
+    );
     let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
     let isCorrect = $derived(isCleared);
 
@@ -49,7 +57,10 @@
                 type: line.type,
                 initialText: line.displayed_text,
                 correctText: isBuggy ? line.correct_text : line.displayed_text,
-                currentText: isAlreadyCleared && isBuggy ? line.correct_text : line.displayed_text,
+                currentText:
+                    isAlreadyCleared && isBuggy
+                        ? line.correct_text
+                        : line.displayed_text,
                 choices: options,
                 isFixed: isAlreadyCleared ? true : !isBuggy,
             };
@@ -133,7 +144,7 @@
         title={data.game_title || 'Bug Hunt'}
         instructions={data.instructions || 'Identify and patch the anomalies.'}
         isRequired={data.is_required}
-        isCorrect={isCorrect}
+        {isCorrect}
         xpReward={data.xp_reward}
         coinReward={data.coin_reward}
     />

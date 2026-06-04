@@ -53,10 +53,16 @@
                 // Check if the backend flagged a level up
                 if (page.props.flash?.game_result?.leveled_up) {
                     // Pause navigation and wait for the modal to close
-                    window.addEventListener('levelUpClosed', function handler() {
-                        window.removeEventListener('levelUpClosed', handler);
-                        navigateForward();
-                    });
+                    window.addEventListener(
+                        'levelUpClosed',
+                        function handler() {
+                            window.removeEventListener(
+                                'levelUpClosed',
+                                handler,
+                            );
+                            navigateForward();
+                        },
+                    );
                 } else {
                     // No level up occurred, seamlessly move to the next sector instantly
                     navigateForward();
@@ -126,7 +132,9 @@
             {#each blocks as block, index}
                 <div class="block-wrapper">
                     {#if cleared_block_indices.includes(index)}
-                        <div class="absolute -top-3 right-6 z-30 pointer-events-none bg-emerald-500/10 backdrop-blur border border-emerald-500/40 text-emerald-400 text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-md shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                        <div
+                            class="absolute -top-3 right-6 z-30 pointer-events-none bg-emerald-500/10 backdrop-blur border border-emerald-500/40 text-emerald-400 text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-md shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+                        >
                             ✓ Verified Clear
                         </div>
                     {/if}
@@ -135,9 +143,11 @@
                         <svelte:component
                             this={blockRegistry[block.type]}
                             data={block.data}
-                            index={index}
+                            {index}
                             lessonSlug={actualLesson.slug}
-                            isAlreadyCleared={cleared_block_indices.includes(index)}
+                            isAlreadyCleared={cleared_block_indices.includes(
+                                index,
+                            )}
                         />
                     {:else}
                         <div

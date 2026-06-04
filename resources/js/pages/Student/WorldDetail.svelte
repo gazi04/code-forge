@@ -11,7 +11,9 @@
     let themeData = $derived(worldData.theme);
     let courses = $derived(worldData.courses ?? []);
 
-    let layoutPreference = $derived(themeData?.config?.ui?.course_layout || 'grid');
+    let layoutPreference = $derived(
+        themeData?.config?.ui?.course_layout || 'grid',
+    );
     let userLevel = $derived(page.props.auth.user?.level || 1);
 
     const layoutRegistry = {

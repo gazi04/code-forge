@@ -6,7 +6,11 @@
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
 
-    let statusMessage = $state(isAlreadyCleared ? '✨ Sector cleared! Your instruction routine is fully optimized.' : 'Build your instructions queue.');
+    let statusMessage = $state(
+        isAlreadyCleared
+            ? '✨ Sector cleared! Your instruction routine is fully optimized.'
+            : 'Build your instructions queue.',
+    );
     let statusType = $state(isAlreadyCleared ? 'success' : 'info');
     let levelCleared = $state(isAlreadyCleared);
     let isCorrect = $derived(levelCleared);
@@ -188,9 +192,10 @@
     <BlockHeader
         icon={data.game_icon || '🏃'}
         title={data.game_title || 'Labyrinth Navigation'}
-        instructions={data.instructions || 'Build your instructions queue and execute.'}
+        instructions={data.instructions ||
+            'Build your instructions queue and execute.'}
         isRequired={data.is_required}
-        isCorrect={isCorrect}
+        {isCorrect}
         xpReward={data.xp_reward}
         coinReward={data.coin_reward}
     />
@@ -218,7 +223,7 @@
                                 {:else if cell === 'E'}
                                     <span
                                         class="drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"
-                                    >🏆</span
+                                        >🏆</span
                                     >
                                 {:else if cell === 'S' && !isPlayer}
                                     <span class="opacity-30">🏰</span>
@@ -228,8 +233,8 @@
                                     <div
                                         class="absolute inset-0 flex items-center justify-center transition-transform duration-200 z-10 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]"
                                         style="transform: rotate({dirRotation[
-                                        playerDir
-                                    ]});"
+                                            playerDir
+                                        ]});"
                                     >
                                         ⚔️
                                     </div>
@@ -261,12 +266,12 @@
                 <div class="flex justify-between items-center mb-3">
                     <span
                         class="text-[10px] text-indigo-300/70 uppercase font-bold tracking-widest font-mono"
-                    >1. Available Commands</span
+                        >1. Available Commands</span
                     >
                     {#if data.max_commands}
                         <span
                             class="text-[10px] font-mono px-2 py-1 bg-[#150b2e] border border-indigo-900/50 text-indigo-300 rounded-md"
-                        >Memory: {commandQueue.length}/{data.max_commands}</span
+                            >Memory: {commandQueue.length}/{data.max_commands}</span
                         >
                     {/if}
                 </div>
@@ -298,7 +303,7 @@
                 <div class="mt-8">
                     <span
                         class="text-[10px] text-indigo-300/70 uppercase font-bold tracking-widest font-mono block mb-3"
-                    >2. Execution Stack</span
+                        >2. Execution Stack</span
                     >
                     <div
                         class="bg-[#0a0515] border border-indigo-950/80 rounded-xl p-4 min-h-[120px] flex flex-wrap gap-2 items-start content-start shadow-inner"
@@ -321,13 +326,13 @@
                                     : 'border-indigo-900/50 text-indigo-200'}"
                             >
                                 <span class="opacity-50 text-[10px]"
-                                >{idx + 1}:</span
+                                    >{idx + 1}:</span
                                 >
                                 {cmd === 'FORWARD'
                                     ? '🏃 FWD'
                                     : cmd === 'TURN_LEFT'
-                                        ? '↩️ LFT'
-                                        : '↪️ RGT'}
+                                      ? '↩️ LFT'
+                                      : '↪️ RGT'}
                             </div>
                         {/each}
                     </div>
@@ -349,8 +354,8 @@
                     {isExecuting
                         ? '⚡ Compiling...'
                         : levelCleared
-                            ? '✨ Mastered'
-                            : '▶️ Execute Stack'}
+                          ? '✨ Mastered'
+                          : '▶️ Execute Stack'}
                 </button>
 
                 <button

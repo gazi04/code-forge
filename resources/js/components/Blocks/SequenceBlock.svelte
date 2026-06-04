@@ -10,7 +10,11 @@
     const correctOrder = data.correct_sequence.map((item) => item.value);
     let dynamicList = $state([]);
     let isCleared = $state(isAlreadyCleared);
-    let gameFeedback = $state(isAlreadyCleared ? '✨ Sequence fully restored and verified.' : 'Click an item to select it...');
+    let gameFeedback = $state(
+        isAlreadyCleared
+            ? '✨ Sequence fully restored and verified.'
+            : 'Click an item to select it...',
+    );
     let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
     let isCorrect = $derived(isCleared);
 
@@ -110,9 +114,10 @@
     <BlockHeader
         icon={data.game_icon || '📜'}
         title={data.game_title || 'Sequence Alignment'}
-        instructions={data.instructions || 'Restore the proper chronological order.'}
+        instructions={data.instructions ||
+            'Restore the proper chronological order.'}
         isRequired={data.is_required}
-        isCorrect={isCorrect}
+        {isCorrect}
         xpReward={data.xp_reward}
         coinReward={data.coin_reward}
     />

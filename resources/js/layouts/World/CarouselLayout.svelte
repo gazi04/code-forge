@@ -35,7 +35,8 @@
         if (!container) {
             return;
         }
-        const containerCenter = container.scrollLeft + container.offsetWidth / 2;
+        const containerCenter =
+            container.scrollLeft + container.offsetWidth / 2;
         let closestIndex = 0;
         let minDistance = Infinity;
 
@@ -63,18 +64,30 @@
                     href="/course/{course.slug}"
                     class="w-[350px] sm:w-[400px] shrink-0 group relative flex flex-col p-8 bg-surface border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[var(--primary-color)] transition-all duration-500 rounded-2xl shadow-xl scroll-mx-6"
                 >
-                    <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity text-8xl font-black text-[var(--text-color)] select-none">
+                    <div
+                        class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity text-8xl font-black text-[var(--text-color)] select-none"
+                    >
                         {i + 1}
                     </div>
                     <div class="relative z-10 flex flex-col h-full">
-                        <h3 class="text-2xl font-black text-[var(--text-color)] tracking-tight mb-4 group-hover:text-[var(--primary-color)] transition-colors duration-300">
+                        <h3
+                            class="text-2xl font-black text-[var(--text-color)] tracking-tight mb-4 group-hover:text-[var(--primary-color)] transition-colors duration-300"
+                        >
                             {course.name}
                         </h3>
-                        <p class="text-sm text-[var(--text-color)] opacity-60 leading-relaxed line-clamp-4 mb-8 flex-1">
-                            {course.description || 'Initialize the sequence to discover what lies within this sector.'}
+                        <p
+                            class="text-sm text-[var(--text-color)] opacity-60 leading-relaxed line-clamp-4 mb-8 flex-1"
+                        >
+                            {course.description ||
+                                'Initialize the sequence to discover what lies within this sector.'}
                         </p>
-                        <div class="mt-auto pt-4 border-t border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] text-[var(--primary-color)] transition-all duration-300">
-                            <span class="text-xs font-mono uppercase tracking-widest font-bold">Enter Simulation Module →</span>
+                        <div
+                            class="mt-auto pt-4 border-t border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] text-[var(--primary-color)] transition-all duration-300"
+                        >
+                            <span
+                                class="text-xs font-mono uppercase tracking-widest font-bold"
+                                >Enter Simulation Module →</span
+                            >
                         </div>
                     </div>
                 </Link>
@@ -86,13 +99,20 @@
                         🔒
                     </div>
                     <div class="relative z-10 flex flex-col h-full">
-                        <h3 class="text-2xl font-black text-[var(--text-color)] opacity-40 tracking-tight mb-4">
+                        <h3
+                            class="text-2xl font-black text-[var(--text-color)] opacity-40 tracking-tight mb-4"
+                        >
                             {course.name}
                         </h3>
-                        <p class="text-sm text-[var(--text-color)] opacity-30 leading-relaxed line-clamp-4 mb-8 flex-1">
-                            This modular sector is encrypted. Complete previous coordinates to gain level authorization.
+                        <p
+                            class="text-sm text-[var(--text-color)] opacity-30 leading-relaxed line-clamp-4 mb-8 flex-1"
+                        >
+                            This modular sector is encrypted. Complete previous
+                            coordinates to gain level authorization.
                         </p>
-                        <div class="mt-auto pt-4 border-t border-red-900/20 text-red-500 font-bold font-mono text-xs uppercase tracking-widest">
+                        <div
+                            class="mt-auto pt-4 border-t border-red-900/20 text-red-500 font-bold font-mono text-xs uppercase tracking-widest"
+                        >
                             Requires Level {course.min_level_requirement}
                         </div>
                     </div>
@@ -115,7 +135,9 @@
                 aria-label="Navigate to sector index position {idx + 1}"
             >
                 {#if isActive}
-                    <span class="absolute inset-0 rounded-full bg-[var(--primary-color)] animate-ping opacity-25"></span>
+                    <span
+                        class="absolute inset-0 rounded-full bg-[var(--primary-color)] animate-ping opacity-25"
+                    ></span>
                 {/if}
             </button>
         {/each}
@@ -123,6 +145,11 @@
 {/if}
 
 <style>
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 </style>

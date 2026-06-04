@@ -13,10 +13,13 @@
     let selectedIndexes = $state(isAlreadyCleared ? correctIndexes : []);
     let isSubmitted = $state(isAlreadyCleared);
     let isCorrect = $state(isAlreadyCleared);
-    let feedbackMessages = $state(isAlreadyCleared ? [{ type: 'success', text: 'Sector cleared in a previous run.' }] : []);
+    let feedbackMessages = $state(
+        isAlreadyCleared
+            ? [{ type: 'success', text: 'Sector cleared in a previous run.' }]
+            : [],
+    );
 
     const isMultiple = data.question_type === 'multiple';
-
 
     function toggleSelection(ansIndex) {
         // Prevent changing answers after a correct submission
@@ -99,9 +102,10 @@
     <BlockHeader
         icon={data.game_icon || '❓'}
         title={data.game_title || 'Quiz Time'}
-        instructions={data.instructions || 'Select the correct data parameters.'}
+        instructions={data.instructions ||
+            'Select the correct data parameters.'}
         isRequired={data.is_required}
-        isCorrect={isCorrect}
+        {isCorrect}
         xpReward={data.xp_reward}
         coinReward={data.coin_reward}
     />
@@ -176,7 +180,9 @@
             {/if}
 
             {#if claimedRewards}
-                <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs font-bold text-amber-400 animate-bounce-in">
+                <div
+                    class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs font-bold text-amber-400 animate-bounce-in"
+                >
                     ✨ +{claimedRewards.xp} XP & +{claimedRewards.coins} Coins Secured!
                 </div>
             {/if}
