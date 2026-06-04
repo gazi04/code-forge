@@ -40,6 +40,13 @@ class LessonBlocks
                     ->default('python')
                     ->required(),
 
+                Textarea::make('description')
+                    ->label('Challenge Description')
+                    ->helperText('Explain the task to the student. Shown above the code editor.')
+                    ->placeholder('e.g., Write a function that returns the sum of two numbers.')
+                    ->rows(3)
+                    ->columnSpanFull(),
+
                 CodeEditor::make('initial_code')
                     ->label('Starter Code (What the student sees)')
                     ->required(),

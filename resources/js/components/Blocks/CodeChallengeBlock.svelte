@@ -116,6 +116,14 @@
         coinReward={data.coin_reward}
     />
 
+    {#if data.description}
+        <div
+            class="px-6 py-4 bg-[#0a0518] border-b border-indigo-900/50 text-sm text-indigo-200/80 leading-relaxed whitespace-pre-wrap"
+        >
+            {data.description}
+        </div>
+    {/if}
+
     <div class="grid grid-cols-1 lg:grid-cols-2">
         <div
             class="relative border-r border-[color-mix(in_srgb,var(--text-color)_5%,transparent)]"
