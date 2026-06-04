@@ -1,6 +1,7 @@
 <script>
     import { router } from '@inertiajs/svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
+    import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
@@ -16,20 +17,6 @@
 
     const isMultiple = data.question_type === 'multiple';
 
-    function claimMicroReward() {
-        router.post(`/lessons/${lessonSlug}/blocks/${index}/claim`, {}, {
-            preserveScroll: true,
-            onSuccess: (page) => {
-                const res = page.props.flash?.game_result;
-                if (res && res.status !== 'already_completed') {
-                    claimedRewards = {
-                        xp: res.total_xp_earned || 15,
-                        coins: res.coins_earned || 5
-                    };
-                }
-            }
-        });
-    }
 
     function toggleSelection(ansIndex) {
         // Prevent changing answers after a correct submission
@@ -71,7 +58,9 @@
 
         if (passed) {
             isCorrect = true;
-            claimMicroReward();
+            claimMicroReward(lessonSlug, index, (rewards) => {
+                claimedRewards = rewards;
+            });
             feedbackMessages.push({
                 text: 'Correct! You may proceed.',
                 type: 'success',

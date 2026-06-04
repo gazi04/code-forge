@@ -1,6 +1,7 @@
 <script>
     import { router } from '@inertiajs/svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
+    import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
@@ -34,21 +35,6 @@
     let activeCommandIndex = $state(-1);
 
     const directions = ['UP', 'RIGHT', 'DOWN', 'LEFT'];
-
-    function claimMicroReward() {
-        router.post(`/lessons/${lessonSlug}/blocks/${index}/claim`, {}, {
-            preserveScroll: true,
-            onSuccess: (page) => {
-                const res = page.props.flash?.game_result;
-                if (res && res.status !== 'already_completed') {
-                    claimedRewards = {
-                        xp: res.total_xp_earned || 15,
-                        coins: res.coins_earned || 5
-                    };
-                }
-            }
-        });
-    }
 
     function addCommand(type) {
         if (levelCleared || isExecuting) {
@@ -170,7 +156,9 @@
                 statusMessage =
                     '🎉 Quest Completed! You navigated the labyrinth!';
                 statusType = 'success';
-                claimMicroReward();
+                claimMicroReward(lessonSlug, index, (rewards) => {
+                    claimedRewards = rewards;
+                });
 
                 return;
             }

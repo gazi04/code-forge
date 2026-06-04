@@ -2,6 +2,7 @@
     import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
+    import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
@@ -29,21 +30,6 @@
             pyodideReady = true;
         }
     });
-
-    function claimMicroReward() {
-        router.post(`/lessons/${lessonSlug}/blocks/${index}/claim`, {}, {
-            preserveScroll: true,
-            onSuccess: (page) => {
-                const res = page.props.flash?.game_result;
-                if (res && res.status !== 'already_completed') {
-                    claimedRewards = {
-                        xp: res.total_xp_earned || 15,
-                        coins: res.coins_earned || 5
-                    };
-                }
-            }
-        });
-    }
 
     async function runCode() {
         isExecuting = true;
@@ -91,7 +77,9 @@
             if (allTestsPassed && testResults.length > 0) {
                 terminalOutput +=
                     '\n✨ QUEST COMPLETE! All validations passed. ✨';
-                claimMicroReward();
+                claimMicroReward(lessonSlug, index, (rewards) => {
+                    claimedRewards = rewards;
+                });
             } else {
                 terminalOutput +=
                     '\n❌ Some objectives have failed. Adjust your scrolls and try again.';

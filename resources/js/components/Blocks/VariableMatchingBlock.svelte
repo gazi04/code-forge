@@ -2,6 +2,7 @@
     import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
+    import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
@@ -23,21 +24,6 @@
     onMount(() => {
         initializeMatrix();
     });
-
-    function claimMicroReward() {
-        router.post(`/lessons/${lessonSlug}/blocks/${index}/claim`, {}, {
-            preserveScroll: true,
-            onSuccess: (page) => {
-                const res = page.props.flash?.game_result;
-                if (res && res.status !== 'already_completed') {
-                    claimedRewards = {
-                        xp: res.total_xp_earned || 15,
-                        coins: res.coins_earned || 5
-                    };
-                }
-            }
-        });
-    }
 
     function initializeMatrix() {
         // Break relationships down into independent structures mapped with a common relational ID
@@ -119,7 +105,9 @@
             isCleared = true;
             networkFeedback = `🎉 Matrix Synchronization Complete! All relational data layers anchored flawlessly in ${movesCount} actions.`;
             feedbackStatus = 'success';
-            claimMicroReward();
+            claimMicroReward(lessonSlug, index, (rewards) => {
+                claimedRewards = rewards;
+            });
         }
     }
 </script>
