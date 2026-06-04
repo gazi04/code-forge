@@ -9,7 +9,6 @@
     import VariableMatchingBlock from '../../components/Blocks/VariableMatchingBlock.svelte';
     import Layout from '../../layouts/StudentLayout.svelte';
 
-    // 1. Svelte 5 Props Configuration
     let {
         lesson,
         theme,
@@ -19,7 +18,6 @@
         cleared_block_indices = [],
     } = $props();
 
-    // 2. Svelte 5 Derived State (No legacy '$:' markers)
     let actualLesson = $derived(lesson?.data ?? lesson);
     let blocks = $derived(actualLesson?.blocks || []);
 
@@ -33,13 +31,23 @@
         variable_matching_challenge: VariableMatchingBlock,
     };
 
-    // 3. Inertia Claim Form Controller
     const claimForm = useForm({});
 
-    // 4. Combined Submit & Advance Router Logic
+    let errorMessage = $state('');
+
     function handleAdvanceOrFinish() {
+        errorMessage = '';
+
         claimForm.post(`/lessons/${actualLesson.slug}/submit`, {
             preserveScroll: true,
+            onError: (errors) => {
+                if (errors.error) {
+                    errorMessage = errors.error;
+                    setTimeout(() => {
+                        errorMessage = '';
+                    }, 5000);
+                }
+            },
             onSuccess: (page) => {
                 // Define the routing behavior
                 const navigateForward = () => {
@@ -200,4 +208,37 @@
             {/if}
         </div>
     </footer>
+
+    {#if errorMessage}
+        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md bg-rose-950/90 backdrop-blur-xl border border-rose-500/50 text-rose-300 px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(225,29,72,0.2)] flex items-start gap-4 animate-fade-in-up">
+            <div class="text-2xl mt-0.5 animate-pulse">⚠️</div>
+            <div class="flex-1 flex flex-col gap-1">
+                <span class="text-[10px] uppercase tracking-widest font-black text-rose-500">Access Denied</span>
+                <span class="font-mono text-sm font-medium leading-relaxed">{errorMessage}</span>
+            </div>
+            <button
+                onclick={() => errorMessage = ''}
+                class="opacity-50 hover:opacity-100 hover:text-white transition-colors text-lg"
+                aria-label="Close notification"
+            >
+                ✕
+            </button>
+        </div>
+    {/if}
 </Layout>
+
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translate(-50%, 20px);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+</style>
