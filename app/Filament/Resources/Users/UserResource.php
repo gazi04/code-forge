@@ -6,6 +6,8 @@ use App\Filament\Resources\UserResource\RelationManagers\ActivitiesRelationManag
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\RelationManagers\BlockSubmissionsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\LessonSubmissionsRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
@@ -36,6 +38,8 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
+            LessonSubmissionsRelationManager::class,
+            BlockSubmissionsRelationManager::class,
             ActivitiesRelationManager::class,
         ];
     }
