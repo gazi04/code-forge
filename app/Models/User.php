@@ -15,7 +15,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Activitylog\Models\Concerns\HasActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
-#[Fillable(['name', 'email', 'password', 'role', 'xp', 'level', 'coins', 'streak_count', 'last_active_at', 'streak_freezes', 'rested_xp_balance'])]
+#[Fillable(['name', 'email', 'password', 'role', 'xp', 'level', 'coins', 'streak_count', 'last_active_at', 'streak_freezes', 'rested_xp_balance', 'preferences'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -36,6 +36,7 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'last_active_at' => 'datetime',
+            'preferences' => 'array',
         ];
     }
 
