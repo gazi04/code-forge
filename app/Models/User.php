@@ -59,4 +59,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(LessonSubmission::class);
     }
+
+    public function blockSubmissions(): HasMany
+    {
+        return $this->hasMany(BlockSubmission::class);
+    }
 }

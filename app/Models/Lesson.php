@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 
@@ -32,5 +33,10 @@ class Lesson extends Model implements Sortable
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function blockSubmissions(): HasMany
+    {
+        return $this->hasMany(BlockSubmission::class);
     }
 }
