@@ -23,8 +23,13 @@ class BlockSubmissionsTable
                 TextColumn::make('lesson.name')
                     ->sortable(),
 
+                TextColumn::make('block_title')
+                    ->label('Block Title')
+                    ->searchable()
+                    ->placeholder('—'),
+
                 TextColumn::make('block_index')
-                    ->label('Block')
+                    ->label('#')
                     ->badge(),
 
                 TextColumn::make('xp_rewarded')

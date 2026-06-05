@@ -20,20 +20,27 @@ class BlockSubmissionInfolist
                         TextEntry::make('lesson.name')
                             ->label('Lesson'),
 
-                        TextEntry::make('block_index')
-                            ->label('Block')
-                            ->badge(),
+                        TextEntry::make('block_title')
+                            ->label('Block Title')
+                            ->placeholder('—'),
                     ]),
 
                 Grid::make(3)
                     ->schema([
+                        TextEntry::make('block_index')
+                            ->label('Block #')
+                            ->badge(),
+
                         TextEntry::make('xp_rewarded')
                             ->label('XP Rewarded')
                             ->color('success'),
 
                         TextEntry::make('coins_rewarded')
                             ->label('Coins Rewarded'),
+                    ]),
 
+                Grid::make(1)
+                    ->schema([
                         TextEntry::make('created_at')
                             ->label('Submitted At')
                             ->dateTime(),

@@ -28,9 +28,9 @@ class BlockSubmissionsRelationManager extends RelationManager
                     TextEntry::make('user.name')
                         ->label('Student'),
 
-                    TextEntry::make('block_index')
-                        ->label('Block')
-                        ->badge(),
+                    TextEntry::make('block_title')
+                        ->label('Block Title')
+                        ->placeholder('—'),
 
                     TextEntry::make('created_at')
                         ->label('Submitted At')
@@ -60,8 +60,13 @@ class BlockSubmissionsRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('block_title')
+                    ->label('Block Title')
+                    ->searchable()
+                    ->placeholder('—'),
+
                 TextColumn::make('block_index')
-                    ->label('Block')
+                    ->label('#')
                     ->badge(),
 
                 TextColumn::make('xp_rewarded')

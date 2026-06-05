@@ -32,6 +32,19 @@ class LessonBlocks
             ->label('Interactive Code Challenge')
             ->icon('heroicon-o-code-bracket')
             ->schema([
+                Grid::make(2)->schema([
+                    TextInput::make('game_title')
+                        ->label('Challenge Title')
+                        ->placeholder('e.g., The Corrupted Terminal')
+                        ->required(),
+
+                    TextInput::make('game_icon')
+                        ->label('Display Emoji Icon')
+                        ->default('🖥️')
+                        ->placeholder('e.g., 🖥️, ⚡, 🔬')
+                        ->required(),
+                ]),
+
                 Select::make('language')
                     ->options([
                         'python' => 'Python 3 (Pyodide)',
@@ -100,6 +113,19 @@ class LessonBlocks
             ->icon('heroicon-o-question-mark-circle')
             ->schema([
                 Grid::make(2)->schema([
+                    TextInput::make('game_title')
+                        ->label('Quiz Title')
+                        ->placeholder('e.g., The Gatekeeper\'s Riddle')
+                        ->required(),
+
+                    TextInput::make('game_icon')
+                        ->label('Display Emoji Icon')
+                        ->default('❓')
+                        ->placeholder('e.g., ❓, 🧠, ⚔️')
+                        ->required(),
+                ]),
+
+                Grid::make(2)->schema([
                     Toggle::make('is_required')
                         ->label('Mandatory Encounter')
                         ->helperText('If checked, the student cannot advance until passed.')
@@ -165,6 +191,19 @@ class LessonBlocks
             ->label('Labyrinth of Logic (Grid Challenge)')
             ->icon('heroicon-o-map')
             ->schema([
+                Grid::make(2)->schema([
+                    TextInput::make('game_title')
+                        ->label('Labyrinth Title')
+                        ->placeholder('e.g., The Obsidian Maze')
+                        ->required(),
+
+                    TextInput::make('game_icon')
+                        ->label('Display Emoji Icon')
+                        ->default('🏃')
+                        ->placeholder('e.g., 🏃, 🗺️, ⚔️')
+                        ->required(),
+                ]),
+
                 Grid::make(2)->schema([
                     Toggle::make('is_required')
                         ->label('Mandatory Encounter')
