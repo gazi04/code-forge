@@ -43,6 +43,7 @@ class AchievementForm
                     FileUpload::make('image_path')
                         ->label('Achievement Artwork')
                         ->image()
+                        ->disk('public')
                         ->directory('achievements')
                         ->columnSpanFull(),
 
