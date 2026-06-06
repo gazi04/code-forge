@@ -57,12 +57,13 @@
         leftNodes = leftSide;
         rightNodes = rightSide;
         selectedLeftId = null;
-        matchedIds = [];
+        matchedIds = isAlreadyCleared ? data.pairs.map((_, idx) => idx) : [];
         movesCount = 0;
-        isCleared = false;
-        networkFeedback =
-            'Select a node from the left matrix, then find its matching anchor on the right.';
-        feedbackStatus = 'info';
+        isCleared = isAlreadyCleared;
+        networkFeedback = isAlreadyCleared
+            ? '✨ All node alignments secured and stable.'
+            : 'Select a node from the left matrix, then find its matching anchor on the right.';
+        feedbackStatus = isAlreadyCleared ? 'success' : 'info';
     }
 
     function handleLeftClick(id) {

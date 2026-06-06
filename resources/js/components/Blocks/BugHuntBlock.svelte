@@ -66,12 +66,13 @@
             };
         });
 
-        bugsRemaining = internalBugs;
+        bugsRemaining = isAlreadyCleared ? 0 : internalBugs;
         activeLineIdx = null;
-        isCleared = false;
-        feedbackMsg =
-            'Inspect the codebase thoroughly. Click any line to analyze its state.';
-        feedbackStatus = 'info';
+        isCleared = isAlreadyCleared;
+        feedbackMsg = isAlreadyCleared
+            ? '✨ Codebase verified. Hotfixes are fully integrated.'
+            : 'Inspect the codebase thoroughly. Click any line to analyze its state.';
+        feedbackStatus = isAlreadyCleared ? 'success' : 'info';
     }
 
     function handleLineClick(idx) {
