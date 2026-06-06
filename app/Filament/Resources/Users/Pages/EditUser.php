@@ -40,7 +40,7 @@ class EditUser extends EditRecord
                                 'coins' => $this->record->coins,
                             ],
                         ])
-                        ->log('Account progression parameters manually forced to defaults by Administrator.');
+                        ->log('Admin reset student progress. Level, XP, coins, all lesson and block submissions, and earned achievements have been wiped.');
 
                     $this->record->lessonSubmissions()->delete();
                     $this->record->blockSubmissions()->delete();
