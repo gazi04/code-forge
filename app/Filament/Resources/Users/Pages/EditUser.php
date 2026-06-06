@@ -21,7 +21,7 @@ class EditUser extends EditRecord
                 ->icon('heroicon-o-arrow-path')
                 ->requiresConfirmation()
                 ->modalHeading('Reset Student Progression?')
-                ->modalDescription('This will completely wipe out this student\'s level, current XP, and wallet balance back to baseline defaults. This action is destructive.')
+                ->modalDescription('This will completely wipe out this student\'s level, XP, coins, lesson submissions, block submissions, and all earned achievements back to baseline defaults. This action is destructive and irreversible.')
                 ->visible(fn () => $this->record->role === 'student')
                 ->action(function (): void {
                     activity()
@@ -41,6 +41,10 @@ class EditUser extends EditRecord
                             ],
                         ])
                         ->log('Account progression parameters manually forced to defaults by Administrator.');
+
+                    $this->record->lessonSubmissions()->delete();
+                    $this->record->blockSubmissions()->delete();
+                    $this->record->achievements()->detach();
 
                     $this->record->updateQuietly([
                         'level' => 1,
