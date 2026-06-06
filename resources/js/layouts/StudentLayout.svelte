@@ -1,5 +1,6 @@
 <script>
     import { page } from '@inertiajs/svelte';
+    import AchievementToast from '@/components/AchievementToast.svelte';
     import StudentNav from '@/components/StudentNav.svelte';
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
@@ -222,6 +223,8 @@
         {/key}
     </main>
 </div>
+
+<AchievementToast />
 
 {#if showLevelUpModal}
     <div
