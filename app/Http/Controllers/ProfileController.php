@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Achievement;
 use App\Models\BlockSubmission;
 use App\Models\LessonSubmission;
 use App\Services\ProgressionService;
@@ -51,6 +52,19 @@ class ProfileController extends Controller
             ->take(10)
             ->values();
 
+        $earnedAchievements = $user->achievements()->withPivot('unlocked_at')->get()->keyBy('id');
+
+        $achievements = Achievement::all()->map(fn (Achievement $achievement): array => [
+            'id' => $achievement->id,
+            'name' => $achievement->name,
+            'description' => $achievement->description,
+            'image_path' => $achievement->image_path,
+            'metric_type' => $achievement->metric_type,
+            'threshold' => $achievement->threshold,
+            'unlocked' => $earnedAchievements->has($achievement->id),
+            'unlocked_at' => $earnedAchievements->get($achievement->id)?->pivot?->unlocked_at,
+        ]);
+
         return Inertia::render('Student/Profile/Index', [
             'hero' => [
                 'name' => $user->name,
@@ -62,6 +76,7 @@ class ProfileController extends Controller
                 'streak_count' => $user->streak_count,
             ],
             'ledger' => $ledger,
+            'achievements' => $achievements,
             'preferences' => $user->preferences ?? [
                 'background_audio' => true,
                 'sound_effects' => true,
