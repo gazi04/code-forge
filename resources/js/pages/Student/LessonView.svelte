@@ -16,6 +16,7 @@
         previous_lesson_slug = null,
         next_lesson_slug = null,
         cleared_block_indices = [],
+        is_completed = false,
     } = $props();
 
     let actualLesson = $derived(lesson?.data ?? lesson);
@@ -121,6 +122,15 @@
             </div>
         </div>
     </header>
+
+    {#if is_completed}
+        <div
+            class="max-w-4xl mx-auto mb-6 flex items-center gap-3 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+        >
+            <span class="text-lg">✓</span>
+            <span class="text-sm font-black uppercase tracking-widest">Lesson Completed</span>
+        </div>
+    {/if}
 
     <div class="space-y-8 max-w-4xl mx-auto pb-4 relative z-10">
         {#if blocks.length === 0}
