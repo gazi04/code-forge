@@ -8,6 +8,7 @@
     import TextBlock from '../../components/Blocks/TextBlock.svelte';
     import VariableMatchingBlock from '../../components/Blocks/VariableMatchingBlock.svelte';
     import Layout from '../../layouts/StudentLayout.svelte';
+    import LessonHeader from '../../components/LessonHeader.svelte';
 
     let {
         lesson,
@@ -82,55 +83,7 @@
 </script>
 
 <Layout {theme}>
-    <header
-        class="sticky top-14 z-40 -mx-4 px-4 py-4 mb-8 backdrop-blur-md bg-[color-mix(in_srgb,var(--bg-color)_90%,transparent)] border-b border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors duration-800"
-    >
-        <div class="flex items-center gap-4">
-            <Link
-                href="/course/{course_slug}"
-                class="w-10 h-10 rounded-md bg-surface flex items-center justify-center border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-inner hover:border-[var(--primary-color)] transition-colors group"
-            >
-                <span class="text-xl group-hover:scale-110 transition-transform"
-                    >↩️</span
-                >
-            </Link>
-
-            <div>
-                <h1
-                    class="text-xl font-bold tracking-wide text-[var(--text-color)]"
-                >
-                    {actualLesson.name}
-                </h1>
-                <p
-                    class="text-xs text-[var(--text-color)] opacity-50 uppercase tracking-wider"
-                >
-                    Estimated: {actualLesson.estimated_duration}m
-                </p>
-            </div>
-        </div>
-
-        <div class="flex gap-3 text-sm font-medium">
-            <div
-                class="bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] px-4 py-1.5 rounded-md border border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] text-[var(--primary-color)] shadow-[0_0_10px_color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-800"
-            >
-                ✨ {actualLesson.xp_reward} XP
-            </div>
-            <div
-                class="bg-[color-mix(in_srgb,var(--accent-color)_10%,transparent)] px-4 py-1.5 rounded-md border border-[color-mix(in_srgb,var(--accent-color)_30%,transparent)] text-[var(--accent-color)] shadow-[0_0_10px_color-mix(in_srgb,var(--accent-color)_20%,transparent)] transition-colors duration-800"
-            >
-                💰 {actualLesson.coin_reward}
-            </div>
-        </div>
-    </header>
-
-    {#if is_completed}
-        <div
-            class="max-w-4xl mx-auto mb-6 flex items-center gap-3 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
-        >
-            <span class="text-lg">✓</span>
-            <span class="text-sm font-black uppercase tracking-widest">Lesson Completed</span>
-        </div>
-    {/if}
+    <LessonHeader lesson={actualLesson} {course_slug} {is_completed} />
 
     <div class="space-y-8 max-w-4xl mx-auto pb-4 relative z-10">
         {#if blocks.length === 0}
