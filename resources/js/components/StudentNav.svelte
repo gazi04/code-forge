@@ -7,9 +7,7 @@
 <nav
     class="sticky top-0 z-50 border-b border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] bg-[color-mix(in_srgb,var(--bg-color)_75%,transparent)] backdrop-blur-2xl text-[var(--text-color)] transition-colors duration-500"
 >
-    <div
-        class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between"
-    >
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <div class="flex items-center gap-6">
             <Link
                 href="/worlds"
@@ -61,14 +59,18 @@
                     >
                         {user.name.charAt(0)}
                     </div>
-                    <span class="text-[var(--text-color)] opacity-80 hidden md:block">{user.name}</span>
+                    <span
+                        class="text-[var(--text-color)] opacity-80 hidden md:block"
+                        >{user.name}</span
+                    >
                 </Link>
             {:else}
                 <div
                     class="px-3 py-1 rounded-md bg-white/5 border border-white/10 flex items-center gap-2"
                 >
                     <span class="opacity-50">System</span>
-                    <span class="text-[var(--accent-color)] transition-colors duration-500"
+                    <span
+                        class="text-[var(--accent-color)] transition-colors duration-500"
                         >Online</span
                     >
                 </div>

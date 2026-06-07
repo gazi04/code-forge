@@ -43,6 +43,10 @@ class LessonController extends Controller
             ->orderBy('sort_order', 'asc')
             ->first();
 
+        $isCompleted = LessonSubmission::where('user_id', $user->id)
+            ->where('lesson_id', $lesson->slug)
+            ->exists();
+
         return Inertia::render('Student/LessonView', [
             'lesson' => new LessonResource($lesson),
             'theme' => $course->world->themePack,
@@ -50,6 +54,7 @@ class LessonController extends Controller
             'previous_lesson_slug' => $previousLesson?->slug,
             'next_lesson_slug' => $nextLesson?->slug,
             'cleared_block_indices' => $clearedBlockIndices,
+            'is_completed' => $isCompleted,
         ]);
     }
 

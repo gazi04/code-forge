@@ -16,7 +16,9 @@
             >
                 Agent Profile
             </div>
-            <h1 class="text-3xl font-black text-white tracking-tight">Command Center</h1>
+            <h1 class="text-3xl font-black text-white tracking-tight">
+                Command Center
+            </h1>
         </header>
 
         <HeroBanner {hero} />

@@ -16,22 +16,24 @@
 </script>
 
 <div class="bg-surface rounded-2xl p-6">
-    <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-4">System Settings</h2>
+    <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-4">
+        System Settings
+    </h2>
 
     <div class="space-y-3">
-        {#each [
-            { key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' },
-            { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' },
-            { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' },
-        ] as setting}
+        {#each [{ key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' }, { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' }, { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' }] as setting}
             <div
                 class="flex items-center justify-between gap-4 p-4 rounded-xl bg-black/30 border border-white/5"
             >
                 <div class="flex items-center gap-3">
                     <span class="text-xl leading-none">{setting.icon}</span>
                     <div>
-                        <p class="text-sm font-semibold text-white/90">{setting.label}</p>
-                        <p class="text-[11px] text-white/35 font-mono">{setting.description}</p>
+                        <p class="text-sm font-semibold text-white/90">
+                            {setting.label}
+                        </p>
+                        <p class="text-[11px] text-white/35 font-mono">
+                            {setting.description}
+                        </p>
                     </div>
                 </div>
 
@@ -48,7 +50,9 @@
                 >
                     <span
                         class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-300
-                            {form[setting.key] ? 'translate-x-6' : 'translate-x-1'}"
+                            {form[setting.key]
+                            ? 'translate-x-6'
+                            : 'translate-x-1'}"
                     ></span>
                 </button>
             </div>
