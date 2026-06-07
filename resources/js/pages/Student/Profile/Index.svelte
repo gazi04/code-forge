@@ -1,10 +1,11 @@
 <script>
     import Layout from '../../../layouts/StudentLayout.svelte';
+    import AchievementsGrid from '@/components/Profile/AchievementsGrid.svelte';
     import HeroBanner from '@/components/Profile/HeroBanner.svelte';
     import QuestLedger from '@/components/Profile/QuestLedger.svelte';
     import SystemSettings from '@/components/Profile/SystemSettings.svelte';
 
-    let { hero, ledger, preferences } = $props();
+    let { hero, ledger, achievements, preferences } = $props();
 </script>
 
 <Layout>
@@ -19,6 +20,7 @@
         </header>
 
         <HeroBanner {hero} />
+        <AchievementsGrid {achievements} />
         <QuestLedger {ledger} />
         <SystemSettings {preferences} />
     </div>

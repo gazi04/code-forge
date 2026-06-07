@@ -5,7 +5,7 @@
 </script>
 
 <nav
-    class="sticky top-0 z-50 border-b border-white/10 bg-black/60 backdrop-blur-2xl text-white transition-colors duration-500"
+    class="sticky top-0 z-50 border-b border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] bg-[color-mix(in_srgb,var(--bg-color)_75%,transparent)] backdrop-blur-2xl text-[var(--text-color)] transition-colors duration-500"
 >
     <div
         class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between"
@@ -13,7 +13,7 @@
         <div class="flex items-center gap-6">
             <Link
                 href="/worlds"
-                class="font-black tracking-widest uppercase text-sm opacity-80 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors drop-shadow-md"
+                class="font-black tracking-widest uppercase text-sm text-[var(--text-color)] opacity-80 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors drop-shadow-md"
             >
                 Arcane.dev
             </Link>
@@ -54,14 +54,14 @@
 
                 <Link
                     href="/profile"
-                    class="flex items-center gap-2 pl-3 ml-2 border-l border-white/10 hover:opacity-80 transition-opacity"
+                    class="flex items-center gap-2 pl-3 ml-2 border-l border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:opacity-80 transition-opacity"
                 >
                     <div
                         class="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--primary-color)] to-[var(--accent-color)] flex items-center justify-center text-black font-black text-sm shadow-inner transition-colors duration-500"
                     >
                         {user.name.charAt(0)}
                     </div>
-                    <span class="opacity-80 hidden md:block">{user.name}</span>
+                    <span class="text-[var(--text-color)] opacity-80 hidden md:block">{user.name}</span>
                 </Link>
             {:else}
                 <div

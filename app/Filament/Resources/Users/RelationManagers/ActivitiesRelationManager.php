@@ -29,6 +29,8 @@ class ActivitiesRelationManager extends RelationManager
             'deleted' => 'danger',
             'updated' => 'warning',
             'admin.reset' => 'danger',
+            'admin.grant_achievement' => 'success',
+            'admin.revoke_achievement' => 'warning',
             default => 'gray',
         };
     }

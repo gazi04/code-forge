@@ -50,6 +50,16 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'game_result' => fn () => $request->session()->get('game_result'),
+                'achievements_unlocked' => function () use ($request): array {
+                    $user = $request->user();
+                    if (! $user || empty($user->pending_achievements)) {
+                        return [];
+                    }
+                    $pending = $user->pending_achievements;
+                    $user->update(['pending_achievements' => null]);
+
+                    return $pending;
+                },
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
