@@ -6,6 +6,7 @@ use App\Events\UserLeveledUp;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class ProgressionService
 {
@@ -118,6 +119,11 @@ class ProgressionService
 
             if ($leveledUp) {
                 event(new UserLeveledUp($user, $startingLevel, $user->level));
+            }
+
+            if (! $user->is_shadowbanned) {
+                Redis::zincrby('leaderboard:all_time', $earnedXp, $user->name);
+                Redis::zincrby('leaderboard:weekly', $earnedXp, $user->name);
             }
 
             // Return the payload formatted perfectly for Svelte

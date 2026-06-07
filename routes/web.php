@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WorldController;
@@ -15,6 +16,8 @@ Route::get('/login', [StudentLoginController::class, 'show'])->name('login');
 Route::post('/login/student', [StudentLoginController::class, 'store'])->name('student.login.submit');
 
 Route::middleware(['auth'])->name('student.')->group(function (): void {
+
+    Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile/settings', [ProfileController::class, 'updateSettings'])->name('profile.settings.update');
