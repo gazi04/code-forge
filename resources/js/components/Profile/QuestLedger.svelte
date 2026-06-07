@@ -17,7 +17,9 @@
 </script>
 
 <div class="bg-surface rounded-2xl p-6 mb-6">
-    <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-4">Quest Ledger</h2>
+    <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-4">
+        Quest Ledger
+    </h2>
 
     {#if ledger.length === 0}
         <p class="text-center text-white/30 font-mono text-sm py-8">
@@ -35,10 +37,14 @@
 
                     <div class="flex items-start justify-between gap-2">
                         <div>
-                            <p class="text-sm font-semibold text-white/90 leading-tight capitalize">
+                            <p
+                                class="text-sm font-semibold text-white/90 leading-tight capitalize"
+                            >
                                 {entry.label.replace(/-/g, ' ')}
                             </p>
-                            <time class="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+                            <time
+                                class="text-[10px] font-mono text-white/30 uppercase tracking-wider"
+                            >
                                 {formatDate(entry.completed_at)}
                             </time>
                         </div>

@@ -26,7 +26,9 @@
                 {title}
             </h4>
 
-            <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono mt-0.5">
+            <p
+                class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono mt-0.5"
+            >
                 {instructions}
             </p>
 

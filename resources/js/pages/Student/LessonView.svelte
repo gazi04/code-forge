@@ -210,14 +210,21 @@
     </footer>
 
     {#if errorMessage}
-        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md bg-rose-950/90 backdrop-blur-xl border border-rose-500/50 text-rose-300 px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(225,29,72,0.2)] flex items-start gap-4 animate-fade-in-up">
+        <div
+            class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md bg-rose-950/90 backdrop-blur-xl border border-rose-500/50 text-rose-300 px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(225,29,72,0.2)] flex items-start gap-4 animate-fade-in-up"
+        >
             <div class="text-2xl mt-0.5 animate-pulse">⚠️</div>
             <div class="flex-1 flex flex-col gap-1">
-                <span class="text-[10px] uppercase tracking-widest font-black text-rose-500">Access Denied</span>
-                <span class="font-mono text-sm font-medium leading-relaxed">{errorMessage}</span>
+                <span
+                    class="text-[10px] uppercase tracking-widest font-black text-rose-500"
+                    >Access Denied</span
+                >
+                <span class="font-mono text-sm font-medium leading-relaxed"
+                    >{errorMessage}</span
+                >
             </div>
             <button
-                onclick={() => errorMessage = ''}
+                onclick={() => (errorMessage = '')}
                 class="opacity-50 hover:opacity-100 hover:text-white transition-colors text-lg"
                 aria-label="Close notification"
             >
@@ -239,6 +246,7 @@
         }
     }
     .animate-fade-in-up {
-        animation: fadeInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        animation: fadeInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+            forwards;
     }
 </style>

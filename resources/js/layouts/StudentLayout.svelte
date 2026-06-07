@@ -242,13 +242,17 @@
             <div
                 class="w-32 h-32 mx-auto my-6 bg-[color-mix(in_srgb,var(--primary-color)_20%,var(--bg-color))] border-4 border-yellow-400 rounded-full flex items-center justify-center shadow-inner"
             >
-                <span class="text-6xl font-black text-[var(--text-color)]">{newLevel}</span>
+                <span class="text-6xl font-black text-[var(--text-color)]"
+                    >{newLevel}</span
+                >
             </div>
 
             <h3 class="text-2xl font-bold text-[var(--text-color)] mb-1">
                 {getTitle(newLevel)}
             </h3>
-            <p class="text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] mb-8 font-mono text-sm">
+            <p
+                class="text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] mb-8 font-mono text-sm"
+            >
                 Your logical reasoning has expanded.<br />
                 <span class="text-yellow-400 font-bold block mt-2"
                     >+ {coinBonus} Gold Coins</span

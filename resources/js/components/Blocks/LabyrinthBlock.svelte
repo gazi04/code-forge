@@ -339,7 +339,9 @@
                 </div>
             </div>
 
-            <div class="mt-6 pt-5 border-t border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] flex gap-4">
+            <div
+                class="mt-6 pt-5 border-t border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] flex gap-4"
+            >
                 <button
                     onclick={runProgram}
                     disabled={commandQueue.length === 0 ||
