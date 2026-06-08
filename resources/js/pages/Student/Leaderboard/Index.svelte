@@ -53,7 +53,7 @@
                 <p class="text-sm uppercase tracking-widest">No rankings yet. Be the first.</p>
             </div>
         {:else}
-            <Podium {leaders} />
+            <Podium {leaders} playerName={player?.name ?? ''} />
             <Roster {leaders} playerName={player?.name ?? ''} />
         {/if}
     </div>
