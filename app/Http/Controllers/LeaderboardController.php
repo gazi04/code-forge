@@ -38,13 +38,21 @@ class LeaderboardController extends Controller
         $userRank = Redis::zrevrank($redisKey, $user->name);
         $userScore = Redis::zscore($redisKey, $user->name);
 
+        if ($userRank === null) {
+            if ($scope === 'all_time') {
+                $userRank = User::where('xp', '>', $user->xp)->where('is_shadowbanned', false)->count();
+            }
+        } else {
+            $userRank = (int) $userRank;
+        }
+
         return Inertia::render('Student/Leaderboard/Index', [
             'leaders' => $leaders,
             'scope' => $scope,
             'player' => [
                 'name' => $user->name,
-                'rank' => $userRank !== null ? (int) $userRank + 1 : null,
-                'xp' => (int) ($userScore ?? 0),
+                'rank' => $userRank !== null ? $userRank + 1 : null,
+                'xp' => (int) ($userScore ?? ($scope === 'all_time' ? $user->xp : 0)),
                 'level' => $user->level,
             ],
         ]);
