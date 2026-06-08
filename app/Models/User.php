@@ -39,6 +39,7 @@ class User extends Authenticatable implements FilamentUser
             'last_active_at' => 'datetime',
             'preferences' => 'array',
             'pending_achievements' => 'array',
+            'is_shadowbanned' => 'boolean',
         ];
     }
 

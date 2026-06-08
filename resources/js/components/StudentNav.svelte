@@ -1,7 +1,9 @@
 <script>
-    import { Link } from '@inertiajs/svelte';
+    import { Link, page } from '@inertiajs/svelte';
 
     let { user } = $props();
+
+    let isLeaderboard = $derived(page.url.startsWith('/leaderboard'));
 </script>
 
 <nav
@@ -49,6 +51,16 @@
                 >
                     Lv. {user.level}
                 </div>
+
+                <Link
+                    href="/leaderboard"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono border transition-colors duration-500
+                        {isLeaderboard
+                            ? 'bg-amber-500/15 border-amber-400/40 text-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.2)]'
+                            : 'bg-amber-500/5 border-amber-500/15 text-amber-400/60 hover:bg-amber-500/10 hover:border-amber-400/30 hover:text-amber-400'}"
+                >
+                    <span class="text-sm leading-none">🏆</span>
+                </Link>
 
                 <Link
                     href="/profile"
