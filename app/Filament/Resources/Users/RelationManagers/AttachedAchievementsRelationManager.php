@@ -24,6 +24,7 @@ class AttachedAchievementsRelationManager extends RelationManager
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Art')
+                    ->disk('public')
                     ->square()
                     ->size(40),
 
