@@ -1,5 +1,6 @@
 <script>
     import { page } from '@inertiajs/svelte';
+    import AchievementToast from '@/components/AchievementToast.svelte';
     import StudentNav from '@/components/StudentNav.svelte';
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
@@ -223,12 +224,14 @@
     </main>
 </div>
 
+<AchievementToast />
+
 {#if showLevelUpModal}
     <div
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-all"
     >
         <div
-            class="bg-[#150b2e] border-4 border-yellow-400 rounded-3xl p-10 max-w-md w-full text-center shadow-[0_0_50px_rgba(250,204,21,0.4)] animate-bounce-in"
+            class="bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border-4 border-yellow-400 rounded-3xl p-10 max-w-md w-full text-center shadow-[0_0_50px_rgba(250,204,21,0.4)] animate-bounce-in"
         >
             <h2
                 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-orange-500 mb-2 drop-shadow-lg"
@@ -237,15 +240,19 @@
             </h2>
 
             <div
-                class="w-32 h-32 mx-auto my-6 bg-indigo-900 border-4 border-yellow-400 rounded-full flex items-center justify-center shadow-inner"
+                class="w-32 h-32 mx-auto my-6 bg-[color-mix(in_srgb,var(--primary-color)_20%,var(--bg-color))] border-4 border-yellow-400 rounded-full flex items-center justify-center shadow-inner"
             >
-                <span class="text-6xl font-black text-white">{newLevel}</span>
+                <span class="text-6xl font-black text-[var(--text-color)]"
+                    >{newLevel}</span
+                >
             </div>
 
-            <h3 class="text-2xl font-bold text-white mb-1">
+            <h3 class="text-2xl font-bold text-[var(--text-color)] mb-1">
                 {getTitle(newLevel)}
             </h3>
-            <p class="text-indigo-300 mb-8 font-mono text-sm">
+            <p
+                class="text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] mb-8 font-mono text-sm"
+            >
                 Your logical reasoning has expanded.<br />
                 <span class="text-yellow-400 font-bold block mt-2"
                     >+ {coinBonus} Gold Coins</span

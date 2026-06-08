@@ -155,7 +155,8 @@
             <div
                 class="px-3 py-1.5 bg-[var(--surface-color)] border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] rounded-md"
             >
-                Anomalies Found: <span class="font-bold text-[var(--text-color)]"
+                Anomalies Found: <span
+                    class="font-bold text-[var(--text-color)]"
                     >{isCleared ? '0' : bugsRemaining}</span
                 >
             </div>

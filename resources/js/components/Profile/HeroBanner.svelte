@@ -2,9 +2,14 @@
     let { hero } = $props();
 
     let xpInCurrentLevel = $derived(hero.xp - hero.xp_for_current_level);
-    let xpNeededForNextLevel = $derived(hero.xp_for_next_level - hero.xp_for_current_level);
+    let xpNeededForNextLevel = $derived(
+        hero.xp_for_next_level - hero.xp_for_current_level,
+    );
     let xpPercent = $derived(
-        Math.min(100, Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100)),
+        Math.min(
+            100,
+            Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100),
+        ),
     );
 
     function getTitle(level) {
@@ -25,15 +30,21 @@
 
         <div class="flex-1 w-full text-center md:text-left">
             <h1 class="text-2xl font-black text-white mb-0.5">{hero.name}</h1>
-            <p class="text-xs font-mono uppercase tracking-widest text-white/40 mb-4">
+            <p
+                class="text-xs font-mono uppercase tracking-widest text-white/40 mb-4"
+            >
                 {getTitle(hero.level)}
             </p>
 
-            <div class="mb-2 flex items-center justify-between text-xs font-mono text-white/50">
+            <div
+                class="mb-2 flex items-center justify-between text-xs font-mono text-white/50"
+            >
                 <span>Level {hero.level}</span>
                 <span>{hero.xp} / {hero.xp_for_next_level} XP</span>
             </div>
-            <div class="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
+            <div
+                class="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/5"
+            >
                 <div
                     class="h-full rounded-full bg-gradient-to-r from-[var(--primary-color)] to-[var(--accent-color)] transition-all duration-700"
                     style="width: {xpPercent}%"
@@ -47,26 +58,40 @@
             class="flex flex-col items-center gap-1 px-3 py-3 rounded-xl bg-black/30 border border-white/5"
         >
             <span class="text-lg leading-none">✨</span>
-            <span class="text-sm font-black text-[var(--primary-color)] font-mono transition-colors duration-500"
+            <span
+                class="text-sm font-black text-[var(--primary-color)] font-mono transition-colors duration-500"
                 >{hero.xp}</span
             >
-            <span class="text-[10px] font-mono uppercase tracking-widest text-white/30">XP</span>
+            <span
+                class="text-[10px] font-mono uppercase tracking-widest text-white/30"
+                >XP</span
+            >
         </div>
 
         <div
             class="flex flex-col items-center gap-1 px-3 py-3 rounded-xl bg-black/30 border border-white/5"
         >
             <span class="text-lg leading-none">💰</span>
-            <span class="text-sm font-black text-yellow-400 font-mono">{hero.coins}</span>
-            <span class="text-[10px] font-mono uppercase tracking-widest text-white/30">Coins</span>
+            <span class="text-sm font-black text-yellow-400 font-mono"
+                >{hero.coins}</span
+            >
+            <span
+                class="text-[10px] font-mono uppercase tracking-widest text-white/30"
+                >Coins</span
+            >
         </div>
 
         <div
             class="flex flex-col items-center gap-1 px-3 py-3 rounded-xl bg-black/30 border border-white/5"
         >
             <span class="text-lg leading-none">🔥</span>
-            <span class="text-sm font-black text-orange-400 font-mono">{hero.streak_count}</span>
-            <span class="text-[10px] font-mono uppercase tracking-widest text-white/30">Streak</span>
+            <span class="text-sm font-black text-orange-400 font-mono"
+                >{hero.streak_count}</span
+            >
+            <span
+                class="text-[10px] font-mono uppercase tracking-widest text-white/30"
+                >Streak</span
+            >
         </div>
     </div>
 </div>

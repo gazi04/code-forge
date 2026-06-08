@@ -8,6 +8,7 @@
     import TextBlock from '../../components/Blocks/TextBlock.svelte';
     import VariableMatchingBlock from '../../components/Blocks/VariableMatchingBlock.svelte';
     import Layout from '../../layouts/StudentLayout.svelte';
+    import LessonHeader from '../../components/LessonHeader.svelte';
 
     let {
         lesson,
@@ -16,6 +17,7 @@
         previous_lesson_slug = null,
         next_lesson_slug = null,
         cleared_block_indices = [],
+        is_completed = false,
     } = $props();
 
     let actualLesson = $derived(lesson?.data ?? lesson);
@@ -81,46 +83,7 @@
 </script>
 
 <Layout {theme}>
-    <header
-        class="sticky top-14 z-40 -mx-4 px-4 py-4 mb-8 backdrop-blur-md bg-[color-mix(in_srgb,var(--bg-color)_90%,transparent)] border-b border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors duration-800"
-    >
-        <div class="flex items-center gap-4">
-            <Link
-                href="/course/{course_slug}"
-                class="w-10 h-10 rounded-md bg-surface flex items-center justify-center border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-inner hover:border-[var(--primary-color)] transition-colors group"
-            >
-                <span class="text-xl group-hover:scale-110 transition-transform"
-                    >↩️</span
-                >
-            </Link>
-
-            <div>
-                <h1
-                    class="text-xl font-bold tracking-wide text-[var(--text-color)]"
-                >
-                    {actualLesson.name}
-                </h1>
-                <p
-                    class="text-xs text-[var(--text-color)] opacity-50 uppercase tracking-wider"
-                >
-                    Estimated: {actualLesson.estimated_duration}m
-                </p>
-            </div>
-        </div>
-
-        <div class="flex gap-3 text-sm font-medium">
-            <div
-                class="bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] px-4 py-1.5 rounded-md border border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] text-[var(--primary-color)] shadow-[0_0_10px_color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-800"
-            >
-                ✨ {actualLesson.xp_reward} XP
-            </div>
-            <div
-                class="bg-[color-mix(in_srgb,var(--accent-color)_10%,transparent)] px-4 py-1.5 rounded-md border border-[color-mix(in_srgb,var(--accent-color)_30%,transparent)] text-[var(--accent-color)] shadow-[0_0_10px_color-mix(in_srgb,var(--accent-color)_20%,transparent)] transition-colors duration-800"
-            >
-                💰 {actualLesson.coin_reward}
-            </div>
-        </div>
-    </header>
+    <LessonHeader lesson={actualLesson} {course_slug} {is_completed} />
 
     <div class="space-y-8 max-w-4xl mx-auto pb-4 relative z-10">
         {#if blocks.length === 0}
@@ -210,14 +173,21 @@
     </footer>
 
     {#if errorMessage}
-        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md bg-rose-950/90 backdrop-blur-xl border border-rose-500/50 text-rose-300 px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(225,29,72,0.2)] flex items-start gap-4 animate-fade-in-up">
+        <div
+            class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md bg-rose-950/90 backdrop-blur-xl border border-rose-500/50 text-rose-300 px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(225,29,72,0.2)] flex items-start gap-4 animate-fade-in-up"
+        >
             <div class="text-2xl mt-0.5 animate-pulse">⚠️</div>
             <div class="flex-1 flex flex-col gap-1">
-                <span class="text-[10px] uppercase tracking-widest font-black text-rose-500">Access Denied</span>
-                <span class="font-mono text-sm font-medium leading-relaxed">{errorMessage}</span>
+                <span
+                    class="text-[10px] uppercase tracking-widest font-black text-rose-500"
+                    >Access Denied</span
+                >
+                <span class="font-mono text-sm font-medium leading-relaxed"
+                    >{errorMessage}</span
+                >
             </div>
             <button
-                onclick={() => errorMessage = ''}
+                onclick={() => (errorMessage = '')}
                 class="opacity-50 hover:opacity-100 hover:text-white transition-colors text-lg"
                 aria-label="Close notification"
             >
@@ -239,6 +209,7 @@
         }
     }
     .animate-fade-in-up {
-        animation: fadeInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        animation: fadeInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+            forwards;
     }
 </style>

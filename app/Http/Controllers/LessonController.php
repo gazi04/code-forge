@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProgressRegistered;
 use App\Http\Resources\LessonResource;
 use App\Models\BlockSubmission;
 use App\Models\Lesson;
@@ -42,6 +43,10 @@ class LessonController extends Controller
             ->orderBy('sort_order', 'asc')
             ->first();
 
+        $isCompleted = LessonSubmission::where('user_id', $user->id)
+            ->where('lesson_id', $lesson->slug)
+            ->exists();
+
         return Inertia::render('Student/LessonView', [
             'lesson' => new LessonResource($lesson),
             'theme' => $course->world->themePack,
@@ -49,6 +54,7 @@ class LessonController extends Controller
             'previous_lesson_slug' => $previousLesson?->slug,
             'next_lesson_slug' => $nextLesson?->slug,
             'cleared_block_indices' => $clearedBlockIndices,
+            'is_completed' => $isCompleted,
         ]);
     }
 
@@ -115,6 +121,8 @@ class LessonController extends Controller
             'coins_rewarded' => $result['coins_earned'],
         ]);
 
+        ProgressRegistered::dispatch($user);
+
         // 5. Flash the result payload to the session for Svelte to intercept
         return back()->with('game_result', $result);
     }
@@ -146,6 +154,7 @@ class LessonController extends Controller
 
         $xpReward = $blockData['xp_reward'] ?? 15; // 15 XP default for mini-tasks
         $coinReward = $blockData['coin_reward'] ?? 5; // 5 Coins default
+        $blockTitle = $blockData['game_title'] ?? null;
 
         // 3. Engine Processing: Run the math
         $result = $this->progressionService->processVictory(
@@ -159,9 +168,12 @@ class LessonController extends Controller
             'user_id' => $user->id,
             'lesson_id' => $lesson->id,
             'block_index' => $blockIndex,
+            'block_title' => $blockTitle,
             'xp_rewarded' => $result['total_xp_earned'],
             'coins_rewarded' => $result['coins_earned'],
         ]);
+
+        ProgressRegistered::dispatch($user);
 
         // 5. Intercept & Celebrate:
         // Flashing this data means if this 15 XP pushes them over the edge,

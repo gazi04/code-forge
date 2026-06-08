@@ -150,7 +150,9 @@
         </div>
 
         <div class="flex flex-col h-[400px]">
-            <div class="flex-1 p-6 bg-[color-mix(in_srgb,var(--bg-color)_70%,black)] overflow-y-auto">
+            <div
+                class="flex-1 p-6 bg-[color-mix(in_srgb,var(--bg-color)_70%,black)] overflow-y-auto"
+            >
                 <div
                     class="font-mono text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest mb-2"
                 >
