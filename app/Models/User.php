@@ -16,7 +16,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Activitylog\Models\Concerns\HasActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
-#[Fillable(['name', 'email', 'password', 'role', 'xp', 'level', 'coins', 'streak_count', 'last_active_at', 'streak_freezes', 'rested_xp_balance', 'preferences', 'pending_achievements'])]
+#[Fillable(['name', 'email', 'password', 'role', 'xp', 'level', 'coins', 'streak_count', 'last_active_at', 'streak_freezes', 'rested_xp_balance', 'xp_boost_lessons_remaining', 'xp_boost_multiplier', 'preferences', 'pending_achievements'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -67,6 +67,11 @@ class User extends Authenticatable implements FilamentUser
     public function blockSubmissions(): HasMany
     {
         return $this->hasMany(BlockSubmission::class);
+    }
+
+    public function inventory(): HasMany
+    {
+        return $this->hasMany(UserInventory::class);
     }
 
     public function achievements(): BelongsToMany
