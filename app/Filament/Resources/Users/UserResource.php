@@ -8,6 +8,7 @@ use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\RelationManagers\AttachedAchievementsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\BlockSubmissionsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\InventoryRelationManager;
 use App\Filament\Resources\Users\RelationManagers\LessonSubmissionsRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
@@ -42,6 +43,7 @@ class UserResource extends Resource
             LessonSubmissionsRelationManager::class,
             BlockSubmissionsRelationManager::class,
             AttachedAchievementsRelationManager::class,
+            InventoryRelationManager::class,
             ActivitiesRelationManager::class,
         ];
     }
