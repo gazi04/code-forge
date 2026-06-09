@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\StoreItem;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -46,10 +49,12 @@ class HandleInertiaRequests extends Middleware
                     'xp' => $request->user()->xp,
                     'coins' => $request->user()->coins,
                     'streak_count' => $request->user()->streak_count,
+                    'equipped' => $this->resolveEquipped($request->user()),
                 ] : null,
             ],
             'flash' => [
                 'game_result' => fn () => $request->session()->get('game_result'),
+                'store_result' => fn () => $request->session()->get('store_result'),
                 'achievements_unlocked' => function () use ($request): array {
                     $user = $request->user();
                     if (! $user || empty($user->pending_achievements)) {
@@ -62,6 +67,35 @@ class HandleInertiaRequests extends Middleware
                 },
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+        ];
+    }
+
+    /** @return array{title: array<string, mixed>|null, avatar: array<string, mixed>|null} */
+    private function resolveEquipped(User $user): array
+    {
+        $prefs = $user->preferences ?? [];
+        $titleId = $prefs['equipped_title'] ?? null;
+        $avatarId = $prefs['equipped_avatar'] ?? null;
+        $ids = array_filter([$titleId, $avatarId]);
+
+        $items = $ids
+            ? StoreItem::whereIn('id', $ids)->select(['id', 'name', 'type', 'image', 'display_config'])->get()->keyBy('id')
+            : collect();
+
+        $title = $titleId && $items->has($titleId) ? $items->get($titleId) : null;
+        $avatar = $avatarId && $items->has($avatarId) ? $items->get($avatarId) : null;
+
+        return [
+            'title' => $title ? [
+                'id' => $title->id,
+                'name' => $title->name,
+                'color' => $title->display_config['color'] ?? null,
+            ] : null,
+            'avatar' => $avatar ? [
+                'id' => $avatar->id,
+                'name' => $avatar->name,
+                'image_url' => $avatar->image ? Storage::url($avatar->image) : null,
+            ] : null,
         ];
     }
 }

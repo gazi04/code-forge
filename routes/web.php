@@ -5,6 +5,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WorldController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,17 @@ Route::post('/login/student', [StudentLoginController::class, 'store'])->name('s
 Route::middleware(['auth'])->name('student.')->group(function (): void {
 
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
+
+    Route::name('store.')->group(function (): void {
+        Route::get('/store', [StoreController::class, 'index'])->name('index');
+        Route::post('/store/{item}/purchase', [StoreController::class, 'purchase'])->name('purchase');
+    });
+
+    Route::name('inventory.')->group(function (): void {
+        Route::post('/inventory/{inventory}/activate', [StoreController::class, 'activateItem'])->name('activate');
+        Route::post('/inventory/{inventory}/equip', [StoreController::class, 'equip'])->name('equip');
+        Route::delete('/inventory/unequip/{type}', [StoreController::class, 'unequip'])->name('unequip');
+    });
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile/settings', [ProfileController::class, 'updateSettings'])->name('profile.settings.update');
