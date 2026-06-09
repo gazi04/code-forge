@@ -1,6 +1,8 @@
 <script>
     let { ledger } = $props();
 
+    let recentEntries = $derived(ledger.slice(0, 10));
+
     function formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleDateString(undefined, {
@@ -11,59 +13,102 @@
         });
     }
 
-    function entryIcon(type) {
-        return type === 'lesson' ? '📜' : '⚡';
-    }
+    const TYPE_CONFIG = {
+        lesson: { icon: '📜', label: 'Lesson', color: 'var(--primary-color)' },
+        block: { icon: '⚡', label: 'Block', color: 'var(--accent-color)' },
+    };
 </script>
 
 <div class="bg-surface rounded-2xl p-6 mb-6">
-    <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-4">
-        Quest Ledger
-    </h2>
+    <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-black text-[var(--text-color)] tracking-tight">
+            Quest Ledger
+        </h2>
+        {#if ledger.length > 10}
+            <span
+                class="text-xs font-mono text-[color-mix(in_srgb,var(--text-color)_30%,transparent)] uppercase tracking-widest"
+            >
+                Last 10 of {ledger.length}
+            </span>
+        {/if}
+    </div>
 
     {#if ledger.length === 0}
-        <p class="text-center text-white/30 font-mono text-sm py-8">
-            No completions yet. Start a lesson to build your ledger.
-        </p>
+        <div class="text-center py-14">
+            <p class="text-4xl mb-4">📜</p>
+            <p
+                class="text-sm font-black uppercase tracking-widest text-[color-mix(in_srgb,var(--text-color)_30%,transparent)]"
+            >
+                No missions logged yet
+            </p>
+            <p
+                class="text-sm text-[color-mix(in_srgb,var(--text-color)_20%,transparent)] mt-1"
+            >
+                Complete a lesson to fill your ledger.
+            </p>
+        </div>
     {:else}
-        <ol class="relative border-l border-white/10 ml-3 space-y-0">
-            {#each ledger as entry, i (i)}
-                <li class="mb-6 ml-6">
-                    <span
-                        class="absolute -left-3 flex items-center justify-center w-6 h-6 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_40%,transparent)] text-xs transition-colors duration-500"
+        <div class="space-y-2.5">
+            {#each recentEntries as entry, i (i)}
+                {@const config = TYPE_CONFIG[entry.type] ?? TYPE_CONFIG.block}
+                <div class="entry-row group flex items-center gap-4 px-4 py-3.5 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_7%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] transition-all duration-200">
+                    <!-- Icon -->
+                    <div
+                        class="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-500"
                     >
-                        {entryIcon(entry.type)}
-                    </span>
+                        {config.icon}
+                    </div>
 
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <p
-                                class="text-sm font-semibold text-white/90 leading-tight capitalize"
+                    <!-- Label + time -->
+                    <div class="flex-1 min-w-0">
+                        <p
+                            class="text-sm font-bold text-[var(--text-color)] capitalize leading-tight truncate"
+                        >
+                            {entry.label.replace(/-/g, ' ')}
+                        </p>
+                        <time
+                            class="text-xs font-mono text-[color-mix(in_srgb,var(--text-color)_35%,transparent)]"
+                        >
+                            {formatDate(entry.completed_at)}
+                        </time>
+                    </div>
+
+                    <!-- Rewards -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <div
+                            class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-500"
+                        >
+                            <span class="text-xs">✨</span>
+                            <span
+                                class="text-xs font-black font-mono text-[var(--primary-color)]"
+                                >+{entry.xp}</span
                             >
-                                {entry.label.replace(/-/g, ' ')}
-                            </p>
-                            <time
-                                class="text-[10px] font-mono text-white/30 uppercase tracking-wider"
-                            >
-                                {formatDate(entry.completed_at)}
-                            </time>
                         </div>
-
-                        <div class="flex items-center gap-2 shrink-0">
+                        <div
+                            class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-yellow-400/10 border border-yellow-400/20"
+                        >
+                            <span class="text-xs">💰</span>
                             <span
-                                class="text-[10px] font-mono text-[var(--primary-color)] bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] px-2 py-0.5 rounded-full border border-[color-mix(in_srgb,var(--primary-color)_25%,transparent)] transition-colors duration-500"
+                                class="text-xs font-black font-mono text-yellow-400"
+                                >+{entry.coins}</span
                             >
-                                +{entry.xp} XP
-                            </span>
-                            <span
-                                class="text-[10px] font-mono text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full border border-yellow-400/20"
-                            >
-                                +{entry.coins} 💰
-                            </span>
                         </div>
                     </div>
-                </li>
+                </div>
             {/each}
-        </ol>
+        </div>
     {/if}
 </div>
+
+<style>
+    .entry-row {
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease,
+            border-color 0.2s ease;
+    }
+    .entry-row:hover {
+        transform: translateX(2px);
+        box-shadow: 0 0 16px color-mix(in srgb, var(--primary-color) 8%, transparent);
+    }
+</style>

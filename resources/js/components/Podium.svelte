@@ -59,15 +59,31 @@
             {:else}
                 <div class="mb-1 h-8"></div>
             {/if}
-
-            <div
-                class="{medal.size} rounded-full {medal.bg} border-2 {medal.border} {medal.glow} flex items-center justify-center font-black {medal.text} uppercase tracking-wider relative {i === 0 ? 'pulse-ring' : ''}"
-            >
-                {leader.name.slice(0, 2).toUpperCase()}
+            <div class="{medal.size} relative">
+                {#if leader.equipped?.avatar?.image_url}
+                    <div
+                        class="absolute inset-0 rounded-full border-2 {medal.border} {medal.glow} overflow-hidden {i === 0 ? 'pulse-ring' : ''}"
+                    >
+                        <img
+                            src={leader.equipped.avatar.image_url}
+                            alt={leader.name}
+                            class="w-full h-full object-cover"
+                        />
+                    </div>
+                {:else}
+                    <div
+                        class="absolute inset-0 rounded-full {medal.bg} border-2 {medal.border} {medal.glow} flex items-center justify-center font-black {medal.text} uppercase tracking-wider {i === 0 ? 'pulse-ring' : ''}"
+                    >
+                        {leader.name.slice(0, 2).toUpperCase()}
+                    </div>
+                {/if}
             </div>
 
             <div class="text-center mt-2 mb-2">
                 <p class="font-bold text-[var(--text-color)] text-sm truncate max-w-[100px]">{leader.name}</p>
+                {#if leader.equipped?.title}
+                    <p class="text-[10px] font-mono" style="color: {leader.equipped.title.color ?? 'inherit'}">{leader.equipped.title.name}</p>
+                {/if}
                 <p class="text-xs {medal.text} font-mono font-bold">Lv. {leader.level}</p>
                 <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_50%,transparent)] font-mono">{leader.xp.toLocaleString()} XP</p>
                 {#if isPlayer}

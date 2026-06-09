@@ -16,22 +16,22 @@
 </script>
 
 <div class="bg-surface rounded-2xl p-6">
-    <h2 class="text-sm font-mono uppercase tracking-widest text-white/40 mb-4">
+    <h2 class="text-base font-black text-[var(--text-color)] tracking-tight mb-5">
         System Settings
     </h2>
 
     <div class="space-y-3">
         {#each [{ key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' }, { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' }, { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' }] as setting}
             <div
-                class="flex items-center justify-between gap-4 p-4 rounded-xl bg-black/30 border border-white/5"
+                class="flex items-center justify-between gap-4 p-4 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_4%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]"
             >
                 <div class="flex items-center gap-3">
                     <span class="text-xl leading-none">{setting.icon}</span>
                     <div>
-                        <p class="text-sm font-semibold text-white/90">
+                        <p class="text-base font-semibold text-[var(--text-color)]">
                             {setting.label}
                         </p>
-                        <p class="text-[11px] text-white/35 font-mono">
+                        <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] font-mono mt-0.5">
                             {setting.description}
                         </p>
                     </div>

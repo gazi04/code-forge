@@ -15,114 +15,148 @@
 </script>
 
 <div class="bg-surface rounded-2xl p-6 mb-6">
-    <h2 class="text-lg font-black text-white mb-1 tracking-tight">
-        Achievements
-    </h2>
-    <p class="text-xs font-mono text-white/40 uppercase tracking-widest mb-5">
-        {unlocked.length} / {achievements.length} Unlocked
-    </p>
+    <div class="flex items-baseline justify-between mb-5">
+        <h2 class="text-lg font-black text-[var(--text-color)] tracking-tight">
+            Achievements
+        </h2>
+        <span
+            class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_12%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] text-[var(--primary-color)] transition-colors duration-500"
+        >
+            {unlocked.length} / {achievements.length}
+        </span>
+    </div>
 
     {#if achievements.length === 0}
-        <p class="text-sm text-white/30 font-mono text-center py-8">
+        <p
+            class="text-sm text-[color-mix(in_srgb,var(--text-color)_25%,transparent)] font-mono text-center py-12"
+        >
             No achievements configured yet.
         </p>
     {:else}
-        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-            {#each unlocked as achievement (achievement.id)}
-                <div
-                    class="achievement-card unlocked group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-black/30 border border-white/10 cursor-default"
-                >
-                    <div class="achievement-icon">
-                        {#if achievement.image_path}
-                            <img
-                                src={`/storage/${achievement.image_path}`}
-                                alt={achievement.name}
-                                class="w-12 h-12 object-contain drop-shadow-[0_0_8px_var(--primary-color)]"
-                            />
-                        {:else}
-                            <div
-                                class="w-12 h-12 rounded-full bg-gradient-to-tr from-[var(--primary-color)] to-[var(--accent-color)] flex items-center justify-center text-2xl shadow-[0_0_12px_var(--primary-color)]"
-                            >
-                                🏆
-                            </div>
-                        {/if}
-                    </div>
-
-                    <span
-                        class="text-[11px] font-bold text-white text-center leading-tight line-clamp-2"
+        {#if unlocked.length > 0}
+            <p
+                class="text-xs font-mono uppercase tracking-widest text-[color-mix(in_srgb,var(--text-color)_35%,transparent)] mb-3"
+            >
+                Unlocked
+            </p>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-6">
+                {#each unlocked as achievement (achievement.id)}
+                    <div
+                        class="achievement-card unlocked group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] cursor-default transition-colors duration-500"
                     >
-                        {achievement.name}
-                    </span>
+                        <div class="achievement-icon">
+                            {#if achievement.image_path}
+                                <img
+                                    src={`/storage/${achievement.image_path}`}
+                                    alt={achievement.name}
+                                    class="w-12 h-12 object-contain drop-shadow-[0_0_8px_color-mix(in_srgb,var(--primary-color)_70%,transparent)]"
+                                />
+                            {:else}
+                                <div
+                                    class="w-12 h-12 rounded-full bg-gradient-to-tr from-[var(--primary-color)] to-[var(--accent-color)] flex items-center justify-center text-2xl shadow-[0_0_12px_color-mix(in_srgb,var(--primary-color)_40%,transparent)]"
+                                >
+                                    🏆
+                                </div>
+                            {/if}
+                        </div>
 
-                    {#if achievement.unlocked_at}
                         <span
-                            class="text-[9px] font-mono text-[var(--accent-color)] text-center"
+                            class="text-xs font-bold text-[var(--text-color)] text-center leading-tight line-clamp-2"
                         >
-                            {formatDate(achievement.unlocked_at)}
+                            {achievement.name}
                         </span>
-                    {/if}
 
-                    <!-- Tooltip -->
-                    <div
-                        class="achievement-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 bg-black/90 border border-white/10 rounded-xl p-3 text-xs text-white/80 pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    >
-                        <p class="font-bold text-white mb-1">
-                            {achievement.name}
-                        </p>
-                        {#if achievement.description}
-                            <p class="text-white/60 leading-snug">
-                                {achievement.description}
-                            </p>
-                        {/if}
-                    </div>
-                </div>
-            {/each}
-
-            {#each locked as achievement (achievement.id)}
-                <div
-                    class="achievement-card locked group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-black/20 border border-white/5 cursor-default"
-                >
-                    <div class="achievement-icon opacity-30 grayscale">
-                        {#if achievement.image_path}
-                            <img
-                                src={`/storage/${achievement.image_path}`}
-                                alt={achievement.name}
-                                class="w-12 h-12 object-contain"
-                            />
-                        {:else}
-                            <div
-                                class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-2xl"
+                        {#if achievement.unlocked_at}
+                            <span
+                                class="text-[11px] font-mono text-[var(--accent-color)] text-center transition-colors duration-500"
                             >
-                                🏆
-                            </div>
+                                {formatDate(achievement.unlocked_at)}
+                            </span>
                         {/if}
-                    </div>
 
-                    <span
-                        class="text-[11px] font-bold text-white/25 text-center leading-tight line-clamp-2"
-                    >
-                        {achievement.name}
-                    </span>
-
-                    <!-- Tooltip with description -->
-                    <div
-                        class="achievement-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 bg-black/90 border border-white/10 rounded-xl p-3 text-xs text-white/80 pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    >
-                        <p class="font-bold text-white mb-1">
-                            {achievement.name}
-                        </p>
-                        {#if achievement.description}
-                            <p class="text-white/60 leading-snug mb-2">
-                                {achievement.description}
+                        <div
+                            class="achievement-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 bg-[var(--bg-color)] border border-[color-mix(in_srgb,var(--text-color)_12%,transparent)] rounded-xl p-3 text-xs pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-xl"
+                        >
+                            <p
+                                class="font-bold text-[var(--text-color)] mb-1"
+                            >
+                                {achievement.name}
                             </p>
-                        {/if}
-                        <p class="text-white/30 italic text-[10px]">
-                            🔒 Not yet unlocked
-                        </p>
+                            {#if achievement.description}
+                                <p
+                                    class="text-[color-mix(in_srgb,var(--text-color)_55%,transparent)] leading-snug"
+                                >
+                                    {achievement.description}
+                                </p>
+                            {/if}
+                        </div>
                     </div>
+                {/each}
+            </div>
+        {/if}
+
+        {#if locked.length > 0}
+            <div
+                class="border-t border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] pt-4"
+            >
+                <p
+                    class="text-xs font-mono uppercase tracking-widest text-[color-mix(in_srgb,var(--text-color)_25%,transparent)] mb-3"
+                >
+                    Locked — {locked.length} remaining
+                </p>
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                    {#each locked as achievement (achievement.id)}
+                        <div
+                            class="group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_6%,transparent)] cursor-default"
+                        >
+                            <div class="opacity-25 grayscale">
+                                {#if achievement.image_path}
+                                    <img
+                                        src={`/storage/${achievement.image_path}`}
+                                        alt={achievement.name}
+                                        class="w-12 h-12 object-contain"
+                                    />
+                                {:else}
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] flex items-center justify-center text-2xl"
+                                    >
+                                        🏆
+                                    </div>
+                                {/if}
+                            </div>
+
+                            <span
+                                class="text-xs font-bold text-[color-mix(in_srgb,var(--text-color)_20%,transparent)] text-center leading-tight line-clamp-2"
+                            >
+                                {achievement.name}
+                            </span>
+
+                            <div
+                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 bg-[var(--bg-color)] border border-[color-mix(in_srgb,var(--text-color)_12%,transparent)] rounded-xl p-3 text-xs pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-xl"
+                            >
+                                <p
+                                    class="font-bold text-[var(--text-color)] mb-1"
+                                >
+                                    {achievement.name}
+                                </p>
+                                {#if achievement.description}
+                                    <p
+                                        class="text-[color-mix(in_srgb,var(--text-color)_50%,transparent)] leading-snug mb-2"
+                                    >
+                                        {achievement.description}
+                                    </p>
+                                {/if}
+                                <p
+                                    class="text-[color-mix(in_srgb,var(--text-color)_25%,transparent)] italic text-xs"
+                                >
+                                    🔒 Not yet unlocked
+                                </p>
+                            </div>
+                        </div>
+                    {/each}
                 </div>
-            {/each}
-        </div>
+            </div>
+        {/if}
     {/if}
 </div>
 
@@ -134,9 +168,7 @@
     }
     .achievement-card.unlocked:hover {
         transform: translateY(-2px);
-        box-shadow:
-            0 0 16px rgba(var(--primary-color), 0.3),
-            var(--card-shadow);
+        box-shadow: 0 0 20px color-mix(in srgb, var(--primary-color) 25%, transparent);
     }
     .achievement-tooltip {
         transition: opacity 0.2s ease;

@@ -4,6 +4,7 @@
     let { user } = $props();
 
     let isLeaderboard = $derived(page.url.startsWith('/leaderboard'));
+    let isStore = $derived(page.url.startsWith('/store'));
 </script>
 
 <nav
@@ -63,18 +64,43 @@
                 </Link>
 
                 <Link
+                    href="/store"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono border transition-colors duration-500
+                        {isStore
+                            ? 'bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] border-[color-mix(in_srgb,var(--primary-color)_40%,transparent)] text-[var(--primary-color)] shadow-[0_0_10px_color-mix(in_srgb,var(--primary-color)_20%,transparent)]'
+                            : 'bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] text-[color-mix(in_srgb,var(--primary-color)_60%,transparent)] hover:bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] hover:text-[var(--primary-color)]'}"
+                >
+                    <span class="text-sm leading-none">🛍️</span>
+                </Link>
+
+                <Link
                     href="/profile"
                     class="flex items-center gap-2 pl-3 ml-2 border-l border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:opacity-80 transition-opacity"
                 >
-                    <div
-                        class="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--primary-color)] to-[var(--accent-color)] flex items-center justify-center text-black font-black text-sm shadow-inner transition-colors duration-500"
-                    >
-                        {user.name.charAt(0)}
+                    <div class="relative shrink-0 w-8 h-8">
+                        {#if user.equipped?.avatar?.image_url}
+                            <img
+                                src={user.equipped.avatar.image_url}
+                                alt={user.name}
+                                class="absolute inset-0 w-full h-full rounded-full object-cover"
+                            />
+                        {:else}
+                            <div
+                                class="absolute inset-0 rounded-full bg-gradient-to-tr from-[var(--primary-color)] to-[var(--accent-color)] flex items-center justify-center text-black font-black text-sm shadow-inner transition-colors duration-500"
+                            >
+                                {user.name.charAt(0)}
+                            </div>
+                        {/if}
                     </div>
-                    <span
-                        class="text-[var(--text-color)] opacity-80 hidden md:block"
-                        >{user.name}</span
-                    >
+                    <div class="hidden md:flex flex-col">
+                        <span class="text-[var(--text-color)] opacity-80 leading-tight">{user.name}</span>
+                        {#if user.equipped?.title}
+                            <span
+                                class="text-[10px] font-mono leading-tight"
+                                style="color: {user.equipped.title.color ?? 'inherit'}"
+                            >{user.equipped.title.name}</span>
+                        {/if}
+                    </div>
                 </Link>
             {:else}
                 <div

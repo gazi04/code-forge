@@ -1,4 +1,5 @@
 <script>
+
     let { leaders = [], playerName = '' } = $props();
 </script>
 
@@ -14,17 +15,29 @@
             <span class="w-10 text-center font-mono text-base font-black text-[color-mix(in_srgb,var(--text-color)_40%,transparent)]">
                 #{leader.rank}
             </span>
-
-            <div
-                class="w-10 h-10 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_25%,transparent)] flex items-center justify-center text-sm font-black text-[var(--primary-color)]"
-            >
-                {leader.name.slice(0, 2).toUpperCase()}
+            <div class="relative shrink-0 w-10 h-10">
+                {#if leader.equipped?.avatar?.image_url}
+                    <img
+                        src={leader.equipped.avatar.image_url}
+                        alt={leader.name}
+                        class="absolute inset-0 w-full h-full rounded-full object-cover"
+                    />
+                {:else}
+                    <div
+                        class="absolute inset-0 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_25%,transparent)] flex items-center justify-center text-sm font-black text-[var(--primary-color)]"
+                    >
+                        {leader.name.slice(0, 2).toUpperCase()}
+                    </div>
+                {/if}
             </div>
 
             <div class="flex-1 min-w-0">
                 <p class="font-bold text-base text-[var(--text-color)] truncate {isPlayer ? 'text-[var(--primary-color)]' : ''}">
                     {leader.name}{isPlayer ? ' (You)' : ''}
                 </p>
+                {#if leader.equipped?.title}
+                    <p class="text-[10px] font-mono" style="color: {leader.equipped.title.color ?? 'inherit'}">{leader.equipped.title.name}</p>
+                {/if}
                 <p class="text-sm text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono">Lv. {leader.level}</p>
             </div>
 
