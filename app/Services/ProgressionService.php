@@ -101,6 +101,15 @@ class ProgressionService
                 }
             }
 
+            // Apply active XP boost before awarding
+            if ($user->xp_boost_lessons_remaining > 0) {
+                $earnedXp = (int) ($earnedXp * $user->xp_boost_multiplier);
+                $user->xp_boost_lessons_remaining--;
+                if ($user->xp_boost_lessons_remaining === 0) {
+                    $user->xp_boost_multiplier = 1;
+                }
+            }
+
             // --- C. Award Loot ---
             $user->xp += $earnedXp;
             $user->coins += $baseCoins; // We keep coins flat and predictable

@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Achievement;
 use App\Models\BlockSubmission;
 use App\Models\LessonSubmission;
+use App\Models\StoreItem;
+use App\Models\UserInventory;
 use App\Services\ProgressionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -65,6 +68,18 @@ class ProfileController extends Controller
             'unlocked_at' => $earnedAchievements->get($achievement->id)?->pivot?->unlocked_at,
         ]);
 
+        $prefs = $user->preferences ?? [];
+        $titleId = $prefs['equipped_title'] ?? null;
+        $avatarId = $prefs['equipped_avatar'] ?? null;
+        $ids = array_filter([$titleId, $avatarId]);
+
+        $equippedItems = $ids
+            ? StoreItem::whereIn('id', $ids)->select(['id', 'name', 'type', 'image', 'display_config'])->get()->keyBy('id')
+            : collect();
+
+        $titleItem = $titleId ? $equippedItems->get($titleId) : null;
+        $avatarItem = $avatarId ? $equippedItems->get($avatarId) : null;
+
         return Inertia::render('Student/Profile/Index', [
             'hero' => [
                 'name' => $user->name,
@@ -74,9 +89,37 @@ class ProfileController extends Controller
                 'xp_for_next_level' => $xpForNextLevel,
                 'coins' => $user->coins,
                 'streak_count' => $user->streak_count,
+                'equipped' => [
+                    'title' => $titleItem ? [
+                        'id' => $titleItem->id,
+                        'name' => $titleItem->name,
+                        'color' => $titleItem->display_config['color'] ?? null,
+                    ] : null,
+                    'avatar' => $avatarItem ? [
+                        'id' => $avatarItem->id,
+                        'name' => $avatarItem->name,
+                        'image_url' => $avatarItem->image ? Storage::url($avatarItem->image) : null,
+                    ] : null,
+                ],
             ],
             'ledger' => $ledger,
             'achievements' => $achievements,
+            'inventory' => UserInventory::where('user_id', $user->id)
+                ->with('storeItem')
+                ->get()
+                ->map(fn (UserInventory $inv): array => [
+                    'id' => $inv->id,
+                    'store_item_id' => $inv->store_item_id,
+                    'quantity' => $inv->quantity,
+                    'store_item' => [
+                        ...$inv->storeItem->toArray(),
+                        'image_url' => $inv->storeItem->image ? Storage::disk('public')->url($inv->storeItem->image) : null,
+                    ],
+                ]),
+            'equipped' => [
+                'title' => $prefs['equipped_title'] ?? null,
+                'avatar' => $prefs['equipped_avatar'] ?? null,
+            ],
             'preferences' => $user->preferences ?? [
                 'background_audio' => true,
                 'sound_effects' => true,
