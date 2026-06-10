@@ -6,10 +6,12 @@
     export let world;
     export let lessons = [];
     export let resume_lesson_slug = null;
+    export let completed_lesson_slugs = [];
 
     $: worldData = world.data ?? world;
     $: themeData = worldData.theme;
     $: mapLayout = themeData?.config?.ui?.map_layout || 'linear';
+    $: isCompleted = (slug) => completed_lesson_slugs.includes(slug);
 </script>
 
 <Layout theme={themeData}>
@@ -75,12 +77,21 @@
                                 : 'w-full max-w-md bg-surface p-4'} transition-all duration-300 hover:scale-[1.02] hover:border-[var(--primary-color)]"
                         >
                             <div
-                                class="w-14 h-14 rounded-full bg-[var(--bg-color)] border-2 border-[var(--primary-color)] flex items-center justify-center shadow-[0_0_20px_color-mix(in_srgb,var(--primary-color)_40%,transparent)] group-hover:bg-[var(--primary-color)] transition-colors duration-300 flex-shrink-0"
+                                class="w-14 h-14 rounded-full bg-[var(--bg-color)] border-2 {isCompleted(lesson.slug)
+                                    ? 'border-emerald-500 group-hover:bg-emerald-500'
+                                    : 'border-[var(--primary-color)] group-hover:bg-[var(--primary-color)]'} flex items-center justify-center shadow-[0_0_20px_color-mix(in_srgb,var(--primary-color)_40%,transparent)] transition-colors duration-300 flex-shrink-0"
                             >
-                                <span
-                                    class="font-bold text-lg text-[var(--primary-color)] group-hover:text-[var(--bg-color)] transition-colors"
-                                    >{i + 1}</span
-                                >
+                                {#if isCompleted(lesson.slug)}
+                                    <span
+                                        class="font-bold text-lg text-emerald-400 group-hover:text-white transition-colors"
+                                        >✓</span
+                                    >
+                                {:else}
+                                    <span
+                                        class="font-bold text-lg text-[var(--primary-color)] group-hover:text-[var(--bg-color)] transition-colors"
+                                        >{i + 1}</span
+                                    >
+                                {/if}
                             </div>
 
                             <div class="flex-1 {isBranching ? '' : 'ml-2'}">
@@ -90,9 +101,11 @@
                                     {lesson.name}
                                 </h3>
                                 <div
-                                    class="text-xs font-mono text-[var(--text-color)] opacity-40 mt-1 uppercase tracking-wider"
+                                    class="text-xs font-mono mt-1 uppercase tracking-wider {isCompleted(lesson.slug)
+                                        ? 'text-emerald-400'
+                                        : 'text-[var(--text-color)] opacity-40'}"
                                 >
-                                    Quest Active
+                                    {isCompleted(lesson.slug) ? '✓ Cleared' : 'Quest Active'}
                                 </div>
                             </div>
                         </Link>
@@ -126,16 +139,27 @@
                                 : 'flex-row-reverse text-right'} transition-all duration-300 hover:scale-[1.02]"
                         >
                             <div
-                                class="w-14 h-14 rounded-full bg-[var(--bg-color)] border-2 border-[var(--primary-color)] flex items-center justify-center shadow-[0_0_20px_color-mix(in_srgb,var(--primary-color)_40%,transparent)] group-hover:bg-[var(--primary-color)] transition-colors duration-300 flex-shrink-0 z-20"
+                                class="w-14 h-14 rounded-full bg-[var(--bg-color)] border-2 {isCompleted(lesson.slug)
+                                    ? 'border-emerald-500 group-hover:bg-emerald-500'
+                                    : 'border-[var(--primary-color)] group-hover:bg-[var(--primary-color)]'} flex items-center justify-center shadow-[0_0_20px_color-mix(in_srgb,var(--primary-color)_40%,transparent)] transition-colors duration-300 flex-shrink-0 z-20"
                             >
-                                <span
-                                    class="font-bold text-lg text-[var(--primary-color)] group-hover:text-[var(--bg-color)] transition-colors"
-                                    >{i + 1}</span
-                                >
+                                {#if isCompleted(lesson.slug)}
+                                    <span
+                                        class="font-bold text-lg text-emerald-400 group-hover:text-white transition-colors"
+                                        >✓</span
+                                    >
+                                {:else}
+                                    <span
+                                        class="font-bold text-lg text-[var(--primary-color)] group-hover:text-[var(--bg-color)] transition-colors"
+                                        >{i + 1}</span
+                                    >
+                                {/if}
                             </div>
 
                             <div
-                                class="flex-1 bg-surface p-5 rounded-2xl border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] group-hover:border-[var(--primary-color)] group-hover:shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-all duration-300"
+                                class="flex-1 bg-surface p-5 rounded-2xl border {isCompleted(lesson.slug)
+                                    ? 'border-emerald-500/40 group-hover:border-emerald-500 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                                    : 'border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] group-hover:border-[var(--primary-color)] group-hover:shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_20%,transparent)]'} transition-all duration-300"
                             >
                                 <h3
                                     class="font-bold text-xl text-[var(--text-color)] opacity-90 group-hover:opacity-100 transition-opacity leading-tight"
@@ -143,9 +167,11 @@
                                     {lesson.name}
                                 </h3>
                                 <div
-                                    class="text-xs font-mono text-[var(--text-color)] opacity-40 mt-2 uppercase tracking-wider"
+                                    class="text-xs font-mono mt-2 uppercase tracking-wider {isCompleted(lesson.slug)
+                                        ? 'text-emerald-400'
+                                        : 'text-[var(--text-color)] opacity-40'}"
                                 >
-                                    Quest Active
+                                    {isCompleted(lesson.slug) ? '✓ Cleared' : 'Quest Active'}
                                 </div>
                             </div>
                         </Link>

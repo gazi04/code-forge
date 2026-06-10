@@ -1,4 +1,5 @@
 <script>
+    import { onMount, tick } from 'svelte';
     import { Link, page, useForm, router } from '@inertiajs/svelte';
     import BugHuntBlock from '../../components/Blocks/BugHuntBlock.svelte';
     import CodeChallengeBlock from '../../components/Blocks/CodeChallengeBlock.svelte';
@@ -23,6 +24,18 @@
     let actualLesson = $derived(lesson?.data ?? lesson);
     let blocks = $derived(actualLesson?.blocks || []);
 
+    let blockRefs = $state([]);
+
+    let firstIncompleteIndex = $derived(
+        is_completed
+            ? -1
+            : blocks.findIndex(
+                  (block, i) =>
+                      (block.data?.is_required ?? false) &&
+                      !cleared_block_indices.includes(i),
+              ),
+    );
+
     const blockRegistry = {
         text_content: TextBlock,
         code_challenge: CodeChallengeBlock,
@@ -36,6 +49,17 @@
     const claimForm = useForm({});
 
     let errorMessage = $state('');
+
+    onMount(async () => {
+        if (firstIncompleteIndex > 0) {
+            await tick();
+            const el = blockRefs[firstIncompleteIndex];
+            if (el) {
+                const top = el.getBoundingClientRect().top + window.scrollY - 96;
+                window.scrollTo({ top, behavior: 'smooth' });
+            }
+        }
+    });
 
     function handleAdvanceOrFinish() {
         errorMessage = '';
@@ -101,7 +125,14 @@
             </div>
         {:else}
             {#each blocks as block, index}
-                <div class="block-wrapper">
+                <div bind:this={blockRefs[index]} class="block-wrapper relative">
+                    {#if index === firstIncompleteIndex && firstIncompleteIndex > 0}
+                        <div
+                            class="absolute -top-3 left-6 z-30 pointer-events-none bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] backdrop-blur border border-[color-mix(in_srgb,var(--primary-color)_40%,transparent)] text-[var(--primary-color)] text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-md shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_15%,transparent)]"
+                        >
+                            ▶ Resume
+                        </div>
+                    {/if}
                     {#if cleared_block_indices.includes(index)}
                         <div
                             class="absolute -top-3 right-6 z-30 pointer-events-none bg-emerald-500/10 backdrop-blur border border-emerald-500/40 text-emerald-400 text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-md shadow-[0_0_15px_rgba(16,185,129,0.15)]"

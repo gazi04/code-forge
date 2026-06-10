@@ -46,11 +46,14 @@ class CourseController extends Controller
             ? $course->lessons->find($resumeLessonId)?->slug
             : null;
 
+        $completedSlugs = $course->lessons->whereIn('id', $completedIds)->pluck('slug')->toArray();
+
         return Inertia::render('Student/CourseDetail', [
             'course' => $course,
             'world' => new WorldResource($course->world),
             'lessons' => $course->lessons,
             'resume_lesson_slug' => $resumeLessonSlug,
+            'completed_lesson_slugs' => $completedSlugs,
         ]);
     }
 }
