@@ -32,9 +32,19 @@
                     <span class="text-yellow-400 font-bold">💰 {user.coins.toLocaleString()}</span>
                     {#if user.streak_count > 0}
                         <span class="text-[color-mix(in_srgb,var(--text-color)_15%,transparent)]">·</span>
-                        <span class="text-orange-400 font-bold">🔥 {user.streak_count}</span>
+                        {#if user.streak_at_risk}
+                            <span class="text-red-400 font-bold animate-pulse">⚠️ {user.streak_count} 🔥</span>
+                        {:else}
+                            <span class="text-orange-400 font-bold">🔥 {user.streak_count}</span>
+                        {/if}
                     {/if}
                 </div>
+
+                {#if user.streak_at_risk && user.streak_count > 0}
+                    <div class="lg:hidden flex items-center gap-1 px-2 py-1 rounded-md bg-red-500/10 border border-red-400/30 text-red-400 text-xs font-bold animate-pulse">
+                        ⚠️ {user.streak_count}🔥
+                    </div>
+                {/if}
 
                 <!-- Divider -->
                 <div class="hidden lg:block w-px h-6 bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] mx-1"></div>

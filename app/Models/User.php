@@ -79,4 +79,13 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(Achievement::class)
             ->withPivot('unlocked_at');
     }
+
+    public function isStreakAtRisk(): bool
+    {
+        if ($this->streak_count === 0 || is_null($this->last_active_at)) {
+            return false;
+        }
+
+        return ! $this->last_active_at->isToday();
+    }
 }

@@ -49,6 +49,7 @@ class HandleInertiaRequests extends Middleware
                     'xp' => $request->user()->xp,
                     'coins' => $request->user()->coins,
                     'streak_count' => $request->user()->streak_count,
+                    'streak_at_risk' => $request->user()->isStreakAtRisk(),
                     'equipped' => $this->resolveEquipped($request->user()),
                 ] : null,
             ],
