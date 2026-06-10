@@ -10,7 +10,9 @@ use App\Http\Controllers\WorldController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return 'hi';
+    return auth()->check()
+        ? redirect()->route('student.world.index')
+        : redirect()->route('login');
 })->name('home');
 
 Route::get('/login', [StudentLoginController::class, 'show'])->name('login');
