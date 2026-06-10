@@ -5,6 +5,7 @@
     export let course;
     export let world;
     export let lessons = [];
+    export let resume_lesson_slug = null;
 
     $: worldData = world.data ?? world;
     $: themeData = worldData.theme;
@@ -32,6 +33,17 @@
         >
             {course.name}
         </h1>
+
+        {#if resume_lesson_slug}
+            <div class="mt-6">
+                <a
+                    href="/lessons/{resume_lesson_slug}"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--primary-color)] text-[var(--bg-color)] text-sm font-black uppercase tracking-widest shadow-[0_4px_20px_color-mix(in_srgb,var(--primary-color)_30%,transparent)] hover:scale-[1.03] active:scale-[0.98] transition-all"
+                >
+                    ▶ Resume
+                </a>
+            </div>
+        {/if}
     </header>
 
     <div class="map-viewport relative max-w-4xl mx-auto py-12">

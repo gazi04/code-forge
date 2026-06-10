@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\WorldResource;
+use App\Models\BlockSubmission;
 use App\Models\Course;
+use App\Models\LessonSubmission;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CourseController extends Controller
@@ -24,10 +27,30 @@ class CourseController extends Controller
 
         $this->authorize('view', $course);
 
+        $user = Auth::user();
+        $lessonIds = $course->lessons->pluck('id');
+        $lessonSlugs = $course->lessons->pluck('slug');
+
+        $completedIds = LessonSubmission::where('user_id', $user->id)
+            ->whereIn('lesson_id', $lessonSlugs)
+            ->pluck('lesson_id')
+            ->pipe(fn ($slugs) => $course->lessons->whereIn('slug', $slugs)->pluck('id'));
+
+        $resumeLessonId = BlockSubmission::where('user_id', $user->id)
+            ->whereIn('lesson_id', $lessonIds)
+            ->whereNotIn('lesson_id', $completedIds)
+            ->latest()
+            ->value('lesson_id');
+
+        $resumeLessonSlug = $resumeLessonId
+            ? $course->lessons->find($resumeLessonId)?->slug
+            : null;
+
         return Inertia::render('Student/CourseDetail', [
             'course' => $course,
             'world' => new WorldResource($course->world),
             'lessons' => $course->lessons,
+            'resume_lesson_slug' => $resumeLessonSlug,
         ]);
     }
 }
