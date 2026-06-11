@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Users;
 
-use App\Filament\Resources\UserResource\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\RelationManagers\ActivitiesRelationManager;
 use App\Filament\Resources\Users\RelationManagers\AttachedAchievementsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\BlockSubmissionsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\InventoryRelationManager;

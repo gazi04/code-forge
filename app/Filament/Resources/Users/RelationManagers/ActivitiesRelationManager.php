@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\UserResource\RelationManagers;
+namespace App\Filament\Resources\Users\RelationManagers;
 
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
