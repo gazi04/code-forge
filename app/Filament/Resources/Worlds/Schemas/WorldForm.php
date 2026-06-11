@@ -45,9 +45,6 @@ class WorldForm
                     Textarea::make('description')
                         ->rows(3),
 
-                    TextInput::make('layout_template')
-                        ->placeholder('e.g., world_map_default')
-                        ->helperText('Svelte template identifier for the world view.'),
                 ]),
         ]);
     }

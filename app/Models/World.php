@@ -11,7 +11,7 @@ use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 
 #[Table('worlds')]
-#[Fillable(['name', 'slug', 'description', 'theme_pack_id', 'layout_template', 'is_published'])]
+#[Fillable(['name', 'slug', 'description', 'theme_pack_id', 'is_published'])]
 class World extends Model implements Sortable
 {
     use SortableTrait;
