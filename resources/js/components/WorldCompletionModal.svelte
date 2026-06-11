@@ -54,35 +54,37 @@
     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md"
 >
     <div
-        class="animate-bounce-in bg-zinc-900 border-4 border-yellow-400 rounded-3xl p-10 max-w-md w-full text-center shadow-[0_0_60px_rgba(250,204,21,0.45)] mx-4"
+        class="animate-bounce-in rounded-3xl p-10 max-w-md w-full text-center mx-4 bg-[var(--surface-color)] border-4 border-[var(--primary-color)]"
+        style="box-shadow: 0 0 60px color-mix(in srgb, var(--primary-color) 45%, transparent);"
     >
         <div class="text-6xl mb-3">🏆</div>
 
         <h2
-            class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-orange-500 mb-1 drop-shadow-lg"
+            class="text-4xl font-black mb-1 drop-shadow-lg text-[var(--primary-color)]"
         >
             World Complete!
         </h2>
 
-        <p class="text-slate-400 text-sm mb-4 font-mono">
+        <p class="text-[var(--text-color)] opacity-50 text-sm mb-4 font-mono">
             You conquered
         </p>
 
         <div
-            class="text-2xl font-bold text-white mb-6 px-4 py-2 rounded-xl bg-zinc-800 border border-yellow-400/30 inline-block"
+            class="text-2xl font-bold mb-6 px-4 py-2 rounded-xl inline-block text-[var(--text-color)] bg-[var(--secondary-color)]"
+            style="border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);"
         >
             {worldName}
         </div>
 
         <div class="flex justify-center gap-6 mb-8">
             <div class="text-center">
-                <div class="text-yellow-400 font-black text-xl">+{bonusXp}</div>
-                <div class="text-slate-400 text-xs font-mono uppercase tracking-wider">Bonus XP</div>
+                <div class="font-black text-xl text-[var(--primary-color)]">+{bonusXp}</div>
+                <div class="text-[var(--text-color)] opacity-50 text-xs font-mono uppercase tracking-wider">Bonus XP</div>
             </div>
-            <div class="w-px bg-zinc-700"></div>
+            <div class="w-px bg-[var(--primary-color)] opacity-20"></div>
             <div class="text-center">
                 <div class="text-amber-400 font-black text-xl">+{bonusCoins}</div>
-                <div class="text-slate-400 text-xs font-mono uppercase tracking-wider">Coins</div>
+                <div class="text-[var(--text-color)] opacity-50 text-xs font-mono uppercase tracking-wider">Coins</div>
             </div>
         </div>
 
@@ -91,14 +93,16 @@
                 href={certificateUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-black uppercase tracking-widest py-3 rounded-xl shadow-[0_0_15px_rgba(250,204,21,0.4)] transition-all transform hover:scale-105 active:scale-95 text-sm"
+                class="w-full flex items-center justify-center gap-2 font-black uppercase tracking-widest py-3 rounded-xl transition-all transform hover:scale-105 active:scale-95 text-sm text-[var(--bg-color)]"
+                style="background: var(--primary-color); box-shadow: 0 0 15px color-mix(in srgb, var(--primary-color) 40%, transparent);"
             >
                 📜 Download Certificate
             </a>
 
             <button
                 onclick={onclose}
-                class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-bold uppercase tracking-widest py-3 rounded-xl border border-zinc-600 transition-all transform hover:scale-105 active:scale-95 text-sm"
+                class="w-full font-bold uppercase tracking-widest py-3 rounded-xl transition-all transform hover:scale-105 active:scale-95 text-sm text-[var(--text-color)] bg-[var(--secondary-color)]"
+                style="border: 1px solid color-mix(in srgb, var(--text-color) 15%, transparent);"
             >
                 Continue Journey
             </button>

@@ -233,65 +233,65 @@
             </div>
         {/key}
     </main>
-</div>
 
-<AchievementToast />
+    <AchievementToast />
 
-{#if showWorldCompletionModal && worldCompletion}
-    <WorldCompletionModal
-        worldSlug={worldCompletion.world_slug}
-        worldName={worldCompletion.world_name}
-        bonusXp={worldCompletion.bonus_xp}
-        bonusCoins={worldCompletion.bonus_coins}
-        onclose={() => {
-            showWorldCompletionModal = false;
-            window.dispatchEvent(new CustomEvent('worldCompletionClosed'));
-        }}
-    />
-{/if}
+    {#if showWorldCompletionModal && worldCompletion}
+        <WorldCompletionModal
+            worldSlug={worldCompletion.world_slug}
+            worldName={worldCompletion.world_name}
+            bonusXp={worldCompletion.bonus_xp}
+            bonusCoins={worldCompletion.bonus_coins}
+            onclose={() => {
+                showWorldCompletionModal = false;
+                window.dispatchEvent(new CustomEvent('worldCompletionClosed'));
+            }}
+        />
+    {/if}
 
-{#if showLevelUpModal}
-    <div
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-all"
-    >
+    {#if showLevelUpModal}
         <div
-            class="bg-zinc-900 border-4 border-yellow-400 rounded-3xl p-10 max-w-md w-full text-center shadow-[0_0_50px_rgba(250,204,21,0.4)] animate-bounce-in"
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-all"
         >
-            <h2
-                class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-orange-500 mb-2 drop-shadow-lg"
-            >
-                LEVEL UP!
-            </h2>
-
             <div
-                class="w-32 h-32 mx-auto my-6 bg-zinc-800 border-4 border-yellow-400 rounded-full flex items-center justify-center shadow-inner"
+                class="rounded-3xl p-10 max-w-md w-full text-center animate-bounce-in bg-[var(--surface-color)] border-4 border-[var(--primary-color)]"
+                style="box-shadow: 0 0 50px color-mix(in srgb, var(--primary-color) 40%, transparent);"
             >
-                <span class="text-6xl font-black text-white"
-                    >{newLevel}</span
+                <h2
+                    class="text-5xl font-black mb-2 drop-shadow-lg text-[var(--primary-color)]"
                 >
+                    LEVEL UP!
+                </h2>
+
+                <div
+                    class="w-32 h-32 mx-auto my-6 rounded-full flex items-center justify-center shadow-inner bg-[var(--secondary-color)] border-4 border-[var(--primary-color)]"
+                >
+                    <span class="text-6xl font-black text-[var(--text-color)]"
+                        >{newLevel}</span
+                    >
+                </div>
+
+                <h3 class="text-2xl font-bold text-[var(--text-color)] mb-1">
+                    {getTitle(newLevel)}
+                </h3>
+                <p class="text-[var(--text-color)] opacity-60 mb-8 font-mono text-sm">
+                    Your logical reasoning has expanded.<br />
+                    <span class="font-bold block mt-2 opacity-100 text-[var(--primary-color)]"
+                        >+ {coinBonus} Gold Coins</span
+                    >
+                </p>
+
+                <button
+                    onclick={closeModal}
+                    class="w-full font-black uppercase tracking-widest py-4 rounded-xl transition-all transform hover:scale-105 active:scale-95 text-[var(--bg-color)]"
+                    style="background: var(--primary-color); box-shadow: 0 0 15px color-mix(in srgb, var(--primary-color) 50%, transparent);"
+                >
+                    Continue Journey
+                </button>
             </div>
-
-            <h3 class="text-2xl font-bold text-white mb-1">
-                {getTitle(newLevel)}
-            </h3>
-            <p
-                class="text-slate-300 mb-8 font-mono text-sm"
-            >
-                Your logical reasoning has expanded.<br />
-                <span class="text-yellow-400 font-bold block mt-2"
-                    >+ {coinBonus} Gold Coins</span
-                >
-            </p>
-
-            <button
-                onclick={closeModal}
-                class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_15px_rgba(250,204,21,0.5)] transition-all transform hover:scale-105 active:scale-95"
-            >
-                Continue Journey
-            </button>
         </div>
-    </div>
-{/if}
+    {/if}
+</div>
 
 <style>
     .layout-container {

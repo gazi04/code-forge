@@ -87,23 +87,25 @@
         role="alert"
     >
         <div
-            class="relative rounded-xl overflow-hidden border border-yellow-500/60 bg-[#07071a] shadow-[0_0_40px_rgba(234,179,8,0.25),inset_0_1px_0_rgba(234,179,8,0.15)]"
+            class="relative rounded-xl overflow-hidden bg-[var(--surface-color)]"
+            style="border: 1px solid color-mix(in srgb, var(--primary-color) 60%, transparent); box-shadow: 0 0 40px color-mix(in srgb, var(--primary-color) 25%, transparent), inset 0 1px 0 color-mix(in srgb, var(--primary-color) 15%, transparent);"
         >
             <!-- Top header bar -->
             <div
-                class="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-yellow-500/20 via-amber-400/15 to-yellow-500/20 border-b border-yellow-500/30"
+                class="flex items-center justify-between px-4 py-2 border-b"
+                style="background: linear-gradient(to right, color-mix(in srgb, var(--primary-color) 20%, transparent), color-mix(in srgb, var(--primary-color) 12%, transparent), color-mix(in srgb, var(--primary-color) 20%, transparent)); border-color: color-mix(in srgb, var(--primary-color) 30%, transparent);"
             >
                 <div class="flex items-center gap-1.5">
-                    <span class="text-yellow-400 text-xs animate-pulse">✦</span>
+                    <span class="text-[var(--primary-color)] text-xs animate-pulse">✦</span>
                     <span
-                        class="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-400"
+                        class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--primary-color)]"
                         >Achievement Unlocked</span
                     >
-                    <span class="text-yellow-400 text-xs animate-pulse">✦</span>
+                    <span class="text-[var(--primary-color)] text-xs animate-pulse">✦</span>
                 </div>
                 <button
                     onclick={dismiss}
-                    class="text-yellow-500/40 hover:text-yellow-400 transition-colors text-base leading-none"
+                    class="text-[var(--primary-color)] opacity-40 hover:opacity-100 transition-colors text-base leading-none"
                     aria-label="Dismiss">×</button
                 >
             </div>
@@ -113,7 +115,8 @@
                 <!-- Badge / Image -->
                 <div class="shrink-0 relative">
                     <div
-                        class="w-14 h-14 rounded-xl border border-yellow-500/40 bg-gradient-to-br from-yellow-950/80 to-amber-950/80 flex items-center justify-center overflow-hidden shadow-[0_0_16px_rgba(234,179,8,0.3)]"
+                        class="w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden"
+                        style="border: 1px solid color-mix(in srgb, var(--primary-color) 40%, transparent); background: color-mix(in srgb, var(--primary-color) 10%, var(--surface-color)); box-shadow: 0 0 16px color-mix(in srgb, var(--primary-color) 30%, transparent);"
                     >
                         {#if current.image_path && !imageError}
                             <img
@@ -128,19 +131,19 @@
                     </div>
                     <!-- Corner sparkle -->
                     <span
-                        class="absolute -top-1 -right-1 text-[10px] text-yellow-400 animate-spin"
+                        class="absolute -top-1 -right-1 text-[10px] text-[var(--primary-color)] animate-spin"
                         style="animation-duration:3s">✦</span
                     >
                 </div>
 
                 <!-- Text -->
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-black text-white leading-tight">
+                    <p class="text-sm font-black text-[var(--text-color)] leading-tight">
                         {current.name}
                     </p>
                     {#if current.description}
                         <p
-                            class="text-[11px] text-white/50 mt-1 line-clamp-2 leading-relaxed"
+                            class="text-[11px] text-[var(--text-color)] opacity-50 mt-1 line-clamp-2 leading-relaxed"
                         >
                             {current.description}
                         </p>
@@ -149,9 +152,10 @@
             </div>
 
             <!-- Progress bar -->
-            <div class="h-0.5 bg-yellow-950/60">
+            <div class="h-0.5 bg-[var(--secondary-color)]">
                 <div
-                    class="progress-bar h-full bg-gradient-to-r from-yellow-500 to-amber-400 shadow-[0_0_6px_rgba(234,179,8,0.8)]"
+                    class="progress-bar h-full"
+                    style="background: var(--primary-color); box-shadow: 0 0 6px color-mix(in srgb, var(--primary-color) 80%, transparent);"
                 ></div>
             </div>
         </div>

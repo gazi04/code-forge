@@ -209,7 +209,8 @@
                 <button
                     onclick={handleAdvanceOrFinish}
                     disabled={claimForm.processing}
-                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-sm font-black uppercase tracking-widest text-zinc-950 shadow-[0_4px_25px_rgba(245,158,11,0.4)] hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center gap-2 border border-amber-300 disabled:opacity-60"
+                    class="px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center gap-2 disabled:opacity-60 text-[var(--bg-color)]"
+                    style="background: var(--primary-color); box-shadow: 0 4px 25px color-mix(in srgb, var(--primary-color) 40%, transparent);"
                 >
                     🏆 {claimForm.processing
                         ? 'Securing Spoils...'
