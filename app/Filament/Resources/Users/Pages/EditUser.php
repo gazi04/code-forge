@@ -21,7 +21,7 @@ class EditUser extends EditRecord
                 ->icon('heroicon-o-arrow-path')
                 ->requiresConfirmation()
                 ->modalHeading('Reset Student Progression?')
-                ->modalDescription('This will completely wipe out this student\'s level, XP, coins, lesson submissions, block submissions, and all earned achievements back to baseline defaults. This action is destructive and irreversible.')
+                ->modalDescription('This will completely wipe out this student\'s level, XP, coins, lesson submissions, block submissions, earned achievements, inventory, and world completion certificates back to baseline defaults. This action is destructive and irreversible.')
                 ->visible(fn () => $this->record->role === 'student')
                 ->action(function (): void {
                     activity()
@@ -40,11 +40,13 @@ class EditUser extends EditRecord
                                 'coins' => $this->record->coins,
                             ],
                         ])
-                        ->log('Admin reset student progress. Level, XP, coins, all lesson and block submissions, and earned achievements have been wiped.');
+                        ->log('Admin reset student progress. Level, XP, coins, lesson and block submissions, achievements, inventory, and world completion certificates have been wiped.');
 
                     $this->record->lessonSubmissions()->delete();
                     $this->record->blockSubmissions()->delete();
                     $this->record->achievements()->detach();
+                    $this->record->inventory()->delete();
+                    $this->record->worldCompletions()->delete();
 
                     $this->record->updateQuietly([
                         'level' => 1,
