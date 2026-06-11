@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Events\ProgressRegistered;
+use App\Events\WorldCompleted;
 use App\Listeners\EvaluateAchievements;
+use App\Listeners\HandleWorldCompletion;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
 
         Event::listen(ProgressRegistered::class, EvaluateAchievements::class);
+        Event::listen(WorldCompleted::class, HandleWorldCompletion::class);
     }
 
     /**

@@ -1,6 +1,7 @@
 <script>
     import { page } from '@inertiajs/svelte';
     import AchievementToast from '@/components/AchievementToast.svelte';
+    import WorldCompletionModal from '@/components/WorldCompletionModal.svelte';
     import StudentNav from '@/components/StudentNav.svelte';
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
@@ -13,10 +14,13 @@
     let flash = $derived(page.props.flash);
     let user = $derived(page.props.auth.user);
 
-    // Local state for the modal
+    // Local state for the modals
     let showLevelUpModal = $state(false);
     let newLevel = $state(0);
     let coinBonus = $state(0);
+
+    let showWorldCompletionModal = $state(false);
+    let worldCompletion = $state(null);
 
     // Watch for a level up in the flashed session data
     $effect(() => {
@@ -25,6 +29,13 @@
             coinBonus = 50;
             showLevelUpModal = true;
             triggerConfetti();
+        }
+    });
+
+    $effect(() => {
+        if (flash?.world_completed) {
+            worldCompletion = flash.world_completed;
+            showWorldCompletionModal = true;
         }
     });
 
@@ -225,6 +236,19 @@
 </div>
 
 <AchievementToast />
+
+{#if showWorldCompletionModal && worldCompletion}
+    <WorldCompletionModal
+        worldSlug={worldCompletion.world_slug}
+        worldName={worldCompletion.world_name}
+        bonusXp={worldCompletion.bonus_xp}
+        bonusCoins={worldCompletion.bonus_coins}
+        onclose={() => {
+            showWorldCompletionModal = false;
+            window.dispatchEvent(new CustomEvent('worldCompletionClosed'));
+        }}
+    />
+{/if}
 
 {#if showLevelUpModal}
     <div

@@ -75,7 +75,6 @@
                 }
             },
             onSuccess: (page) => {
-                // Define the routing behavior
                 const navigateForward = () => {
                     if (next_lesson_slug) {
                         router.visit(`/lessons/${next_lesson_slug}`);
@@ -84,9 +83,27 @@
                     }
                 };
 
-                // Check if the backend flagged a level up
-                if (page.props.flash?.game_result?.leveled_up) {
-                    // Pause navigation and wait for the modal to close
+                const hasLevelUp = page.props.flash?.game_result?.leveled_up;
+                const hasWorldCompletion = !!page.props.flash?.world_completed;
+
+                const afterWorldCompletion = () => {
+                    if (hasWorldCompletion) {
+                        window.addEventListener(
+                            'worldCompletionClosed',
+                            function handler() {
+                                window.removeEventListener(
+                                    'worldCompletionClosed',
+                                    handler,
+                                );
+                                navigateForward();
+                            },
+                        );
+                    } else {
+                        navigateForward();
+                    }
+                };
+
+                if (hasLevelUp) {
                     window.addEventListener(
                         'levelUpClosed',
                         function handler() {
@@ -94,12 +111,11 @@
                                 'levelUpClosed',
                                 handler,
                             );
-                            navigateForward();
+                            afterWorldCompletion();
                         },
                     );
                 } else {
-                    // No level up occurred, seamlessly move to the next sector instantly
-                    navigateForward();
+                    afterWorldCompletion();
                 }
             },
         });

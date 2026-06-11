@@ -74,6 +74,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(UserInventory::class);
     }
 
+    public function worldCompletions(): HasMany
+    {
+        return $this->hasMany(UserWorldCompletion::class);
+    }
+
     public function achievements(): BelongsToMany
     {
         return $this->belongsToMany(Achievement::class)

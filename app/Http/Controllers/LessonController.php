@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\ProgressRegistered;
+use App\Events\WorldCompleted;
 use App\Http\Resources\LessonResource;
 use App\Models\BlockSubmission;
 use App\Models\Lesson;
@@ -63,7 +64,6 @@ class LessonController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // 1. Gating Check: Ensure the user's level is high enough for this sector
         if ($user->level < $lesson->course->min_level_requirement) {
             return back()->withErrors([
                 'error' => "Your current level ({$user->level}) is insufficient to unlock this sector.",
@@ -86,7 +86,6 @@ class LessonController extends Controller
             }
         }
 
-        // 2. Anti-Cheat: Prevent harvesting duplicate XP for the same lesson
         $alreadySubmitted = LessonSubmission::where('user_id', $user->id)
             ->where('lesson_id', $lesson->slug)
             ->exists();
@@ -105,14 +104,12 @@ class LessonController extends Controller
             ]);
         }
 
-        // 3. Process the math and rewards via the engine
         $result = $this->progressionService->processVictory(
             $user,
             $lesson->xp_reward,
             $lesson->coin_reward
         );
 
-        // 4. Record the ledger entry so they can't farm it again
         LessonSubmission::create([
             'user_id' => $user->id,
             'course_id' => $lesson->course_id,
@@ -123,8 +120,35 @@ class LessonController extends Controller
 
         ProgressRegistered::dispatch($user);
 
+        $this->checkWorldCompletion($user, $lesson);
+
         // 5. Flash the result payload to the session for Svelte to intercept
         return back()->with('game_result', $result);
+    }
+
+    private function checkWorldCompletion(User $user, Lesson $lesson): void
+    {
+        $lesson->loadMissing('course.world');
+        $world = $lesson->course->world;
+
+        if ($user->worldCompletions()->where('world_id', $world->id)->exists()) {
+            return;
+        }
+
+        $lessonSlugs = Lesson::whereHas('course', fn ($q) => $q->where('world_id', $world->id))
+            ->pluck('slug');
+
+        if ($lessonSlugs->isEmpty()) {
+            return;
+        }
+
+        $completedCount = LessonSubmission::where('user_id', $user->id)
+            ->whereIn('lesson_id', $lessonSlugs)
+            ->count();
+
+        if ($completedCount >= $lessonSlugs->count()) {
+            WorldCompleted::dispatch($user, $world);
+        }
     }
 
     public function submitBlockClaim(Request $request, Lesson $lesson, int $blockIndex)

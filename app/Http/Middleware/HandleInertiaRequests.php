@@ -56,6 +56,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'game_result' => fn () => $request->session()->get('game_result'),
                 'store_result' => fn () => $request->session()->get('store_result'),
+                'world_completed' => fn () => $request->session()->get('world_completed'),
                 'achievements_unlocked' => function () use ($request): array {
                     $user = $request->user();
                     if (! $user || empty($user->pending_achievements)) {

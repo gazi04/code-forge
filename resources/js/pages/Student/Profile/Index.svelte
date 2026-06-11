@@ -1,12 +1,13 @@
 <script>
     import Layout from '../../../layouts/StudentLayout.svelte';
     import AchievementsGrid from '@/components/Profile/AchievementsGrid.svelte';
+    import CertificatesPanel from '@/components/Profile/CertificatesPanel.svelte';
     import HeroBanner from '@/components/Profile/HeroBanner.svelte';
     import InventoryPanel from '@/components/Profile/InventoryPanel.svelte';
     import QuestLedger from '@/components/Profile/QuestLedger.svelte';
     import SystemSettings from '@/components/Profile/SystemSettings.svelte';
 
-    let { hero, ledger, achievements, inventory, equipped, preferences } = $props();
+    let { hero, ledger, achievements, inventory, equipped, preferences, certificates = [] } = $props();
 </script>
 
 <Layout>
@@ -27,6 +28,7 @@
         <HeroBanner {hero} />
         <InventoryPanel {inventory} {equipped} />
         <AchievementsGrid {achievements} />
+        <CertificatesPanel {certificates} />
         <QuestLedger {ledger} />
         <SystemSettings {preferences} />
     </div>

@@ -7,6 +7,7 @@ use App\Models\BlockSubmission;
 use App\Models\LessonSubmission;
 use App\Models\StoreItem;
 use App\Models\UserInventory;
+use App\Models\UserWorldCompletion;
 use App\Services\ProgressionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -125,6 +126,18 @@ class ProfileController extends Controller
                 'sound_effects' => true,
                 'accessibility_mode' => false,
             ],
+            'certificates' => $user->worldCompletions()
+                ->with('world.themePack')
+                ->orderByDesc('completed_at')
+                ->get()
+                ->map(fn (UserWorldCompletion $c): array => [
+                    'world_name' => $c->world->name,
+                    'world_slug' => $c->world->slug,
+                    'primary_color' => $c->world->themePack?->config['palette']['primary'] ?? '#8b5cf6',
+                    'completed_at' => $c->completed_at,
+                    'xp_bonus' => $c->xp_bonus_awarded,
+                    'coins_bonus' => $c->coins_bonus_awarded,
+                ]),
         ]);
     }
 
