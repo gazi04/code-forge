@@ -42,6 +42,9 @@ Route::middleware(['auth'])->name('student.')->group(function (): void {
 
         Route::get('/worlds/{world:slug}', [WorldController::class, 'show'])
             ->name('show');
+
+        Route::get('/worlds/{world:slug}/certificate', [WorldController::class, 'certificate'])
+            ->name('certificate');
     });
 
     Route::get('/course/{course:slug}', [CourseController::class, 'show'])
