@@ -1,7 +1,9 @@
 <script>
     let { ledger } = $props();
 
-    let recentEntries = $derived(ledger.slice(0, 10));
+    const INITIAL_COUNT = 5;
+    let showAll = $state(false);
+    let visibleEntries = $derived(showAll ? ledger : ledger.slice(0, INITIAL_COUNT));
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -49,7 +51,7 @@
         </div>
     {:else}
         <div class="space-y-2.5">
-            {#each recentEntries as entry, i (i)}
+            {#each visibleEntries as entry, i (i)}
                 {@const config = TYPE_CONFIG[entry.type] ?? TYPE_CONFIG.block}
                 <div class="entry-row group flex items-center gap-4 px-4 py-3.5 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_7%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] transition-all duration-200">
                     <!-- Icon -->
@@ -97,6 +99,15 @@
                 </div>
             {/each}
         </div>
+
+        {#if ledger.length > INITIAL_COUNT}
+            <button
+                onclick={() => (showAll = !showAll)}
+                class="mt-4 w-full text-xs font-bold uppercase tracking-widest py-2 rounded-xl border transition-all duration-200 text-[var(--primary-color)] border-[color-mix(in_srgb,var(--primary-color)_25%,transparent)] bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] hover:bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)]"
+            >
+                {showAll ? 'Show less' : `Show ${ledger.length - INITIAL_COUNT} more`}
+            </button>
+        {/if}
     {/if}
 </div>
 

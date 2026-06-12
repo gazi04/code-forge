@@ -5,6 +5,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WorldController;
@@ -18,6 +19,8 @@ Route::get('/', function () {
 
 Route::get('/login', [StudentLoginController::class, 'show'])->name('login');
 Route::post('/login/student', [StudentLoginController::class, 'store'])->name('student.login.submit');
+
+Route::get('/u/{user:name}', [PublicProfileController::class, 'show'])->name('public.profile.show');
 
 Route::middleware(['auth'])->name('student.')->group(function (): void {
 

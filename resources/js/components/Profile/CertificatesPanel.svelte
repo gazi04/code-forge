@@ -1,7 +1,7 @@
 <script>
     import { certificate } from '@/actions/App/Http/Controllers/WorldController';
 
-    let { certificates = [] } = $props();
+    let { certificates = [], isPublic = false } = $props();
 
     function formatDate(dateStr) {
         if (!dateStr) return '';
@@ -93,16 +93,18 @@
                         </div>
                     </div>
 
-                    <!-- Download button -->
-                    <a
-                        href={certificate.url({ world: cert.world_slug })}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="download-btn shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-bold uppercase tracking-wider transition-all duration-200"
-                        style="color: {cert.primary_color}; border-color: color-mix(in srgb, {cert.primary_color} 30%, transparent); background-color: color-mix(in srgb, {cert.primary_color} 8%, transparent);"
-                    >
-                        <span class="text-[11px]">↓</span> PDF
-                    </a>
+                    <!-- Download button (owner only) -->
+                    {#if !isPublic}
+                        <a
+                            href={certificate.url({ world: cert.world_slug })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="download-btn shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-bold uppercase tracking-wider transition-all duration-200"
+                            style="color: {cert.primary_color}; border-color: color-mix(in srgb, {cert.primary_color} 30%, transparent); background-color: color-mix(in srgb, {cert.primary_color} 8%, transparent);"
+                        >
+                            <span class="text-[11px]">↓</span> PDF
+                        </a>
+                    {/if}
                 </div>
             {/each}
         </div>

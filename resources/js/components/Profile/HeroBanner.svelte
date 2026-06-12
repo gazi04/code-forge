@@ -101,7 +101,7 @@
     </div>
 
     <!-- Stats -->
-    <div class="relative mt-6 grid grid-cols-3 gap-3">
+    <div class="relative mt-6 grid gap-3 {hero.coins != null ? 'grid-cols-3' : 'grid-cols-2'}">
         <div
             class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_7%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-500"
         >
@@ -116,18 +116,20 @@
             >
         </div>
 
-        <div
-            class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl bg-yellow-400/5 border border-yellow-400/20"
-        >
-            <span class="text-lg leading-none">💰</span>
-            <span class="text-base font-black text-yellow-400 font-mono"
-                >{hero.coins.toLocaleString()}</span
+        {#if hero.coins != null}
+            <div
+                class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl bg-yellow-400/5 border border-yellow-400/20"
             >
-            <span
-                class="text-[10px] font-mono uppercase tracking-widest text-[color-mix(in_srgb,var(--text-color)_30%,transparent)]"
-                >Coins</span
-            >
-        </div>
+                <span class="text-lg leading-none">💰</span>
+                <span class="text-base font-black text-yellow-400 font-mono"
+                    >{hero.coins.toLocaleString()}</span
+                >
+                <span
+                    class="text-[10px] font-mono uppercase tracking-widest text-[color-mix(in_srgb,var(--text-color)_30%,transparent)]"
+                    >Coins</span
+                >
+            </div>
+        {/if}
 
         <div
             class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl bg-orange-400/5 border border-orange-400/20"

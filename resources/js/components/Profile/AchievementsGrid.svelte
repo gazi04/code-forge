@@ -1,8 +1,14 @@
 <script>
     let { achievements = [] } = $props();
 
+    const UNLOCKED_INITIAL = 10;
     let unlocked = $derived(achievements.filter((a) => a.unlocked));
     let locked = $derived(achievements.filter((a) => !a.unlocked));
+
+    let showAllUnlocked = $state(false);
+    let showLocked = $state(false);
+
+    let visibleUnlocked = $derived(showAllUnlocked ? unlocked : unlocked.slice(0, UNLOCKED_INITIAL));
 
     function formatDate(dateStr) {
         if (!dateStr) return '';
@@ -39,8 +45,8 @@
             >
                 Unlocked
             </p>
-            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-6">
-                {#each unlocked as achievement (achievement.id)}
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-3">
+                {#each visibleUnlocked as achievement (achievement.id)}
                     <div
                         class="achievement-card unlocked group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] cursor-default transition-colors duration-500"
                     >
@@ -93,18 +99,30 @@
                     </div>
                 {/each}
             </div>
+
+            {#if unlocked.length > UNLOCKED_INITIAL}
+                <button
+                    onclick={() => (showAllUnlocked = !showAllUnlocked)}
+                    class="mb-3 w-full text-xs font-bold uppercase tracking-widest py-2 rounded-xl border transition-all duration-200 text-[var(--primary-color)] border-[color-mix(in_srgb,var(--primary-color)_25%,transparent)] bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] hover:bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)]"
+                >
+                    {showAllUnlocked ? 'Show less' : `Show ${unlocked.length - UNLOCKED_INITIAL} more`}
+                </button>
+            {/if}
         {/if}
 
         {#if locked.length > 0}
             <div
                 class="border-t border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] pt-4"
             >
-                <p
-                    class="text-xs font-mono uppercase tracking-widest text-[color-mix(in_srgb,var(--text-color)_25%,transparent)] mb-3"
+                <button
+                    onclick={() => (showLocked = !showLocked)}
+                    class="w-full text-xs font-bold uppercase tracking-widest py-2 rounded-xl border transition-all duration-200 text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] border-[color-mix(in_srgb,var(--text-color)_12%,transparent)] bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] hover:bg-[color-mix(in_srgb,var(--text-color)_6%,transparent)]"
                 >
-                    Locked — {locked.length} remaining
-                </p>
-                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                    {showLocked ? `Hide locked` : `Show ${locked.length} locked`}
+                </button>
+
+            {#if showLocked}
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mt-4">
                     {#each locked as achievement (achievement.id)}
                         <div
                             class="group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_6%,transparent)] cursor-default"
@@ -155,6 +173,7 @@
                         </div>
                     {/each}
                 </div>
+            {/if}
             </div>
         {/if}
     {/if}

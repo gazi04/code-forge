@@ -1,17 +1,27 @@
 <script>
     import { useForm } from '@inertiajs/svelte';
 
-    let { preferences } = $props();
+    let { preferences, name = '' } = $props();
 
     const form = useForm({
         background_audio: preferences.background_audio,
         sound_effects: preferences.sound_effects,
         accessibility_mode: preferences.accessibility_mode,
+        public_profile: preferences.public_profile ?? true,
     });
+
+    let copied = $state(false);
 
     function toggle(key) {
         form[key] = !form[key];
         form.put('/profile/settings', { preserveScroll: true });
+    }
+
+    function copyLink() {
+        navigator.clipboard.writeText(`${window.location.origin}/u/${name}`).then(() => {
+            copied = true;
+            setTimeout(() => (copied = false), 2000);
+        });
     }
 </script>
 
@@ -21,7 +31,7 @@
     </h2>
 
     <div class="space-y-3">
-        {#each [{ key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' }, { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' }, { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' }] as setting}
+        {#each [{ key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' }, { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' }, { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' }, { key: 'public_profile', label: 'Public Profile', icon: '🌐', description: 'Allow anyone to view your profile at /u/' + name }] as setting}
             <div
                 class="flex items-center justify-between gap-4 p-4 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_4%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]"
             >
@@ -58,4 +68,19 @@
             </div>
         {/each}
     </div>
+
+    {#if name && (preferences.public_profile ?? true)}
+        <div class="mt-4 flex items-center gap-3 px-4 py-3 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)]">
+            <span class="text-xs font-mono text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] truncate flex-1">
+                {window.location.origin}/u/{name}
+            </span>
+            <button
+                type="button"
+                onclick={copyLink}
+                class="shrink-0 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border transition-all duration-200 text-[var(--primary-color)] border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)]"
+            >
+                {copied ? '✓ Copied' : 'Copy'}
+            </button>
+        </div>
+    {/if}
 </div>

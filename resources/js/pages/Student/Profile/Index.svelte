@@ -30,6 +30,6 @@
         <AchievementsGrid {achievements} />
         <CertificatesPanel {certificates} />
         <QuestLedger {ledger} />
-        <SystemSettings {preferences} />
+        <SystemSettings {preferences} name={hero.name} />
     </div>
 </Layout>
