@@ -1,11 +1,28 @@
 <script>
     import { Link, page, router } from '@inertiajs/svelte';
+    import SearchModal from '@/components/SearchModal.svelte';
 
     let { user } = $props();
 
     let isLeaderboard = $derived(page.url.startsWith('/leaderboard'));
     let isStore = $derived(page.url.startsWith('/store'));
     let isProfile = $derived(page.url.startsWith('/profile'));
+
+    let searchOpen = $state(false);
+
+    $effect(() => {
+        if (!user) return;
+
+        function handleKeydown(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchOpen = true;
+            }
+        }
+
+        window.addEventListener('keydown', handleKeydown);
+        return () => window.removeEventListener('keydown', handleKeydown);
+    });
 </script>
 
 <nav
@@ -22,6 +39,16 @@
         </Link>
 
         {#if user}
+            <!-- Search trigger -->
+            <button
+                onclick={() => (searchOpen = true)}
+                class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] hover:text-[var(--text-color)] hover:border-[color-mix(in_srgb,var(--text-color)_15%,transparent)] transition-colors duration-200 flex-1 max-w-56"
+            >
+                <span class="text-sm leading-none">🔍</span>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-widest flex-1 text-left">Search</span>
+                <kbd class="hidden lg:inline text-[9px] px-1.5 py-0.5 rounded border border-[color-mix(in_srgb,var(--text-color)_12%,transparent)] bg-[color-mix(in_srgb,var(--text-color)_4%,transparent)] font-mono shrink-0">⌘K</kbd>
+            </button>
+
             <!-- Right side -->
             <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
 
@@ -125,3 +152,7 @@
 
     </div>
 </nav>
+
+{#if searchOpen}
+    <SearchModal onclose={() => (searchOpen = false)} />
+{/if}

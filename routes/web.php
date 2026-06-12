@@ -5,6 +5,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WorldController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,8 @@ Route::post('/login/student', [StudentLoginController::class, 'store'])->name('s
 Route::middleware(['auth'])->name('student.')->group(function (): void {
 
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
+
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
 
     Route::name('store.')->group(function (): void {
         Route::get('/store', [StoreController::class, 'index'])->name('index');
