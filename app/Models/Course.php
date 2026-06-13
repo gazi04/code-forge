@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -41,5 +42,10 @@ class Course extends Model implements Sortable
     public function prerequisite(): BelongsTo
     {
         return $this->belongsTo(Course::class, 'prerequisite_course_id');
+    }
+
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('is_published', true);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,6 +33,11 @@ class World extends Model implements Sortable
 
     public function courses(): HasMany
     {
-        return $this->hasMany(Course::class)->orderBy('order');
+        return $this->hasMany(Course::class)->orderBy('sort_order');
+    }
+
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('is_published', true);
     }
 }

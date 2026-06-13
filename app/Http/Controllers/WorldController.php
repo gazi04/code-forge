@@ -13,7 +13,9 @@ class WorldController extends Controller
 {
     public function index()
     {
-        $worlds = World::with('themePack', 'courses')->get();
+        $worlds = World::published()
+            ->with(['themePack', 'courses' => fn ($query) => $query->published()])
+            ->get();
 
         return Inertia::render('Student/WorldMap', [
             'worlds' => WorldResource::collection($worlds),
@@ -22,8 +24,10 @@ class WorldController extends Controller
 
     public function show(World $world)
     {
+        abort_unless($world->is_published, 404);
+
         // Load courses and their themes for the specific world view
-        $world->load(['themePack', 'courses']);
+        $world->load(['themePack', 'courses' => fn ($query) => $query->published()]);
 
         return Inertia::render('Student/WorldDetail', [
             'world' => new WorldResource($world),
