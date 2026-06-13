@@ -121,11 +121,12 @@ class ProfileController extends Controller
                 'title' => $prefs['equipped_title'] ?? null,
                 'avatar' => $prefs['equipped_avatar'] ?? null,
             ],
-            'preferences' => $user->preferences ?? [
+            'preferences' => array_merge([
                 'background_audio' => true,
                 'sound_effects' => true,
                 'accessibility_mode' => false,
-            ],
+                'public_profile' => true,
+            ], $user->preferences ?? []),
             'certificates' => $user->worldCompletions()
                 ->with('world.themePack')
                 ->orderByDesc('completed_at')
@@ -147,9 +148,11 @@ class ProfileController extends Controller
             'background_audio' => ['required', 'boolean'],
             'sound_effects' => ['required', 'boolean'],
             'accessibility_mode' => ['required', 'boolean'],
+            'public_profile' => ['required', 'boolean'],
         ]);
 
-        Auth::user()->update(['preferences' => $validated]);
+        $prefs = array_merge(Auth::user()->preferences ?? [], $validated);
+        Auth::user()->update(['preferences' => $prefs]);
 
         return back();
     }
