@@ -67,7 +67,9 @@ it('creates a BlockSubmission and awards XP on a valid block claim', function ()
 
 it('returns already_completed flash and skips duplicate BlockSubmission', function () {
     $user = User::factory()->create();
-    ['lesson' => $lesson] = createLessonHierarchy();
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => ['is_required' => false, 'xp_reward' => 20, 'coin_reward' => 5]],
+    ]);
 
     BlockSubmission::create([
         'user_id' => $user->id,
@@ -94,13 +96,44 @@ it('dispatches ProgressRegistered event on block claim', function () {
     Event::fake([ProgressRegistered::class]);
 
     $user = User::factory()->create();
-    ['lesson' => $lesson] = createLessonHierarchy();
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => ['is_required' => false, 'xp_reward' => 20, 'coin_reward' => 5]],
+    ]);
 
     $this->actingAs($user)
         ->from("/lessons/{$lesson->slug}")
         ->post("/lessons/{$lesson->slug}/blocks/0/claim");
 
     Event::assertDispatched(ProgressRegistered::class);
+});
+
+it('rejects a block claim with an out-of-bounds index and awards nothing', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => ['is_required' => false, 'xp_reward' => 20, 'coin_reward' => 5]],
+    ]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/999/claim")
+        ->assertNotFound();
+
+    expect($user->fresh()->xp)->toBe(0);
+    expect(BlockSubmission::where('user_id', $user->id)->exists())->toBeFalse();
+});
+
+it('rejects a block claim with a negative index', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => ['is_required' => false]],
+    ]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/-1/claim")
+        ->assertNotFound();
+
+    expect($user->fresh()->xp)->toBe(0);
 });
 
 it('uses default 15 XP reward when block has no explicit xp_reward', function () {

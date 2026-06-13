@@ -155,6 +155,12 @@ class LessonController extends Controller
     {
         $user = Auth::user();
 
+        $blocks = $lesson->blocks ?? [];
+
+        if ($blockIndex < 0 || $blockIndex >= count($blocks)) {
+            abort(404);
+        }
+
         // 1. Anti-Cheat: Did they already get the reward for this specific quiz/challenge?
         $alreadySubmitted = BlockSubmission::where('user_id', $user->id)
             ->where('lesson_id', $lesson->id)
@@ -173,7 +179,6 @@ class LessonController extends Controller
 
         // 2. Dynamic Rewards: Extract how much this specific block is worth.
         // If your JSON blocks have an explicit 'xp_reward' set, use it. Otherwise, give a standard micro-reward.
-        $blocks = $lesson->blocks ?? [];
         $blockData = $blocks[$blockIndex]['data'] ?? [];
 
         $xpReward = $blockData['xp_reward'] ?? 15; // 15 XP default for mini-tasks

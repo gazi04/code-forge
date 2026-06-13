@@ -68,7 +68,8 @@ Route::middleware(['auth'])->name('student.')->group(function (): void {
             ->name('submit');
 
         Route::post('/lessons/{lesson:slug}/blocks/{blockIndex}/claim', [LessonController::class, 'submitBlockClaim'])
-            ->name('block.claim');
+            ->name('block.claim')
+            ->whereNumber('blockIndex');
     });
 
 });
