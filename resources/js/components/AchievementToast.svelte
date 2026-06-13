@@ -13,9 +13,11 @@
 
     $effect(() => {
         const unlocked = page.props.flash?.achievements_unlocked ?? [];
+
         if (unlocked.length > 0) {
             untrack(() => {
                 queue.push(...unlocked);
+
                 if (!visible) {
                     showNext();
                 }
@@ -27,8 +29,10 @@
         if (queue.length === 0) {
             visible = false;
             current = null;
+
             return;
         }
+
         current = queue.shift();
         imageError = false;
         visible = true;
@@ -46,7 +50,10 @@
     }
 
     function getImageSrc(imagePath) {
-        if (!imagePath) return null;
+        if (!imagePath) {
+return null;
+}
+
         if (
             imagePath.startsWith('http://') ||
             imagePath.startsWith('https://') ||
@@ -54,6 +61,7 @@
         ) {
             return imagePath;
         }
+
         return `/storage/${imagePath}`;
     }
 

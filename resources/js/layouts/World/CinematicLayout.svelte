@@ -12,7 +12,7 @@
         ↓ Scroll to navigate
     </div>
 
-    {#each courses as course, i}
+    {#each courses as course, i (course.slug)}
         {#if userLevel >= (course.min_level_requirement || 1)}
             <div
                 class="h-full w-full snap-center shrink-0 flex items-center justify-center p-5 sm:p-8 md:p-16 relative overflow-hidden group"

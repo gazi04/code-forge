@@ -1,6 +1,6 @@
 <script>
+    import { Link, useForm, router } from '@inertiajs/svelte';
     import { onMount, tick } from 'svelte';
-    import { Link, page, useForm, router } from '@inertiajs/svelte';
     import BugHuntBlock from '../../components/Blocks/BugHuntBlock.svelte';
     import CodeChallengeBlock from '../../components/Blocks/CodeChallengeBlock.svelte';
     import LabyrinthBlock from '../../components/Blocks/LabyrinthBlock.svelte';
@@ -8,8 +8,8 @@
     import SequenceBlock from '../../components/Blocks/SequenceBlock.svelte';
     import TextBlock from '../../components/Blocks/TextBlock.svelte';
     import VariableMatchingBlock from '../../components/Blocks/VariableMatchingBlock.svelte';
-    import Layout from '../../layouts/StudentLayout.svelte';
     import LessonHeader from '../../components/LessonHeader.svelte';
+    import Layout from '../../layouts/StudentLayout.svelte';
 
     let {
         lesson,
@@ -54,6 +54,7 @@
         if (firstIncompleteIndex > 0) {
             await tick();
             const el = blockRefs[firstIncompleteIndex];
+
             if (el) {
                 const top = el.getBoundingClientRect().top + window.scrollY - 96;
                 window.scrollTo({ top, behavior: 'smooth' });
@@ -140,7 +141,7 @@
                 </p>
             </div>
         {:else}
-            {#each blocks as block, index}
+            {#each blocks as block, index (index)}
                 <div bind:this={blockRefs[index]} class="block-wrapper relative">
                     {#if index === firstIncompleteIndex && firstIncompleteIndex > 0}
                         <div

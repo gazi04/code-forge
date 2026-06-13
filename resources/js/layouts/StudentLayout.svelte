@@ -1,14 +1,13 @@
 <script>
     import { page } from '@inertiajs/svelte';
-    import AchievementToast from '@/components/AchievementToast.svelte';
-    import WorldCompletionModal from '@/components/WorldCompletionModal.svelte';
-    import StudentNav from '@/components/StudentNav.svelte';
-    import { onMount } from 'svelte';
-    import { fade } from 'svelte/transition';
     import confetti from 'canvas-confetti';
+    import { fade } from 'svelte/transition';
+    import AchievementToast from '@/components/AchievementToast.svelte';
+    import StudentNav from '@/components/StudentNav.svelte';
+    import WorldCompletionModal from '@/components/WorldCompletionModal.svelte';
 
     // Prop declaration in Svelte 5 format
-    let { theme = null, children } = $props();
+    let { theme = null } = $props();
 
     // Reactively watch Inertia's flash data
     let flash = $derived(page.props.flash);
@@ -55,7 +54,10 @@
 
         const interval = setInterval(function () {
             const timeLeft = animationEnd - Date.now();
-            if (timeLeft <= 0) return clearInterval(interval);
+
+            if (timeLeft <= 0) {
+return clearInterval(interval);
+}
 
             const particleCount = 50 * (timeLeft / duration);
 
@@ -81,9 +83,18 @@
     }
 
     function getTitle(level) {
-        if (level < 5) return 'The Novice';
-        if (level < 10) return 'Apprentice Coder';
-        if (level < 20) return 'Logic Adept';
+        if (level < 5) {
+return 'The Novice';
+}
+
+        if (level < 10) {
+return 'Apprentice Coder';
+}
+
+        if (level < 20) {
+return 'Logic Adept';
+}
+
         return 'Master Hacker';
     }
 

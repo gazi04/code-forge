@@ -1,5 +1,4 @@
 import { createInertiaApp } from '@inertiajs/svelte';
-import StudentLayout from '@/layouts/StudentLayout.svelte';
 // import AppLayout from '@/layouts/AppLayout.svelte';
 // import AuthLayout from '@/layouts/AuthLayout.svelte';
 // import SettingsLayout from '@/layouts/settings/Layout.svelte';

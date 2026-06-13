@@ -16,7 +16,9 @@
     let searchOpen = $state(false);
 
     $effect(() => {
-        if (!user) return;
+        if (!user) {
+return;
+}
 
         function handleKeydown(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -26,6 +28,7 @@
         }
 
         window.addEventListener('keydown', handleKeydown);
+
         return () => window.removeEventListener('keydown', handleKeydown);
     });
 </script>

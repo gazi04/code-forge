@@ -32,7 +32,7 @@
         <div
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4"
         >
-            {#each worlds.data as world}
+            {#each worlds.data as world (world.slug)}
                 {@const cardColor =
                     world.theme?.config?.palette?.primary || '#8b5cf6'}
 

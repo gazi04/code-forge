@@ -10,6 +10,7 @@
     $effect(() => {
         if (courses) {
             activeIndex = 0;
+
             if (container) {
                 container.scrollLeft = 0;
             }
@@ -20,7 +21,9 @@
         if (idx < 0 || idx >= courses.length || !container) {
             return;
         }
+
         const targetChild = container.children[idx];
+
         if (targetChild) {
             targetChild.scrollIntoView({
                 behavior: 'smooth',
@@ -35,6 +38,7 @@
         if (!container) {
             return;
         }
+
         const containerCenter =
             container.scrollLeft + container.offsetWidth / 2;
         let closestIndex = 0;
@@ -43,6 +47,7 @@
         Array.from(container.children).forEach((child, idx) => {
             const childCenter = child.offsetLeft + child.offsetWidth / 2;
             const distance = Math.abs(containerCenter - childCenter);
+
             if (distance < minDistance) {
                 minDistance = distance;
                 closestIndex = idx;
@@ -58,7 +63,7 @@
         onscroll={handleScroll}
         class="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar px-6 py-4 scroll-smooth"
     >
-        {#each courses as course, i}
+        {#each courses as course, i (course.slug)}
             {#if userLevel >= (course.min_level_requirement || 1)}
                 <Link
                     href="/course/{course.slug}"
@@ -124,7 +129,7 @@
 
 {#if courses.length > 1}
     <div class="flex items-center justify-center gap-2.5 mt-8 w-full">
-        {#each courses as _, idx}
+        {#each courses as _, idx (idx)}
             {@const isActive = activeIndex === idx}
             <button
                 onclick={() => scrollToIdx(idx)}

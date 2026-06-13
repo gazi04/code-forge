@@ -1,7 +1,7 @@
 <script>
     import { page, router } from '@inertiajs/svelte';
-    import Layout from '../../../layouts/StudentLayout.svelte';
     import ItemCard from '../../../components/Store/ItemCard.svelte';
+    import Layout from '../../../layouts/StudentLayout.svelte';
 
     let { items = [], inventory = [], equipped = {}, tab = 'shop' } = $props();
 
@@ -35,6 +35,7 @@
     let inventoryByType = $derived(
         INVENTORY_GROUPS.reduce((acc, group) => {
             acc[group.key] = inventory.filter((inv) => inv.store_item.type === group.key);
+
             return acc;
         }, {}),
     );
@@ -142,7 +143,7 @@
         {#if tab === 'shop'}
             <!-- Category filter -->
             <div class="flex flex-wrap gap-2 mb-6">
-                {#each CATEGORIES as cat}
+                {#each CATEGORIES as cat (cat.key)}
                     <button
                         onclick={() => (selectedCategory = cat.key)}
                         class="px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-colors
@@ -191,7 +192,7 @@
                 </div>
             {:else}
                 <div class="space-y-8">
-                    {#each INVENTORY_GROUPS as group}
+                    {#each INVENTORY_GROUPS as group (group.key)}
                         {@const groupItems = inventoryByType[group.key] ?? []}
                         {#if groupItems.length > 0}
                             <section>

@@ -1,11 +1,10 @@
 <script>
-    import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
-    let claimedRewards = $state(null);
+    let _claimedRewards = $state(null);
 
     let userCode = $state(data.initial_code || '');
     let terminalOutput = $state(
@@ -173,7 +172,7 @@
                     </div>
 
                     <div class="space-y-3">
-                        {#each testResults as test}
+                        {#each testResults as test, i (i)}
                             {#if !test.is_hidden}
                                 <div class="flex items-center gap-3 text-sm">
                                     {#if test.passed === null}

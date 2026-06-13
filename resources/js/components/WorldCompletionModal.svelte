@@ -1,7 +1,7 @@
 <script>
-    import { certificate } from '@/actions/App/Http/Controllers/WorldController';
     import confetti from 'canvas-confetti';
     import { onMount } from 'svelte';
+    import { certificate } from '@/actions/App/Http/Controllers/WorldController';
 
     let {
         worldSlug,
@@ -26,6 +26,7 @@
 
         const interval = setInterval(function () {
             const timeLeft = animationEnd - Date.now();
+
             if (timeLeft <= 0) {
                 return clearInterval(interval);
             }

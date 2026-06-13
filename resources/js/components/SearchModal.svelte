@@ -22,10 +22,13 @@
 
     function handleInput() {
         clearTimeout(debounceTimer);
+
         if (query.trim().length < 2) {
             results = { worlds: [], courses: [], lessons: [] };
+
             return;
         }
+
         debounceTimer = setTimeout(() => {
             http.get(`/search?q=${encodeURIComponent(query.trim())}`, {
                 onSuccess: (data) => {

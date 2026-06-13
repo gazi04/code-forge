@@ -31,7 +31,7 @@
     </h2>
 
     <div class="space-y-3">
-        {#each [{ key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' }, { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' }, { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' }, { key: 'public_profile', label: 'Public Profile', icon: '🌐', description: 'Allow anyone to view your profile at /u/' + name }] as setting}
+        {#each [{ key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' }, { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' }, { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' }, { key: 'public_profile', label: 'Public Profile', icon: '🌐', description: 'Allow anyone to view your profile at /u/' + name }] as setting (setting.key)}
             <div
                 class="flex items-center justify-between gap-4 p-4 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_4%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]"
             >

@@ -1,10 +1,9 @@
 <script>
-    import { router } from '@inertiajs/svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
-    let claimedRewards = $state(null);
+    let _claimedRewards = $state(null);
 
     let statusMessage = $state(
         isAlreadyCleared
@@ -209,8 +208,8 @@
                     style="display: grid; grid-template-columns: repeat({width}, minmax(1.75rem, 3rem)); gap: 0.35rem;"
                     class="mx-auto w-full max-w-fit"
                 >
-                    {#each grid as row, r}
-                        {#each row as cell, c}
+                    {#each grid as row, r (r)}
+                        {#each row as cell, c (c)}
                             {@const isPlayer = playerX === c && playerY === r}
                             <div
                                 class="w-full aspect-square min-w-7 rounded-md flex items-center justify-center text-base sm:text-xl select-none relative transition-colors duration-300
@@ -316,7 +315,7 @@
                             </p>
                         {/if}
 
-                        {#each commandQueue as cmd, idx}
+                        {#each commandQueue as cmd, idx (idx)}
                             {@const isActive = activeCommandIndex === idx}
                             <div
                                 onclick={() => removeCommand(idx)}

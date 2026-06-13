@@ -11,9 +11,18 @@
     let xpToNext = $derived(hero.xp_for_next_level - hero.xp);
 
     function getTitle(level) {
-        if (level < 5) return 'Novice';
-        if (level < 10) return 'Apprentice';
-        if (level < 20) return 'Logic Adept';
+        if (level < 5) {
+return 'Novice';
+}
+
+        if (level < 10) {
+return 'Apprentice';
+}
+
+        if (level < 20) {
+return 'Logic Adept';
+}
+
         return 'Master Hacker';
     }
 </script>

@@ -1,8 +1,8 @@
 import type { LinkComponentBaseProps } from '@inertiajs/core';
+import { router } from '@inertiajs/svelte';
 import { clsx } from 'clsx';
 import type { ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { router } from '@inertiajs/svelte';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -26,6 +26,7 @@ export function claimMicroReward(
             preserveScroll: true,
             onSuccess: (page: any) => {
                 const res = page.props.flash?.game_result;
+
                 if (res && res.status !== 'already_completed') {
                     // Pass the data back to the component to trigger its local animations
                     onRewardClaimed({

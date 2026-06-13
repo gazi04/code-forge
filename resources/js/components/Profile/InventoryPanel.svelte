@@ -14,6 +14,7 @@
     let byType = $derived(
         GROUPS.reduce((acc, group) => {
             acc[group.key] = inventory.filter((inv) => inv.store_item.type === group.key);
+
             return acc;
         }, {}),
     );
@@ -45,7 +46,7 @@
         </div>
     {:else}
         <div class="space-y-6">
-            {#each GROUPS as group}
+            {#each GROUPS as group (group.key)}
                 {@const groupItems = byType[group.key] ?? []}
                 {#if groupItems.length > 0}
                     <section>

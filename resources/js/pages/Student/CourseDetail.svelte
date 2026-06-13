@@ -11,7 +11,9 @@
     $: worldData = world.data ?? world;
     $: themeData = worldData.theme;
     $: mapLayout = themeData?.config?.ui?.map_layout || 'linear';
-    $: isCompleted = (slug) => completed_lesson_slugs.includes(slug);
+    function isCompleted(slug) {
+ return completed_lesson_slugs.includes(slug); 
+}
 </script>
 
 <Layout theme={themeData}>
@@ -55,7 +57,7 @@
             ></div>
 
             <div class="flex flex-col items-center gap-12 relative z-10">
-                {#each lessons as lesson, i}
+                {#each lessons as lesson, i (lesson.slug)}
                     {@const isBranching = mapLayout === 'branching'}
                     {@const alignLeft = isBranching && i % 2 === 0}
 
@@ -114,7 +116,7 @@
             </div>
         {:else if mapLayout === 'road'}
             <div class="flex flex-col relative z-10 w-full px-4 space-y-16">
-                {#each lessons as lesson, i}
+                {#each lessons as lesson, i (lesson.slug)}
                     {@const isLeft = i % 2 === 0}
 
                     <div

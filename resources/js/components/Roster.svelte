@@ -4,7 +4,7 @@
 </script>
 
 <div class="space-y-3">
-    {#each leaders.slice(3) as leader}
+    {#each leaders.slice(3) as leader (leader.name)}
         {@const isPlayer = leader.name === playerName}
         <div
             class="flex items-center gap-4 px-6 py-4 rounded-xl transition-all duration-200 hover:scale-[1.01]

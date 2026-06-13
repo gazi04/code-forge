@@ -19,5 +19,6 @@
             [--tw-prose-hr:color-mix(in_srgb,var(--text-color)_20%,transparent)]
             transition-colors duration-800"
 >
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
     {@html renderedBody}
 </div>

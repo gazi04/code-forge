@@ -1,11 +1,10 @@
 <script>
-    import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
-    let claimedRewards = $state(null);
+    let _claimedRewards = $state(null);
 
     let leftNodes = $state([]);
     let rightNodes = $state([]);

@@ -47,7 +47,7 @@
 </script>
 
 <div class="flex justify-center items-end gap-3 sm:gap-6 mb-10">
-    {#each leaders.slice(0, 3) as leader, i}
+    {#each leaders.slice(0, 3) as leader, i (leader.name)}
         {@const medal = medals[i]}
         {@const isPlayer = leader.name === playerName}
         <div

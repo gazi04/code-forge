@@ -6,7 +6,7 @@
         equipped = false,
         affordable = true,
         quantity = 1,
-        inventoryId = null,
+        inventoryId: _inventoryId = null,
         onPurchase,
         onEquip,
         onUnequip,
@@ -93,7 +93,9 @@
             {:else if confirmingActivate}
                 <div class="flex gap-1">
                     <button
-                        onclick={() => { confirmingActivate = false; onActivate?.(); }}
+                        onclick={() => {
+ confirmingActivate = false; onActivate?.(); 
+}}
                         class="flex-1 py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors"
                     >
                         Confirm

@@ -9,7 +9,7 @@
     ></div>
 
     <div class="flex flex-col gap-12 md:gap-24">
-        {#each courses as course, i}
+        {#each courses as course, i (course.slug)}
             {#if userLevel >= (course.min_level_requirement || 1)}
                 {@const isEven = i % 2 === 0}
 

@@ -4,7 +4,10 @@
     let { certificates = [], isPublic = false } = $props();
 
     function formatDate(dateStr) {
-        if (!dateStr) return '';
+        if (!dateStr) {
+return '';
+}
+
         return new Date(dateStr).toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'short',

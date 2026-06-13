@@ -1,11 +1,10 @@
 <script>
-    import { router } from '@inertiajs/svelte';
     import { onMount } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
-    let claimedRewards = $state(null);
+    let _claimedRewards = $state(null);
 
     let processedLines = $state([]);
     let activeLineIdx = $state(null);
@@ -222,7 +221,7 @@
                             >Select Patch Modification:</span
                         >
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {#each line.choices as option}
+                            {#each line.choices as option (option)}
                                 <button
                                     onclick={() => applyHotfix(idx, option)}
                                     class="w-full text-left p-2.5 rounded-lg border text-xs transition-all bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] font-mono text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_60%,transparent)] hover:bg-[var(--surface-color)]

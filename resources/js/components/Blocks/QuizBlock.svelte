@@ -1,5 +1,4 @@
 <script>
-    import { router } from '@inertiajs/svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
@@ -119,7 +118,7 @@
         </h3>
 
         <div class="space-y-3">
-            {#each data.answers as answer, i}
+            {#each data.answers as answer, i (i)}
                 {@const isSelected = selectedIndexes.includes(i)}
 
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -166,7 +165,7 @@
 
             {#if isSubmitted}
                 <div class="flex flex-col gap-1">
-                    {#each feedbackMessages as msg}
+                    {#each feedbackMessages as msg, i (i)}
                         <span
                             class="text-sm font-medium {msg.type === 'success'
                                 ? 'text-green-400'
