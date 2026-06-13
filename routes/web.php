@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\StudentLoginController;
+use App\Http\Controllers\Auth\StudentRegisterController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LessonController;
@@ -19,6 +20,9 @@ Route::get('/', function () {
 
 Route::get('/login', [StudentLoginController::class, 'show'])->name('login');
 Route::post('/login/student', [StudentLoginController::class, 'store'])->name('student.login.submit');
+
+Route::get('/register', [StudentRegisterController::class, 'show'])->name('register');
+Route::post('/register/student', [StudentRegisterController::class, 'store'])->name('student.register.submit');
 
 Route::get('/u/{user:name}', [PublicProfileController::class, 'show'])->name('public.profile.show');
 

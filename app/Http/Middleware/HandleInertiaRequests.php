@@ -54,6 +54,7 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
             'flash' => [
+                'auth_message' => fn () => $request->session()->get('auth_message'),
                 'game_result' => fn () => $request->session()->get('game_result'),
                 'store_result' => fn () => $request->session()->get('store_result'),
                 'world_completed' => fn () => $request->session()->get('world_completed'),

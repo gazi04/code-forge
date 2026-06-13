@@ -1,5 +1,7 @@
 <script>
-    import { useForm } from '@inertiajs/svelte';
+    import { page, useForm } from '@inertiajs/svelte';
+
+    const authMessage = $derived(page.props.flash?.auth_message);
 
     const form = useForm({
         email: '',
@@ -25,6 +27,12 @@
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Student Portal</h1>
             <p class="text-sm font-mono text-white/25 mt-2 uppercase tracking-widest">Enter your credentials</p>
         </div>
+
+        {#if authMessage}
+            <div class="mb-6 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-center text-sm text-amber-200/90">
+                {authMessage}
+            </div>
+        {/if}
 
         <!-- Card -->
         <div class="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 shadow-[0_0_60px_rgba(99,102,241,0.06)]">
@@ -74,6 +82,11 @@
                 </button>
             </form>
         </div>
+
+        <p class="text-center text-xs font-mono text-white/30 mt-6">
+            New here?
+            <a href="/register" class="text-indigo-400/80 hover:text-indigo-300 font-bold transition-colors">Create an account</a>
+        </p>
 
     </div>
 </div>
