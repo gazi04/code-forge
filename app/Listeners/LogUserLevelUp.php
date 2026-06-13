@@ -14,6 +14,7 @@ class LogUserLevelUp
         // 1. Award a milestone bonus (+50 coins per level)
         $coinBonus = 50;
         $user->increment('coins', $coinBonus);
+        $user->increment('total_coins_earned', $coinBonus);
 
         // 2. Log it directly into your custom audit schema
         ActivityLog::create([

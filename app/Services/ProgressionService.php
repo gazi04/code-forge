@@ -113,6 +113,7 @@ class ProgressionService
             // --- C. Award Loot ---
             $user->xp += $earnedXp;
             $user->coins += $baseCoins; // We keep coins flat and predictable
+            $user->total_coins_earned += $baseCoins;
 
             // --- D. Level Up Engine ---
             $leveledUp = false;

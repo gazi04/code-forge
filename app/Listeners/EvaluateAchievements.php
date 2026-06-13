@@ -70,7 +70,7 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
             'total_xp_earned' => $user->xp,
             'level_reached' => $user->level,
             'daily_streak_count' => $user->streak_count,
-            'total_coins_earned' => $user->coins,
+            'total_coins_earned' => $user->total_coins_earned,
 
             'total_lessons_completed' => LessonSubmission::where('user_id', $user->id)->count(),
 
