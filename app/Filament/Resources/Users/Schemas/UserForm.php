@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Models\User;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Form;
@@ -19,7 +20,9 @@ class UserForm
                     ->columns(2)
                     ->schema([
                         TextInput::make('name')
+                            ->label('Username')
                             ->required()
+                            ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
                         TextInput::make('email')
@@ -27,6 +30,23 @@ class UserForm
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
+
+                        TextInput::make('forename')
+                            ->maxLength(255),
+
+                        TextInput::make('lastname')
+                            ->maxLength(255),
+
+                        DatePicker::make('birthday')
+                            ->native(false)
+                            ->maxDate(now()),
+
+                        Select::make('gender')
+                            ->options([
+                                'male' => 'Male',
+                                'female' => 'Female',
+                            ])
+                            ->native(false),
 
                         Select::make('role')
                             ->options([

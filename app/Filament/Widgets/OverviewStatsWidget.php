@@ -17,6 +17,7 @@ class OverviewStatsWidget extends StatsOverviewWidget
     {
         $totalStudents = User::where('role', 'student')->count();
         $activeToday = User::where('role', 'student')->whereDate('last_active_at', today())->count();
+        $activeThisWeek = User::where('role', 'student')->where('last_active_at', '>=', now()->subDays(7))->count();
 
         $lessonsCompleted = LessonSubmission::count();
         $lessonsLast7 = LessonSubmission::where('created_at', '>=', now()->subDays(7))->count();
@@ -36,6 +37,11 @@ class OverviewStatsWidget extends StatsOverviewWidget
             Stat::make('Active Today', number_format($activeToday))
                 ->description('Students active today')
                 ->descriptionIcon('heroicon-m-fire')
+                ->color('success'),
+
+            Stat::make('Active This Week', number_format($activeThisWeek))
+                ->description('Students active in the last 7 days')
+                ->descriptionIcon('heroicon-m-calendar-days')
                 ->color('success'),
 
             Stat::make('Lessons Completed', number_format($lessonsCompleted))

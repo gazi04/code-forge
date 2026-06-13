@@ -57,12 +57,16 @@ class EditUser extends EditRecord
                         'level' => 1,
                         'xp' => 0,
                         'coins' => 0,
+                        'xp_boost_multiplier' => 1,
+                        'xp_boost_lessons_remaining' => 0,
                     ]);
 
                     $this->refreshFormData([
                         'level',
                         'xp',
                         'coins',
+                        'xp_boost_multiplier',
+                        'xp_boost_lessons_remaining',
                     ]);
 
                     Notification::make()
