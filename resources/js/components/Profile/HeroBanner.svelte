@@ -18,18 +18,18 @@
     }
 </script>
 
-<div class="bg-surface rounded-2xl p-8 mb-6 relative overflow-hidden">
+<div class="bg-surface rounded-2xl p-5 sm:p-8 mb-6 relative overflow-hidden">
     <div
         class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] to-transparent pointer-events-none"
     ></div>
 
-    <div class="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
+    <div class="relative flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
         <!-- Avatar with glow -->
         <div class="relative shrink-0">
             <div
                 class="absolute inset-0 rounded-full bg-gradient-to-tr from-[var(--primary-color)] to-[var(--accent-color)] blur-xl opacity-35 scale-125 pointer-events-none transition-colors duration-500"
             ></div>
-            <div class="relative w-24 h-24">
+            <div class="relative w-20 h-20 sm:w-24 sm:h-24">
                 {#if hero.equipped?.avatar?.image_url}
                     <img
                         src={hero.equipped.avatar.image_url}
@@ -101,7 +101,7 @@
     </div>
 
     <!-- Stats -->
-    <div class="relative mt-6 grid gap-3 {hero.coins != null ? 'grid-cols-3' : 'grid-cols-2'}">
+    <div class="relative mt-6 grid gap-2 sm:gap-3 {hero.coins != null ? 'grid-cols-3' : 'grid-cols-2'}">
         <div
             class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_7%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-500"
         >

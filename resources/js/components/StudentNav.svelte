@@ -1,6 +1,11 @@
 <script>
     import { Link, page, router } from '@inertiajs/svelte';
     import SearchModal from '@/components/SearchModal.svelte';
+    import StudentBottomNav from '@/components/StudentBottomNav.svelte';
+    import { logout } from '@/routes';
+    import { leaderboard, profile } from '@/routes/student';
+    import { index as storeIndex } from '@/routes/student/store';
+    import { index as worldsIndex } from '@/routes/student/world';
 
     let { user } = $props();
 
@@ -32,7 +37,7 @@
 
         <!-- Logo -->
         <Link
-            href="/worlds"
+            href={worldsIndex.url()}
             class="font-black tracking-widest uppercase text-sm text-[var(--text-color)] opacity-70 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors shrink-0"
         >
             Arcane.dev
@@ -42,7 +47,7 @@
             <!-- Search trigger -->
             <button
                 onclick={() => (searchOpen = true)}
-                class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] hover:text-[var(--text-color)] hover:border-[color-mix(in_srgb,var(--text-color)_15%,transparent)] transition-colors duration-200 flex-1 max-w-56"
+                class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-xs border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] hover:text-[var(--text-color)] hover:border-[color-mix(in_srgb,var(--text-color)_15%,transparent)] transition-colors duration-200 flex-1 max-w-56"
             >
                 <span class="text-sm leading-none">🔍</span>
                 <span class="hidden md:inline font-mono text-[10px] uppercase tracking-widest flex-1 text-left">Search</span>
@@ -53,7 +58,7 @@
             <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
 
                 <!-- Stats -->
-                <div class="hidden lg:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-[color-mix(in_srgb,var(--text-color)_4%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_7%,transparent)] font-mono text-xs">
+                <div class="flex items-center gap-2 px-2 py-1.5 lg:gap-3 lg:px-3 rounded-lg bg-[color-mix(in_srgb,var(--text-color)_4%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_7%,transparent)] font-mono text-xs">
                     <span class="text-[var(--accent-color)] font-black transition-colors duration-500">Lv. {user.level}</span>
                     <span class="text-[color-mix(in_srgb,var(--text-color)_15%,transparent)]">·</span>
                     <span class="text-yellow-400 font-bold">💰 {user.coins.toLocaleString()}</span>
@@ -67,19 +72,13 @@
                     {/if}
                 </div>
 
-                {#if user.streak_at_risk && user.streak_count > 0}
-                    <div class="lg:hidden flex items-center gap-1 px-2 py-1 rounded-md bg-red-500/10 border border-red-400/30 text-red-400 text-xs font-bold animate-pulse">
-                        ⚠️ {user.streak_count}🔥
-                    </div>
-                {/if}
-
                 <!-- Divider -->
                 <div class="hidden lg:block w-px h-6 bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] mx-1"></div>
 
                 <!-- Nav links -->
                 <Link
-                    href="/leaderboard"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wide border transition-colors duration-200
+                    href={leaderboard.url()}
+                    class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wide border transition-colors duration-200
                         {isLeaderboard
                             ? 'bg-amber-500/12 border-amber-400/35 text-amber-400'
                             : 'border-transparent text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] hover:bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)] hover:border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:text-[var(--text-color)]'}"
@@ -89,8 +88,8 @@
                 </Link>
 
                 <Link
-                    href="/store"
-                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wide border transition-colors duration-200
+                    href={storeIndex.url()}
+                    class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wide border transition-colors duration-200
                         {isStore
                             ? 'bg-[color-mix(in_srgb,var(--primary-color)_12%,transparent)] border-[color-mix(in_srgb,var(--primary-color)_35%,transparent)] text-[var(--primary-color)]'
                             : 'border-transparent text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] hover:bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)] hover:border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:text-[var(--text-color)]'}"
@@ -100,12 +99,12 @@
                 </Link>
 
                 <!-- Divider -->
-                <div class="w-px h-6 bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] mx-1"></div>
+                <div class="hidden md:block w-px h-6 bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] mx-1"></div>
 
                 <!-- Profile -->
                 <Link
-                    href="/profile"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-colors duration-200
+                    href={profile.url()}
+                    class="hidden md:flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-colors duration-200
                         {isProfile
                             ? 'bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)] border-[color-mix(in_srgb,var(--text-color)_12%,transparent)]'
                             : 'border-transparent hover:bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)] hover:border-[color-mix(in_srgb,var(--text-color)_10%,transparent)]'}"
@@ -135,8 +134,8 @@
 
                 <!-- Logout -->
                 <button
-                    onclick={() => router.post('/logout')}
-                    class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wide border border-transparent text-[color-mix(in_srgb,var(--text-color)_35%,transparent)] hover:text-red-400 hover:bg-red-400/5 hover:border-red-400/20 transition-colors duration-200"
+                    onclick={() => router.post(logout.url())}
+                    class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wide border border-transparent text-[color-mix(in_srgb,var(--text-color)_35%,transparent)] hover:text-red-400 hover:bg-red-400/5 hover:border-red-400/20 active:text-red-400 active:bg-red-400/5 transition-colors duration-200"
                 >
                     <span class="text-base leading-none">↩</span>
                     <span class="hidden sm:inline">Log out</span>
@@ -152,6 +151,10 @@
 
     </div>
 </nav>
+
+{#if user}
+    <StudentBottomNav {user} onsearch={() => (searchOpen = true)} />
+{/if}
 
 {#if searchOpen}
     <SearchModal onclose={() => (searchOpen = false)} />

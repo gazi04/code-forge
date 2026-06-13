@@ -154,7 +154,7 @@
         </div>
 
         <div
-            class="grid grid-cols-1 md:grid-cols-2 gap-8 relative w-full bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] p-6 rounded-xl border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner"
+            class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 relative w-full bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] p-4 sm:p-6 rounded-xl border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner"
         >
             <div
                 class="hidden md:block absolute top-6 bottom-6 left-1/2 -translate-x-1/2 w-px bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)] border-dashed border-l border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]"

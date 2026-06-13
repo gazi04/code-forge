@@ -7,7 +7,7 @@
 </script>
 
 <div
-    class="prose max-w-none bg-surface p-8
+    class="prose prose-sm sm:prose-base max-w-none bg-surface p-5 sm:p-8
             [--tw-prose-body:var(--text-color)]
             [--tw-prose-headings:var(--text-color)]
             [--tw-prose-bold:var(--text-color)]

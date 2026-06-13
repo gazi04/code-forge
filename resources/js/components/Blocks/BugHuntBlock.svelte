@@ -183,16 +183,16 @@
                     class="group w-full flex items-start cursor-pointer transition-colors border-l-2 py-0.5
             {isLineActive
                         ? 'bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] border-[var(--primary-color)]'
-                        : 'border-transparent hover:bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)]'}"
+                        : 'border-transparent hover:bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] active:bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)]'}"
                 >
                     <div
-                        class="w-10 select-none text-right pr-4 text-[color-mix(in_srgb,var(--bg-color)_50%,black)] group-hover:text-[color-mix(in_srgb,var(--text-color)_30%,transparent)] transition-colors font-bold text-xs pt-0.5"
+                        class="w-8 pr-2 sm:w-10 sm:pr-4 select-none text-right text-[color-mix(in_srgb,var(--bg-color)_50%,black)] group-hover:text-[color-mix(in_srgb,var(--text-color)_30%,transparent)] transition-colors font-bold text-xs pt-0.5"
                     >
                         {idx + 1}
                     </div>
 
                     <div
-                        class="flex-1 whitespace-pre-wrap tracking-wide transition-colors
+                        class="flex-1 min-w-0 whitespace-pre-wrap break-words tracking-wide transition-colors
             {line.type === 'buggy' && line.isFixed
                             ? 'text-emerald-400'
                             : isLineBuggyAndUnresolved

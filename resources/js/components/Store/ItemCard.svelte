@@ -66,15 +66,15 @@
         <!-- Action -->
         {#if mode === 'shop'}
             {#if isSoldOut || (!affordable && !owned)}
-                <button disabled class="w-full py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)] text-[color-mix(in_srgb,var(--text-color)_25%,transparent)] cursor-not-allowed">
+                <button disabled class="w-full py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--text-color)_5%,transparent)] text-[color-mix(in_srgb,var(--text-color)_25%,transparent)] cursor-not-allowed">
                     {isSoldOut ? 'Sold Out' : "Can't Afford"}
                 </button>
             {:else if equipped || (owned && !isCosmetic)}
-                <button disabled class="w-full py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] text-[var(--primary-color)] cursor-not-allowed opacity-60">
+                <button disabled class="w-full py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] text-[var(--primary-color)] cursor-not-allowed opacity-60">
                     {equipped ? 'Equipped' : 'Owned'}
                 </button>
             {:else}
-                <button onclick={onPurchase} class="w-full py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[var(--primary-color)] text-[var(--bg-color)] hover:opacity-90 transition-opacity active:scale-95">
+                <button onclick={onPurchase} class="w-full py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[var(--primary-color)] text-[var(--bg-color)] hover:opacity-90 transition-opacity active:scale-95">
                     Buy
                 </button>
             {/if}
@@ -82,11 +82,11 @@
         {:else if mode === 'inventory'}
             {#if isCosmetic}
                 {#if equipped}
-                    <button onclick={onUnequip} class="w-full py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--text-color)_6%,transparent)] text-[color-mix(in_srgb,var(--text-color)_50%,transparent)] hover:bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] transition-colors">
+                    <button onclick={onUnequip} class="w-full py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--text-color)_6%,transparent)] text-[color-mix(in_srgb,var(--text-color)_50%,transparent)] hover:bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] transition-colors">
                         Unequip
                     </button>
                 {:else}
-                    <button onclick={onEquip} class="w-full py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[var(--primary-color)] text-[var(--bg-color)] hover:opacity-90 transition-opacity active:scale-95">
+                    <button onclick={onEquip} class="w-full py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[var(--primary-color)] text-[var(--bg-color)] hover:opacity-90 transition-opacity active:scale-95">
                         Equip
                     </button>
                 {/if}
@@ -94,19 +94,19 @@
                 <div class="flex gap-1">
                     <button
                         onclick={() => { confirmingActivate = false; onActivate?.(); }}
-                        class="flex-1 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors"
+                        class="flex-1 py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors"
                     >
                         Confirm
                     </button>
                     <button
                         onclick={() => (confirmingActivate = false)}
-                        class="flex-1 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--text-color)_6%,transparent)] text-[color-mix(in_srgb,var(--text-color)_50%,transparent)] hover:bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] transition-colors"
+                        class="flex-1 py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--text-color)_6%,transparent)] text-[color-mix(in_srgb,var(--text-color)_50%,transparent)] hover:bg-[color-mix(in_srgb,var(--text-color)_10%,transparent)] transition-colors"
                     >
                         Cancel
                     </button>
                 </div>
             {:else}
-                <button onclick={() => (confirmingActivate = true)} class="w-full py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--accent-color)_12%,transparent)] text-[var(--accent-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_20%,transparent)] transition-colors">
+                <button onclick={() => (confirmingActivate = true)} class="w-full py-2.5 sm:py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-[color-mix(in_srgb,var(--accent-color)_12%,transparent)] text-[var(--accent-color)] hover:bg-[color-mix(in_srgb,var(--accent-color)_20%,transparent)] transition-colors">
                     Use
                 </button>
             {/if}

@@ -18,7 +18,7 @@
                 Global Matrix
             </div>
             <h1
-                class="text-5xl font-black text-white tracking-tight mb-6 drop-shadow-md"
+                class="text-3xl sm:text-5xl font-black text-white tracking-tight mb-6 drop-shadow-md"
             >
                 Select Realm
             </h1>
@@ -38,7 +38,7 @@
 
                 <Link
                     href="/worlds/{world.slug}"
-                    class="group relative flex flex-col h-[280px] bg-[#18181b] rounded-2xl overflow-hidden border border-white/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]"
+                    class="group relative flex flex-col min-h-[280px] bg-[#18181b] rounded-2xl overflow-hidden border border-white/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] active:scale-[0.99]"
                     style="--hover-color: {cardColor};"
                 >
                     <div
@@ -50,7 +50,7 @@
                         style="background: radial-gradient(circle at 50% 0%, var(--hover-color) 0%, transparent 60%);"
                     ></div>
 
-                    <div class="p-8 flex flex-col h-full relative z-10">
+                    <div class="p-5 sm:p-8 flex flex-col h-full relative z-10">
                         <div class="flex justify-between items-start mb-6">
                             <div
                                 class="w-12 h-12 rounded-xl bg-black/40 border border-white/10 flex items-center justify-center shadow-inner group-hover:border-[var(--hover-color)]/50 transition-colors duration-500"

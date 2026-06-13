@@ -11,7 +11,7 @@
     <div class="max-w-2xl mx-auto pb-16 px-4">
         <header class="mb-6">
             <h1
-                class="text-3xl font-black text-[var(--text-color)] tracking-tight"
+                class="text-2xl sm:text-3xl font-black text-[var(--text-color)] tracking-tight"
             >
                 {hero.name}
             </h1>

@@ -19,7 +19,7 @@
                 Agent Profile
             </div>
             <h1
-                class="text-3xl font-black text-[var(--text-color)] tracking-tight"
+                class="text-2xl sm:text-3xl font-black text-[var(--text-color)] tracking-tight"
             >
                 Command Center
             </h1>

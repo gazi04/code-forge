@@ -222,7 +222,7 @@
 
     {#if errorMessage}
         <div
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-md bg-rose-950/90 backdrop-blur-xl border border-rose-500/50 text-rose-300 px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(225,29,72,0.2)] flex items-start gap-4 animate-fade-in-up"
+            class="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-rose-950/90 backdrop-blur-xl border border-rose-500/50 text-rose-300 px-6 py-4 rounded-2xl shadow-[0_0_30px_rgba(225,29,72,0.2)] flex items-start gap-4 animate-fade-in-up"
         >
             <div class="text-2xl mt-0.5 animate-pulse">⚠️</div>
             <div class="flex-1 flex flex-col gap-1">

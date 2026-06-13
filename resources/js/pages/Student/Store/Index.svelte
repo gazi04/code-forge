@@ -68,9 +68,9 @@
 <Layout>
     <div class="max-w-4xl mx-auto pb-16 px-4">
         <!-- Header -->
-        <div class="mb-8 flex items-start justify-between">
+        <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-                <h1 class="text-3xl font-black tracking-wide text-[var(--text-color)]">
+                <h1 class="text-2xl sm:text-3xl font-black tracking-wide text-[var(--text-color)]">
                     🛍️ Store
                 </h1>
                 <p class="text-sm text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono uppercase tracking-widest mt-1">
@@ -79,7 +79,7 @@
             </div>
 
             <div
-                class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-yellow-500/10 border border-yellow-500/25 text-yellow-400 font-mono font-bold text-sm"
+                class="self-start flex items-center gap-1.5 px-4 py-2 rounded-xl bg-yellow-500/10 border border-yellow-500/25 text-yellow-400 font-mono font-bold text-sm"
             >
                 <span>💰</span>
                 {coins.toLocaleString()} coins

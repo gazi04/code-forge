@@ -83,7 +83,7 @@
 
 {#if visible && current}
     <div
-        class="achievement-toast fixed top-6 right-6 z-[99999] w-80"
+        class="achievement-toast fixed top-6 right-4 sm:right-6 z-[99999] w-80 max-w-[calc(100vw-2rem)]"
         role="alert"
     >
         <div

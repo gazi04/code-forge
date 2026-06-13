@@ -54,7 +54,7 @@
 
 <!-- Backdrop -->
 <div
-    class="fixed inset-0 z-[9999] flex items-start justify-center pt-[15vh] px-4"
+    class="fixed inset-0 z-[9999] flex items-start justify-center pt-[8vh] sm:pt-[15vh] px-4"
     role="dialog"
     aria-modal="true"
 >
@@ -72,7 +72,7 @@
     >
         <!-- Search input row -->
         <div
-            class="flex items-center gap-4 px-6 py-5 border-b"
+            class="flex items-center gap-3 sm:gap-4 px-4 py-4 sm:px-6 sm:py-5 border-b"
             style="border-color: color-mix(in srgb, var(--text-color) 8%, transparent);"
         >
             <span class="text-2xl shrink-0 text-[color-mix(in_srgb,var(--text-color)_35%,transparent)]">🔍</span>
@@ -82,7 +82,7 @@
                 oninput={handleInput}
                 type="text"
                 placeholder="Search worlds, courses, lessons..."
-                class="flex-1 bg-transparent text-xl font-bold font-mono text-[var(--text-color)] placeholder-[color-mix(in_srgb,var(--text-color)_25%,transparent)] outline-none"
+                class="flex-1 min-w-0 bg-transparent text-base sm:text-xl font-bold font-mono text-[var(--text-color)] placeholder-[color-mix(in_srgb,var(--text-color)_25%,transparent)] outline-none"
             />
             {#if http.processing}
                 <span
@@ -120,7 +120,7 @@
                         <button
                             type="button"
                             onclick={() => navigate(`/worlds/${world.slug}`)}
-                            class="w-full flex items-center gap-4 px-6 py-4 text-left transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)]"
+                            class="w-full flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 text-left transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] active:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)]"
                         >
                             <span
                                 class="shrink-0 w-4 h-4 rounded-full"
@@ -148,7 +148,7 @@
                         <button
                             type="button"
                             onclick={() => navigate(`/course/${course.slug}`)}
-                            class="w-full flex items-center gap-4 px-6 py-4 text-left transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)]"
+                            class="w-full flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 text-left transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] active:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)]"
                         >
                             <span class="shrink-0 text-2xl leading-none">{TIER_ICONS[course.age_tier] ?? '🎓'}</span>
                             <div class="flex-1 min-w-0">
@@ -173,7 +173,7 @@
                         <button
                             type="button"
                             onclick={() => navigate(`/lessons/${lesson.slug}`)}
-                            class="w-full flex items-center gap-4 px-6 py-4 text-left transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)]"
+                            class="w-full flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 text-left transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] active:bg-[color-mix(in_srgb,var(--primary-color)_8%,transparent)]"
                         >
                             <span class="shrink-0 text-2xl leading-none">{lesson.is_boss ? '👑' : '⚡'}</span>
                             <div class="flex-1 min-w-0">

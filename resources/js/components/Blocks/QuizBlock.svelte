@@ -125,10 +125,10 @@
                 <!-- svelte-ignore a11y_click_events_have_key_events -->
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <div
-                    class="p-4 rounded-xl border transition-all cursor-pointer flex items-start gap-4
+                    class="p-3 sm:p-4 rounded-xl border transition-all cursor-pointer flex items-start gap-3 sm:gap-4
             {isSelected
                         ? 'border-[var(--primary-color)] bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)]'
-                        : 'border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--text-color)_30%,transparent)]'}
+                        : 'border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--text-color)_30%,transparent)] active:border-[color-mix(in_srgb,var(--text-color)_30%,transparent)] active:bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)]'}
             {isCorrect ? 'opacity-60 cursor-not-allowed' : ''}"
                     onclick={() => toggleSelection(i)}
                 >
@@ -144,7 +144,7 @@
                             <span class="text-xs font-black">✓</span>
                         {/if}
                     </div>
-                    <span class="text-[var(--text-color)] opacity-90"
+                    <span class="text-[var(--text-color)] opacity-90 min-w-0 break-words"
                         >{answer.text}</span
                     >
                 </div>

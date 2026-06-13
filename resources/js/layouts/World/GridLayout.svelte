@@ -3,12 +3,12 @@
     let { courses = [], userLevel = 1 } = $props();
 </script>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 pb-24">
     {#each courses as course, i}
         {#if userLevel >= (course.min_level_requirement || 1)}
             <Link
                 href="/course/{course.slug}"
-                class="group relative flex flex-col p-8 bg-surface border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[var(--primary-color)] hover:-translate-y-1 transition-all duration-300 overflow-hidden rounded-2xl shadow-lg"
+                class="group relative flex flex-col p-5 sm:p-8 bg-surface border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[var(--primary-color)] hover:-translate-y-1 active:border-[var(--primary-color)] active:scale-[0.99] transition-all duration-300 overflow-hidden rounded-2xl shadow-lg"
             >
                 <div
                     class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 group-hover:scale-110 transition-all duration-500 font-black text-6xl text-[var(--text-color)]"
@@ -39,7 +39,7 @@
             </Link>
         {:else}
             <div
-                class="group relative flex flex-col p-8 bg-black/40 border border-red-900/30 overflow-hidden rounded-2xl shadow-none grayscale opacity-80 cursor-not-allowed"
+                class="group relative flex flex-col p-5 sm:p-8 bg-black/40 border border-red-900/30 overflow-hidden rounded-2xl shadow-none grayscale opacity-80 cursor-not-allowed"
             >
                 <div
                     class="absolute top-0 right-0 p-4 opacity-5 font-black text-6xl text-red-500"

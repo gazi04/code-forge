@@ -254,11 +254,11 @@
             class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md transition-all"
         >
             <div
-                class="rounded-3xl p-10 max-w-md w-full text-center animate-bounce-in bg-[var(--surface-color)] border-4 border-[var(--primary-color)]"
+                class="rounded-3xl p-6 sm:p-10 max-w-md w-full max-h-[90dvh] overflow-y-auto text-center animate-bounce-in bg-[var(--surface-color)] border-4 border-[var(--primary-color)]"
                 style="box-shadow: 0 0 50px color-mix(in srgb, var(--primary-color) 40%, transparent);"
             >
                 <h2
-                    class="text-5xl font-black mb-2 drop-shadow-lg text-[var(--primary-color)]"
+                    class="text-4xl sm:text-5xl font-black mb-2 drop-shadow-lg text-[var(--primary-color)]"
                 >
                     LEVEL UP!
                 </h2>
@@ -331,6 +331,13 @@
         max-width: 80rem;
         margin: 0 auto;
         padding: 2rem 1rem 6rem 1rem;
+    }
+
+    /* Clear the fixed bottom tab bar on mobile */
+    @media (max-width: 767px) {
+        .content-wrapper {
+            padding-bottom: calc(8rem + env(safe-area-inset-bottom));
+        }
     }
 
     /* Structural classes universally tied to an 0.8s ease to prevent shape/color snapping */

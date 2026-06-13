@@ -200,20 +200,20 @@
         coinReward={data.coin_reward}
     />
 
-    <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
+    <div class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 w-full">
         <div class="lg:col-span-5 flex flex-col w-full">
             <div
                 class="flex-1 flex items-center justify-center bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] rounded-xl p-6 border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner overflow-x-auto"
             >
                 <div
-                    style="display: grid; grid-template-columns: repeat({width}, 3rem); grid-template-rows: repeat({height}, 3rem); gap: 0.35rem;"
-                    class="mx-auto"
+                    style="display: grid; grid-template-columns: repeat({width}, minmax(1.75rem, 3rem)); gap: 0.35rem;"
+                    class="mx-auto w-full max-w-fit"
                 >
                     {#each grid as row, r}
                         {#each row as cell, c}
                             {@const isPlayer = playerX === c && playerY === r}
                             <div
-                                class="w-12 h-12 rounded-md flex items-center justify-center text-xl select-none relative transition-colors duration-300
+                                class="w-full aspect-square min-w-7 rounded-md flex items-center justify-center text-base sm:text-xl select-none relative transition-colors duration-300
                                 {cell === '#'
                                     ? 'bg-[color-mix(in_srgb,var(--surface-color)_80%,black)] border border-[color-mix(in_srgb,var(--text-color)_15%,transparent)]'
                                     : 'bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]'}"
@@ -276,25 +276,25 @@
                     {/if}
                 </div>
 
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-3 gap-2 sm:gap-3">
                     <button
                         onclick={() => addCommand('FORWARD')}
                         disabled={isExecuting || levelCleared}
-                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
+                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] active:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] active:scale-[0.98] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
                     >
                         <span class="text-xl">🏃</span> Move Fwd
                     </button>
                     <button
                         onclick={() => addCommand('TURN_LEFT')}
                         disabled={isExecuting || levelCleared}
-                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
+                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] active:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] active:scale-[0.98] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
                     >
                         <span class="text-xl">↩️</span> Turn Left
                     </button>
                     <button
                         onclick={() => addCommand('TURN_RIGHT')}
                         disabled={isExecuting || levelCleared}
-                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
+                        class="p-3 bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] hover:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] active:bg-[color-mix(in_srgb,var(--primary-color)_15%,var(--bg-color))] active:scale-[0.98] disabled:opacity-30 disabled:hover:bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] rounded-xl text-xs text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] font-medium flex flex-col items-center gap-2 border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] transition-all"
                     >
                         <span class="text-xl">↪️</span> Turn Right
                     </button>

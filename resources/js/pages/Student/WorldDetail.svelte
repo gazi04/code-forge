@@ -36,7 +36,7 @@
                 ← Databanks
             </Link>
             <h1
-                class="text-4xl md:text-6xl font-black text-[var(--text-color)] drop-shadow-md mb-6 transition-colors duration-800"
+                class="text-3xl sm:text-4xl md:text-6xl font-black text-[var(--text-color)] drop-shadow-md mb-6 transition-colors duration-800"
             >
                 {worldData.name}
             </h1>

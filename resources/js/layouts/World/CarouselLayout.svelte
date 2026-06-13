@@ -62,7 +62,7 @@
             {#if userLevel >= (course.min_level_requirement || 1)}
                 <Link
                     href="/course/{course.slug}"
-                    class="w-[350px] sm:w-[400px] shrink-0 group relative flex flex-col p-8 bg-surface border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[var(--primary-color)] transition-all duration-500 rounded-2xl shadow-xl scroll-mx-6"
+                    class="w-[80vw] max-w-[350px] sm:w-[400px] sm:max-w-none shrink-0 group relative flex flex-col p-5 sm:p-8 bg-surface border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[var(--primary-color)] active:border-[var(--primary-color)] transition-all duration-500 rounded-2xl shadow-xl scroll-mx-6"
                 >
                     <div
                         class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity text-8xl font-black text-[var(--text-color)] select-none"
@@ -93,7 +93,7 @@
                 </Link>
             {:else}
                 <div
-                    class="w-[350px] sm:w-[400px] shrink-0 relative flex flex-col p-8 bg-black/40 border border-red-900/20 rounded-2xl shadow-none grayscale opacity-70 cursor-not-allowed scroll-mx-6"
+                    class="w-[80vw] max-w-[350px] sm:w-[400px] sm:max-w-none shrink-0 relative flex flex-col p-5 sm:p-8 bg-black/40 border border-red-900/20 rounded-2xl shadow-none grayscale opacity-70 cursor-not-allowed scroll-mx-6"
                 >
                     <div class="absolute top-4 right-4 text-2xl opacity-30">
                         🔒

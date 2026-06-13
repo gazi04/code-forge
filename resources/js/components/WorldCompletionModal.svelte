@@ -54,7 +54,7 @@
     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md"
 >
     <div
-        class="animate-bounce-in rounded-3xl p-10 max-w-md w-full text-center mx-4 bg-[var(--surface-color)] border-4 border-[var(--primary-color)]"
+        class="animate-bounce-in rounded-3xl p-6 sm:p-10 max-w-md w-full max-h-[90dvh] overflow-y-auto text-center mx-4 bg-[var(--surface-color)] border-4 border-[var(--primary-color)]"
         style="box-shadow: 0 0 60px color-mix(in srgb, var(--primary-color) 45%, transparent);"
     >
         <div class="text-6xl mb-3">🏆</div>

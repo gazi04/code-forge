@@ -13,7 +13,7 @@
             platformBg: 'bg-yellow-400/15',
             platformBorder: 'border-yellow-400/60',
             platformHeight: 'h-20',
-            size: 'w-24 h-24 text-3xl',
+            size: 'w-20 h-20 text-2xl sm:w-24 sm:h-24 sm:text-3xl',
             order: 'order-2',
             flyDelay: 0,
         },
@@ -46,7 +46,7 @@
     ];
 </script>
 
-<div class="flex justify-center items-end gap-6 mb-10">
+<div class="flex justify-center items-end gap-3 sm:gap-6 mb-10">
     {#each leaders.slice(0, 3) as leader, i}
         {@const medal = medals[i]}
         {@const isPlayer = leader.name === playerName}
@@ -99,7 +99,7 @@
                 #{leader.rank}
             </div>
 
-            <div class="w-24 {medal.platformHeight} {medal.platformBg} border-t-2 border-x {medal.platformBorder} rounded-t-md"></div>
+            <div class="w-20 sm:w-24 {medal.platformHeight} {medal.platformBg} border-t-2 border-x {medal.platformBorder} rounded-t-md"></div>
         </div>
     {/each}
 </div>

@@ -8,6 +8,21 @@
     let showAllUnlocked = $state(false);
     let showLocked = $state(false);
 
+    // Tap-to-toggle tooltip for touch devices (hover-only is invisible on touch)
+    let selectedId = $state(null);
+
+    function toggleTooltip(event, id) {
+        event.stopPropagation();
+        selectedId = selectedId === id ? null : id;
+    }
+
+    function handleTooltipKeydown(event, id) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggleTooltip(event, id);
+        }
+    }
+
     let visibleUnlocked = $derived(showAllUnlocked ? unlocked : unlocked.slice(0, UNLOCKED_INITIAL));
 
     function formatDate(dateStr) {
@@ -20,7 +35,9 @@
     }
 </script>
 
-<div class="bg-surface rounded-2xl p-6 mb-6">
+<svelte:window onclick={() => (selectedId = null)} />
+
+<div class="bg-surface rounded-2xl p-5 sm:p-6 mb-6">
     <div class="flex items-baseline justify-between mb-5">
         <h2 class="text-lg font-black text-[var(--text-color)] tracking-tight">
             Achievements
@@ -48,7 +65,11 @@
             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-3">
                 {#each visibleUnlocked as achievement (achievement.id)}
                     <div
-                        class="achievement-card unlocked group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] cursor-default transition-colors duration-500"
+                        role="button"
+                        tabindex="0"
+                        onclick={(e) => toggleTooltip(e, achievement.id)}
+                        onkeydown={(e) => handleTooltipKeydown(e, achievement.id)}
+                        class="achievement-card unlocked group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] cursor-pointer transition-colors duration-500"
                     >
                         <div class="achievement-icon">
                             {#if achievement.image_path}
@@ -81,7 +102,10 @@
                         {/if}
 
                         <div
-                            class="achievement-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 bg-[var(--bg-color)] border border-[color-mix(in_srgb,var(--text-color)_12%,transparent)] rounded-xl p-3 text-xs pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-xl"
+                            class="achievement-tooltip absolute top-full left-1/2 -translate-x-1/2 mt-2 w-44 max-w-[80vw] bg-[var(--bg-color)] border border-[color-mix(in_srgb,var(--text-color)_12%,transparent)] rounded-xl p-3 text-xs pointer-events-none z-20 transition-opacity duration-200 shadow-xl {selectedId ===
+                            achievement.id
+                                ? 'opacity-100'
+                                : 'opacity-0 md:group-hover:opacity-100'}"
                         >
                             <p
                                 class="font-bold text-[var(--text-color)] mb-1"
@@ -125,7 +149,12 @@
                 <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mt-4">
                     {#each locked as achievement (achievement.id)}
                         <div
-                            class="group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_6%,transparent)] cursor-default"
+                            role="button"
+                            tabindex="0"
+                            onclick={(e) => toggleTooltip(e, achievement.id)}
+                            onkeydown={(e) =>
+                                handleTooltipKeydown(e, achievement.id)}
+                            class="group relative flex flex-col items-center gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_6%,transparent)] cursor-pointer"
                         >
                             <div class="opacity-25 grayscale">
                                 {#if achievement.image_path}
@@ -150,7 +179,10 @@
                             </span>
 
                             <div
-                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 bg-[var(--bg-color)] border border-[color-mix(in_srgb,var(--text-color)_12%,transparent)] rounded-xl p-3 text-xs pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-xl"
+                                class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-44 max-w-[80vw] bg-[var(--bg-color)] border border-[color-mix(in_srgb,var(--text-color)_12%,transparent)] rounded-xl p-3 text-xs pointer-events-none z-20 transition-opacity duration-200 shadow-xl {selectedId ===
+                                achievement.id
+                                    ? 'opacity-100'
+                                    : 'opacity-0 md:group-hover:opacity-100'}"
                             >
                                 <p
                                     class="font-bold text-[var(--text-color)] mb-1"

@@ -22,7 +22,7 @@
         <!-- Brand -->
         <div class="text-center mb-10">
             <p class="text-xs font-mono uppercase tracking-[0.3em] text-indigo-400/60 mb-3">Arcane.dev</p>
-            <h1 class="text-3xl font-black text-white tracking-tight">Student Portal</h1>
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Student Portal</h1>
             <p class="text-sm font-mono text-white/25 mt-2 uppercase tracking-widest">Enter your credentials</p>
         </div>
 

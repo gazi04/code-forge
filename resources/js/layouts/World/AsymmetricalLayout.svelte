@@ -5,7 +5,7 @@
 
 <div class="relative max-w-4xl mx-auto pb-24 py-8">
     <div
-        class="absolute left-[28px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-[var(--primary-color)] via-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] to-transparent opacity-50 -translate-x-1/2"
+        class="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-[var(--primary-color)] via-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] to-transparent opacity-50 -translate-x-1/2"
     ></div>
 
     <div class="flex flex-col gap-12 md:gap-24">
@@ -19,12 +19,12 @@
                         : 'md:justify-end'}"
                 >
                     <div
-                        class="absolute left-[28px] md:left-1/2 w-4 h-4 rounded-full bg-[var(--bg-color)] border-4 border-[var(--primary-color)] shadow-[0_0_15px_var(--primary-color)] -translate-x-1/2 z-20"
+                        class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-[var(--bg-color)] border-4 border-[var(--primary-color)] shadow-[0_0_15px_var(--primary-color)] -translate-x-1/2 z-20"
                     ></div>
 
                     <Link
                         href="/course/{course.slug}"
-                        class="ml-16 md:ml-0 w-[calc(100%-4rem)] md:w-[45%] group relative p-6 bg-surface border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[var(--primary-color)] hover:shadow-[0_0_30px_color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-all duration-300 rounded-2xl"
+                        class="ml-10 md:ml-0 w-[calc(100%-2.5rem)] md:w-[45%] group relative p-6 bg-surface border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] hover:border-[var(--primary-color)] hover:shadow-[0_0_30px_color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-all duration-300 rounded-2xl"
                     >
                         <div
                             class="text-[10px] font-black uppercase tracking-widest text-[var(--primary-color)] mb-2"
@@ -45,11 +45,11 @@
                 </div>
             {:else}
                 <div
-                    class="absolute left-[28px] md:left-1/2 w-4 h-4 rounded-full bg-[var(--bg-color)] border-4 border-red-900/40 shadow-[0_0_15px_rgba(239,68,68,0.15)] -translate-x-1/2 z-20 grayscale"
+                    class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-[var(--bg-color)] border-4 border-red-900/40 shadow-[0_0_15px_rgba(239,68,68,0.15)] -translate-x-1/2 z-20 grayscale"
                 ></div>
 
                 <div
-                    class="ml-16 md:ml-0 w-[calc(100%-4rem)] md:w-[45%] relative p-6 bg-black/40 border border-red-900/20 rounded-2xl grayscale opacity-60 cursor-not-allowed"
+                    class="ml-10 md:ml-0 w-[calc(100%-2.5rem)] md:w-[45%] relative p-6 bg-black/40 border border-red-900/20 rounded-2xl grayscale opacity-60 cursor-not-allowed"
                 >
                     <div
                         class="text-[10px] font-black uppercase tracking-widest text-red-500/70 mb-2 flex items-center gap-1.5"

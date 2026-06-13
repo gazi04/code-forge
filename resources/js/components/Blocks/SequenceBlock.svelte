@@ -149,7 +149,7 @@
 
                 <div
                     onclick={() => selectItem(idx)}
-                    class="w-full p-4 rounded-xl border font-mono text-sm transition-all duration-200 flex items-center gap-4 select-none cursor-pointer
+                    class="w-full p-3 sm:p-4 rounded-xl border font-mono text-sm transition-all duration-200 flex items-center gap-3 sm:gap-4 select-none cursor-pointer
             {isCleared
                         ? 'bg-emerald-950/30 border-emerald-800/80 text-emerald-300 shadow-[0_0_10px_color-mix(in_srgb,var(--primary-color)_5%,transparent)]'
                         : isCurrentSelection
@@ -162,7 +162,7 @@
                         {idx + 1}
                     </div>
 
-                    <div class="flex-1 whitespace-pre-wrap tracking-wide">
+                    <div class="flex-1 min-w-0 whitespace-pre-wrap break-words tracking-wide">
                         {elementValue}
                     </div>
 

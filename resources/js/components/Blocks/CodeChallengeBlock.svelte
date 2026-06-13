@@ -130,7 +130,7 @@
         >
             <textarea
                 bind:value={userCode}
-                class="w-full h-[400px] bg-transparent p-6 font-mono text-sm text-[var(--text-color)] focus:outline-none resize-none"
+                class="w-full h-56 sm:h-72 lg:h-[400px] bg-transparent p-4 sm:p-6 font-mono text-base sm:text-sm text-[var(--text-color)] focus:outline-none resize-none"
                 spellcheck="false"
             ></textarea>
 
@@ -149,9 +149,9 @@
             </div>
         </div>
 
-        <div class="flex flex-col h-[400px]">
+        <div class="flex flex-col h-56 sm:h-72 lg:h-[400px]">
             <div
-                class="flex-1 p-6 bg-[color-mix(in_srgb,var(--bg-color)_70%,black)] overflow-y-auto"
+                class="flex-1 p-4 sm:p-6 bg-[color-mix(in_srgb,var(--bg-color)_70%,black)] overflow-y-auto"
             >
                 <div
                     class="font-mono text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest mb-2"
@@ -164,7 +164,7 @@
 
             {#if testResults.length > 0}
                 <div
-                    class="h-1/2 p-6 bg-[color-mix(in_srgb,var(--bg-color)_30%,transparent)] border-t border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] overflow-y-auto"
+                    class="h-1/2 p-4 sm:p-6 bg-[color-mix(in_srgb,var(--bg-color)_30%,transparent)] border-t border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] overflow-y-auto"
                 >
                     <div
                         class="font-mono text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest mb-4"

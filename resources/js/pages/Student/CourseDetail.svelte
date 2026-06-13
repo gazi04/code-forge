@@ -15,7 +15,7 @@
 </script>
 
 <Layout theme={themeData}>
-    <header class="mb-16 text-center relative z-10 pt-8">
+    <header class="mb-10 sm:mb-16 text-center relative z-10 pt-8">
         <Link
             href="/worlds/{worldData.slug}"
             class="absolute left-0 top-10 text-sm text-[var(--text-color)] opacity-40 hover:opacity-100 transition-opacity flex items-center gap-2"
@@ -31,7 +31,7 @@
         </div>
 
         <h1
-            class="text-4xl md:text-5xl font-black text-[var(--text-color)] tracking-tight drop-shadow-lg transition-colors duration-500"
+            class="text-3xl sm:text-4xl md:text-5xl font-black text-[var(--text-color)] tracking-tight drop-shadow-lg transition-colors duration-500"
         >
             {course.name}
         </h1>
@@ -70,10 +70,10 @@
 
                         <Link
                             href="/lessons/{lesson.slug}"
-                            class="relative z-10 flex items-center gap-6 {isBranching
+                            class="relative z-10 flex items-center gap-4 sm:gap-6 {isBranching
                                 ? alignLeft
-                                    ? 'mr-auto ml-12 md:ml-24 flex-row'
-                                    : 'ml-auto mr-12 md:mr-24 flex-row-reverse text-right'
+                                    ? 'mr-auto ml-6 sm:ml-12 md:ml-24 flex-row'
+                                    : 'ml-auto mr-6 sm:mr-12 md:mr-24 flex-row-reverse text-right'
                                 : 'w-full max-w-md bg-surface p-4'} transition-all duration-300 hover:scale-[1.02] hover:border-[var(--primary-color)]"
                         >
                             <div
@@ -134,7 +134,7 @@
 
                         <Link
                             href="/lessons/{lesson.slug}"
-                            class="relative z-10 flex items-center gap-6 w-[90%] md:w-[75%] {isLeft
+                            class="relative z-10 flex items-center gap-4 sm:gap-6 w-[90%] md:w-[75%] {isLeft
                                 ? 'flex-row'
                                 : 'flex-row-reverse text-right'} transition-all duration-300 hover:scale-[1.02]"
                         >
