@@ -7,6 +7,8 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class EditUser extends EditRecord
 {
@@ -42,24 +44,35 @@ class EditUser extends EditRecord
                         ])
                         ->log('Admin reset student progress. Level, XP, coins, lesson and block submissions, achievements, inventory, equipped items, and world completion certificates have been wiped.');
 
-                    $this->record->lessonSubmissions()->delete();
-                    $this->record->blockSubmissions()->delete();
-                    $this->record->achievements()->detach();
-                    $this->record->inventory()->delete();
-                    $this->record->worldCompletions()->delete();
+                    DB::transaction(function (): void {
+                        $this->record->lessonSubmissions()->delete();
+                        $this->record->blockSubmissions()->delete();
+                        $this->record->achievements()->detach();
+                        $this->record->inventory()->delete();
+                        $this->record->worldCompletions()->delete();
 
-                    $prefs = $this->record->preferences ?? [];
-                    $prefs['equipped_title'] = null;
-                    $prefs['equipped_avatar'] = null;
-                    $this->record->update(['preferences' => $prefs]);
+                        $prefs = $this->record->preferences ?? [];
+                        $prefs['equipped_title'] = null;
+                        $prefs['equipped_avatar'] = null;
 
-                    $this->record->updateQuietly([
-                        'level' => 1,
-                        'xp' => 0,
-                        'coins' => 0,
-                        'xp_boost_multiplier' => 1,
-                        'xp_boost_lessons_remaining' => 0,
-                    ]);
+                        $this->record->updateQuietly([
+                            'level' => 1,
+                            'xp' => 0,
+                            'coins' => 0,
+                            'xp_boost_multiplier' => 1,
+                            'xp_boost_lessons_remaining' => 0,
+                            'streak_count' => 0,
+                            'streak_freezes' => 0,
+                            'rested_xp_balance' => 0,
+                            'pending_achievements' => null,
+                            'preferences' => $prefs,
+                        ]);
+                    });
+
+                    // Drop the student from both Redis leaderboards so the reset
+                    // also clears their rank (member key is the user id).
+                    Redis::zrem('leaderboard:all_time', $this->record->id);
+                    Redis::zrem('leaderboard:weekly', $this->record->id);
 
                     $this->refreshFormData([
                         'level',
@@ -67,6 +80,10 @@ class EditUser extends EditRecord
                         'coins',
                         'xp_boost_multiplier',
                         'xp_boost_lessons_remaining',
+                        'streak_count',
+                        'streak_freezes',
+                        'rested_xp_balance',
+                        'pending_achievements',
                     ]);
 
                     Notification::make()
