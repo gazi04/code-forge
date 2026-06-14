@@ -11,12 +11,16 @@ use App\Models\LessonSubmission;
 use App\Models\User;
 use App\Services\BlockValidator;
 use App\Services\ProgressionService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class LessonController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected ProgressionService $progressionService,
         protected BlockValidator $blockValidator,
@@ -27,6 +31,8 @@ class LessonController extends Controller
         $user = Auth::user();
         $lesson->load('course.world.themePack');
         $course = $lesson->course;
+
+        $this->authorize('view', $course);
 
         $clearedBlockIndices = BlockSubmission::where('user_id', $user->id)
             ->where('lesson_id', $lesson->id)
@@ -85,11 +91,16 @@ class LessonController extends Controller
             }
         }
 
-        $alreadySubmitted = LessonSubmission::where('user_id', $user->id)
-            ->where('lesson_id', $lesson->slug)
-            ->exists();
+        // Atomic anti-double-reward gate: the unique (user_id, lesson_id) index is the
+        // single source of truth. `createOrFirst` inserts the row in its own transaction
+        // and, on a concurrent unique-constraint violation, returns the existing row —
+        // so only the request that actually inserts proceeds to award XP.
+        $submission = LessonSubmission::createOrFirst(
+            ['user_id' => $user->id, 'lesson_id' => $lesson->id],
+            ['course_id' => $lesson->course_id, 'xp_rewarded' => 0, 'coins_rewarded' => 0],
+        );
 
-        if ($alreadySubmitted) {
+        if (! $submission->wasRecentlyCreated) {
             return back()->with([
                 'game_result' => [
                     'status' => 'already_completed',
@@ -103,25 +114,26 @@ class LessonController extends Controller
             ]);
         }
 
-        $result = $this->progressionService->processVictory(
-            $user,
-            $lesson->xp_reward,
-            $lesson->coin_reward
-        );
+        $result = DB::transaction(function () use ($user, $lesson, $submission) {
+            $result = $this->progressionService->processVictory(
+                $user,
+                $lesson->xp_reward,
+                $lesson->coin_reward
+            );
 
-        LessonSubmission::create([
-            'user_id' => $user->id,
-            'course_id' => $lesson->course_id,
-            'lesson_id' => $lesson->slug,
-            'xp_rewarded' => $result['total_xp_earned'],
-            'coins_rewarded' => $result['coins_earned'],
-        ]);
+            $submission->update([
+                'xp_rewarded' => $result['total_xp_earned'],
+                'coins_rewarded' => $result['coins_earned'],
+            ]);
+
+            return $result;
+        });
 
         ProgressRegistered::dispatch($user);
 
         $this->checkWorldCompletion($user, $lesson);
 
-        // 5. Flash the result payload to the session for Svelte to intercept
+        // Flash the result payload to the session for Svelte to intercept
         return back()->with('game_result', $result);
     }
 
@@ -153,6 +165,8 @@ class LessonController extends Controller
     public function submitBlockClaim(Request $request, Lesson $lesson, int $blockIndex)
     {
         $user = Auth::user();
+
+        $this->authorize('view', $lesson->course);
 
         $blocks = $lesson->blocks ?? [];
 
@@ -194,22 +208,38 @@ class LessonController extends Controller
         $coinReward = $blockData['coin_reward'] ?? 5; // 5 Coins default
         $blockTitle = $blockData['game_title'] ?? null;
 
-        // 4. Engine Processing: Run the math
-        $result = $this->progressionService->processVictory(
-            $user,
-            $xpReward,
-            $coinReward
+        // 4. Atomic anti-double-reward gate: the unique (user_id, lesson_id, block_index)
+        // index is the source of truth. `createOrFirst` returns the existing row on a
+        // concurrent insert, so only the genuine first claim awards XP/coins.
+        $submission = BlockSubmission::createOrFirst(
+            ['user_id' => $user->id, 'lesson_id' => $lesson->id, 'block_index' => $blockIndex],
+            ['block_title' => $blockTitle, 'xp_rewarded' => 0, 'coins_rewarded' => 0],
         );
 
-        // 5. Ledger Record: Save it so they can't farm it
-        BlockSubmission::create([
-            'user_id' => $user->id,
-            'lesson_id' => $lesson->id,
-            'block_index' => $blockIndex,
-            'block_title' => $blockTitle,
-            'xp_rewarded' => $result['total_xp_earned'],
-            'coins_rewarded' => $result['coins_earned'],
-        ]);
+        if (! $submission->wasRecentlyCreated) {
+            return back()->with([
+                'game_result' => [
+                    'status' => 'already_completed',
+                    'leveled_up' => false,
+                ],
+            ]);
+        }
+
+        // 5. Engine Processing: run the math and persist the rewards on the gate row.
+        $result = DB::transaction(function () use ($user, $xpReward, $coinReward, $submission) {
+            $result = $this->progressionService->processVictory(
+                $user,
+                $xpReward,
+                $coinReward
+            );
+
+            $submission->update([
+                'xp_rewarded' => $result['total_xp_earned'],
+                'coins_rewarded' => $result['coins_earned'],
+            ]);
+
+            return $result;
+        });
 
         ProgressRegistered::dispatch($user);
 
