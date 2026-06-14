@@ -132,8 +132,8 @@ class ProgressionService
             }
 
             if (! $user->is_shadowbanned) {
-                Redis::zincrby('leaderboard:all_time', $earnedXp, $user->name);
-                Redis::zincrby('leaderboard:weekly', $earnedXp, $user->name);
+                Redis::zincrby('leaderboard:all_time', $earnedXp, $user->id);
+                Redis::zincrby('leaderboard:weekly', $earnedXp, $user->id);
             }
 
             // Return the payload formatted perfectly for Svelte

@@ -85,10 +85,10 @@ class UsersTable
                         $record->save();
 
                         if ($record->is_shadowbanned) {
-                            Redis::zrem('leaderboard:all_time', $record->name);
-                            Redis::zrem('leaderboard:weekly', $record->name);
+                            Redis::zrem('leaderboard:all_time', $record->id);
+                            Redis::zrem('leaderboard:weekly', $record->id);
                         } else {
-                            Redis::zadd('leaderboard:all_time', $record->xp, $record->name);
+                            Redis::zadd('leaderboard:all_time', $record->xp, $record->id);
                         }
                     }),
 

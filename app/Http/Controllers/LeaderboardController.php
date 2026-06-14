@@ -22,8 +22,8 @@ class LeaderboardController extends Controller
 
         $rawEntries = Redis::zrevrange($redisKey, 0, 49, ['withscores' => true]);
 
-        $names = array_keys($rawEntries);
-        $enrichedUsers = User::whereIn('name', $names)->get()->keyBy('name');
+        $ids = array_keys($rawEntries);
+        $enrichedUsers = User::whereIn('id', $ids)->get()->keyBy('id');
 
         $allEquippedIds = $enrichedUsers->flatMap(function (User $u): array {
             $prefs = $u->preferences ?? [];
@@ -43,19 +43,24 @@ class LeaderboardController extends Controller
         $leaders = [];
         $rank = 1;
 
-        foreach ($rawEntries as $name => $score) {
-            $dbUser = $enrichedUsers->get($name);
+        foreach ($rawEntries as $id => $score) {
+            $dbUser = $enrichedUsers->get($id);
+
+            if (! $dbUser) {
+                continue;
+            }
+
             $leaders[] = [
                 'rank' => $rank++,
-                'name' => $name,
-                'level' => $dbUser?->level ?? 0,
+                'name' => $dbUser->name,
+                'level' => $dbUser->level,
                 'xp' => (int) $score,
-                'equipped' => $dbUser ? $mapEquipped($dbUser) : ['title' => null, 'avatar' => null],
+                'equipped' => $mapEquipped($dbUser),
             ];
         }
 
-        $userRank = Redis::zrevrank($redisKey, $user->name);
-        $userScore = Redis::zscore($redisKey, $user->name);
+        $userRank = Redis::zrevrank($redisKey, $user->id);
+        $userScore = Redis::zscore($redisKey, $user->id);
 
         if ($userRank === null) {
             if ($scope === 'all_time') {

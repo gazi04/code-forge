@@ -24,7 +24,7 @@ Route::post('/login/student', [StudentLoginController::class, 'store'])->name('s
 Route::get('/register', [StudentRegisterController::class, 'show'])->name('register');
 Route::post('/register/student', [StudentRegisterController::class, 'store'])->name('student.register.submit');
 
-Route::get('/u/{user:name}', [PublicProfileController::class, 'show'])->name('public.profile.show');
+Route::get('/u/{user}', [PublicProfileController::class, 'show'])->name('public.profile.show');
 
 Route::middleware(['auth'])->name('student.')->group(function (): void {
 

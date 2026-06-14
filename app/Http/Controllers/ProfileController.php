@@ -84,6 +84,7 @@ class ProfileController extends Controller
         return Inertia::render('Student/Profile/Index', [
             'hero' => [
                 'name' => $user->name,
+                'public_url' => route('public.profile.show', $user),
                 'level' => $user->level,
                 'xp' => $user->xp,
                 'xp_for_current_level' => $xpForCurrentLevel,

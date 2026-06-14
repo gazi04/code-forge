@@ -45,8 +45,8 @@ class LeaderboardSeeder extends Seeder
 
             $weeklyXp = (int) round($tier['xp'] * (rand(20, 80) / 100));
 
-            Redis::zadd('leaderboard:all_time', $tier['xp'], $user->name);
-            Redis::zadd('leaderboard:weekly', $weeklyXp, $user->name);
+            Redis::zadd('leaderboard:all_time', $tier['xp'], $user->id);
+            Redis::zadd('leaderboard:weekly', $weeklyXp, $user->id);
         }
 
         $this->command->info('Leaderboard seeded with '.count($tiers).' students.');
