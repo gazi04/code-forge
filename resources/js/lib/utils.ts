@@ -1,4 +1,7 @@
-import type { LinkComponentBaseProps } from '@inertiajs/core';
+import type {
+    FormDataConvertible,
+    LinkComponentBaseProps,
+} from '@inertiajs/core';
 import { router } from '@inertiajs/svelte';
 import { clsx } from 'clsx';
 import type { ClassValue } from 'clsx';
@@ -14,26 +17,52 @@ export function toUrl(
     return typeof href === 'string' ? href : href.url;
 }
 
+interface ClaimCallbacks {
+    /** Server confirmed the answer (or it was already cleared previously). */
+    onCorrect?: (rewards: { xp: number; coins: number }) => void;
+    /** Server rejected the submitted answer. */
+    onIncorrect?: () => void;
+}
+
+/**
+ * Submit a block answer for server-side validation. The server is the only
+ * authority on correctness — answer keys are stripped from the page props —
+ * so the component must react to the callbacks rather than self-checking.
+ */
 export function claimMicroReward(
     lessonSlug: string,
     blockIndex: number,
-    onRewardClaimed: (rewards: { xp: number; coins: number }) => void,
+    answer: unknown,
+    callbacks: ClaimCallbacks = {},
 ) {
     router.post(
         `/lessons/${lessonSlug}/blocks/${blockIndex}/claim`,
-        {},
+        { answer: answer as FormDataConvertible },
         {
             preserveScroll: true,
             onSuccess: (page: any) => {
                 const res = page.props.flash?.game_result;
 
-                if (res && res.status !== 'already_completed') {
-                    // Pass the data back to the component to trigger its local animations
-                    onRewardClaimed({
-                        xp: res.total_xp_earned || 15,
-                        coins: res.coins_earned || 5,
-                    });
+                if (!res) {
+                    return;
                 }
+
+                if (res.status === 'incorrect') {
+                    callbacks.onIncorrect?.();
+
+                    return;
+                }
+
+                if (res.status === 'already_completed') {
+                    callbacks.onCorrect?.({ xp: 0, coins: 0 });
+
+                    return;
+                }
+
+                callbacks.onCorrect?.({
+                    xp: res.total_xp_earned || 15,
+                    coins: res.coins_earned || 5,
+                });
             },
         },
     );

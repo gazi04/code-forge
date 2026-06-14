@@ -159,8 +159,10 @@
                 statusMessage =
                     '🎉 Quest Completed! You navigated the labyrinth!';
                 statusType = 'success';
-                claimMicroReward(lessonSlug, index, (rewards) => {
-                    claimedRewards = rewards;
+                claimMicroReward(lessonSlug, index, null, {
+                    onCorrect: (rewards) => {
+                        claimedRewards = rewards;
+                    },
                 });
 
                 return;
@@ -199,7 +201,9 @@
         coinReward={data.coin_reward}
     />
 
-    <div class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 w-full">
+    <div
+        class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 w-full"
+    >
         <div class="lg:col-span-5 flex flex-col w-full">
             <div
                 class="flex-1 flex items-center justify-center bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] rounded-xl p-6 border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner overflow-x-auto"

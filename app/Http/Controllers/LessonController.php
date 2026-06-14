@@ -9,6 +9,7 @@ use App\Models\BlockSubmission;
 use App\Models\Lesson;
 use App\Models\LessonSubmission;
 use App\Models\User;
+use App\Services\BlockValidator;
 use App\Services\ProgressionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +17,10 @@ use Inertia\Inertia;
 
 class LessonController extends Controller
 {
-    protected ProgressionService $progressionService;
-
-    public function __construct(ProgressionService $progressionService)
-    {
-        $this->progressionService = $progressionService;
-    }
+    public function __construct(
+        protected ProgressionService $progressionService,
+        protected BlockValidator $blockValidator,
+    ) {}
 
     public function show(Lesson $lesson)
     {
@@ -177,7 +176,17 @@ class LessonController extends Controller
             ]);
         }
 
-        // 2. Dynamic Rewards: Extract how much this specific block is worth.
+        // 2. Anti-Cheat: Verify the submitted answer server-side before awarding.
+        // Answer keys are stripped from the client payload, so correctness can only
+        // be confirmed here against the authoritative block data.
+        if (! $this->blockValidator->isCorrect($blocks[$blockIndex], $request->input('answer'))) {
+            return back()->with('game_result', [
+                'status' => 'incorrect',
+                'leveled_up' => false,
+            ]);
+        }
+
+        // 3. Dynamic Rewards: Extract how much this specific block is worth.
         // If your JSON blocks have an explicit 'xp_reward' set, use it. Otherwise, give a standard micro-reward.
         $blockData = $blocks[$blockIndex]['data'] ?? [];
 
@@ -185,14 +194,14 @@ class LessonController extends Controller
         $coinReward = $blockData['coin_reward'] ?? 5; // 5 Coins default
         $blockTitle = $blockData['game_title'] ?? null;
 
-        // 3. Engine Processing: Run the math
+        // 4. Engine Processing: Run the math
         $result = $this->progressionService->processVictory(
             $user,
             $xpReward,
             $coinReward
         );
 
-        // 4. Ledger Record: Save it so they can't farm it
+        // 5. Ledger Record: Save it so they can't farm it
         BlockSubmission::create([
             'user_id' => $user->id,
             'lesson_id' => $lesson->id,
@@ -204,7 +213,7 @@ class LessonController extends Controller
 
         ProgressRegistered::dispatch($user);
 
-        // 5. Intercept & Celebrate:
+        // 6. Intercept & Celebrate:
         // Flashing this data means if this 15 XP pushes them over the edge,
         // your layout will pause the lesson, fire confetti, and show the Level Up modal!
         return back()->with('game_result', $result);

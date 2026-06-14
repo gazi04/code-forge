@@ -4,14 +4,17 @@
     import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
-    let _claimedRewards = $state(null);
+    let claimedRewards = $state(null);
 
+    // The server ships the two columns already split and shuffled — the
+    // pairing itself is never sent to the client, so links can only be
+    // confirmed server-side.
     let leftNodes = $state([]);
     let rightNodes = $state([]);
-    let matchedIds = $state(
-        isAlreadyCleared ? data.pairs.map((_, idx) => idx) : [],
-    );
+    // Provisional links the student proposes: { leftId: rightId }.
+    let bonds = $state({});
     let isCleared = $state(isAlreadyCleared);
+    let isVerifying = $state(false);
     let networkFeedback = $state(
         isAlreadyCleared
             ? '✨ All node alignments secured and stable.'
@@ -20,43 +23,36 @@
     let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
     let isCorrect = $derived(isCleared);
 
-    // State Trackers via Svelte 5 Runes
     let selectedLeftId = $state(null);
 
-    let totalPairsCount = data.pairs.length;
+    let totalPairsCount = (data.left_items ?? []).length;
     let movesCount = $state(0);
+    let bondedCount = $derived(Object.keys(bonds).length);
 
     onMount(() => {
         initializeMatrix();
     });
 
+    function isLeftBonded(id) {
+        return Object.prototype.hasOwnProperty.call(bonds, id);
+    }
+
+    function isRightBonded(id) {
+        return Object.values(bonds).includes(id);
+    }
+
     function initializeMatrix() {
-        // Break relationships down into independent structures mapped with a common relational ID
-        let leftSide = data.pairs.map((pair, idx) => ({
+        leftNodes = (data.left_items ?? []).map((text, idx) => ({
             id: idx,
-            text: pair.left_item,
+            text,
         }));
-        let rightSide = data.pairs.map((pair, idx) => ({
+        rightNodes = (data.right_items ?? []).map((text, idx) => ({
             id: idx,
-            text: pair.right_item,
+            text,
         }));
 
-        // Completely Scramble Column A
-        for (let i = leftSide.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [leftSide[i], leftSide[j]] = [leftSide[j], leftSide[i]];
-        }
-
-        // Completely Scramble Column B
-        for (let i = rightSide.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [rightSide[i], rightSide[j]] = [rightSide[j], rightSide[i]];
-        }
-
-        leftNodes = leftSide;
-        rightNodes = rightSide;
         selectedLeftId = null;
-        matchedIds = isAlreadyCleared ? data.pairs.map((_, idx) => idx) : [];
+        bonds = {};
         movesCount = 0;
         isCleared = isAlreadyCleared;
         networkFeedback = isAlreadyCleared
@@ -66,11 +62,21 @@
     }
 
     function handleLeftClick(id) {
-        if (isCleared || matchedIds.includes(id)) {
+        if (isCleared || isVerifying) {
             return;
         }
 
-        // Toggle active state selection
+        // Clicking an already-linked node breaks the link so it can be redone.
+        if (isLeftBonded(id)) {
+            const next = { ...bonds };
+            delete next[id];
+            bonds = next;
+            networkFeedback = 'Link dissolved. Reconnect the terminal.';
+            feedbackStatus = 'info';
+
+            return;
+        }
+
         if (selectedLeftId === id) {
             selectedLeftId = null;
         } else {
@@ -82,39 +88,63 @@
     }
 
     function handleRightClick(id) {
-        if (isCleared || matchedIds.includes(id) || selectedLeftId === null) {
+        if (
+            isCleared ||
+            isVerifying ||
+            isRightBonded(id) ||
+            selectedLeftId === null
+        ) {
             return;
         }
 
         movesCount++;
+        bonds = { ...bonds, [selectedLeftId]: id };
+        selectedLeftId = null;
 
-        // Evaluate relational verification ID matching logic
-        if (selectedLeftId === id) {
-            matchedIds = [...matchedIds, id];
-            selectedLeftId = null;
-
-            networkFeedback = '⚡ Connection established! Core link verified.';
-            feedbackStatus = 'info';
-
-            checkWinCondition();
-        } else {
-            // Failed Connection attempt
-            selectedLeftId = null;
+        if (bondedCount === totalPairsCount) {
             networkFeedback =
-                '💥 Link Refused! Relational constraints do not match.';
-            feedbackStatus = 'error';
+                'All terminals linked. Run synchronization to verify.';
+        } else {
+            networkFeedback = '⚡ Link staged. Continue connecting the matrix.';
         }
+
+        feedbackStatus = 'info';
     }
 
-    function checkWinCondition() {
-        if (matchedIds.length === totalPairsCount) {
-            isCleared = true;
-            networkFeedback = `🎉 Matrix Synchronization Complete! All relational data layers anchored flawlessly in ${movesCount} actions.`;
-            feedbackStatus = 'success';
-            claimMicroReward(lessonSlug, index, (rewards) => {
-                claimedRewards = rewards;
-            });
+    function verifyMatches() {
+        if (isCleared || isVerifying || bondedCount !== totalPairsCount) {
+            return;
         }
+
+        isVerifying = true;
+        networkFeedback = 'Synchronizing matrix…';
+        feedbackStatus = 'info';
+
+        const answer = Object.entries(bonds).map(([leftId, rightId]) => ({
+            left: leftNodes.find((n) => n.id === Number(leftId))?.text ?? '',
+            right: rightNodes.find((n) => n.id === rightId)?.text ?? '',
+        }));
+
+        claimMicroReward(lessonSlug, index, answer, {
+            onCorrect: (rewards) => {
+                isVerifying = false;
+                isCleared = true;
+                networkFeedback = `🎉 Matrix Synchronization Complete! All relational data layers anchored flawlessly in ${movesCount} actions.`;
+                feedbackStatus = 'success';
+
+                if (rewards.xp > 0) {
+                    claimedRewards = rewards;
+                }
+            },
+            onIncorrect: () => {
+                isVerifying = false;
+                bonds = {};
+                selectedLeftId = null;
+                networkFeedback =
+                    '💥 Link Refused! One or more relational constraints do not match—reconnect the matrix.';
+                feedbackStatus = 'error';
+            },
+        });
     }
 </script>
 
@@ -139,7 +169,7 @@
             >
                 Bonds Connected: <span
                     class="font-bold text-[var(--text-color)]"
-                    >{matchedIds.length} / {totalPairsCount}</span
+                    >{isCleared ? totalPairsCount : bondedCount} / {totalPairsCount}</span
                 >
             </div>
 
@@ -166,13 +196,14 @@
                 >
                 {#each leftNodes as leftItem (leftItem.id)}
                     {@const isSelected = selectedLeftId === leftItem.id}
-                    {@const isAlreadyMatched = matchedIds.includes(leftItem.id)}
+                    {@const isAlreadyMatched =
+                        isCleared || isLeftBonded(leftItem.id)}
 
                     <div
                         onclick={() => handleLeftClick(leftItem.id)}
                         class="p-4 rounded-xl font-mono text-xs border text-left transition-all select-none cursor-pointer
               {isAlreadyMatched
-                            ? 'bg-emerald-950/20 border-emerald-900/50 text-emerald-400/60 opacity-50 cursor-default pointer-events-none'
+                            ? 'bg-emerald-950/20 border-emerald-900/50 text-emerald-400/60 opacity-60'
                             : isSelected
                               ? 'bg-[color-mix(in_srgb,var(--primary-color)_20%,var(--bg-color))] border-[var(--primary-color)] text-[var(--primary-color)] shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_30%,transparent)] scale-[1.01]'
                               : 'bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] text-[color-mix(in_srgb,var(--text-color)_80%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_40%,transparent)] hover:bg-[var(--surface-color)]'}"
@@ -184,7 +215,7 @@
                             {#if isAlreadyMatched}
                                 <span
                                     class="text-[10px] text-emerald-500/70 font-bold"
-                                    >🔒 Bound</span
+                                    >{isCleared ? '🔒 Bound' : '↺ Unlink'}</span
                                 >
                             {:else if isSelected}
                                 <span
@@ -202,9 +233,8 @@
                     >Anchor Alignment Deck</span
                 >
                 {#each rightNodes as rightItem (rightItem.id)}
-                    {@const isAlreadyMatched = matchedIds.includes(
-                        rightItem.id,
-                    )}
+                    {@const isAlreadyMatched =
+                        isCleared || isRightBonded(rightItem.id)}
                     {@const isInteractable =
                         selectedLeftId !== null && !isAlreadyMatched}
 
@@ -244,5 +274,23 @@
         >
             {networkFeedback}
         </div>
+
+        {#if !isCleared}
+            <button
+                onclick={verifyMatches}
+                disabled={isVerifying || bondedCount !== totalPairsCount}
+                class="w-full mt-4 px-8 py-3 rounded-xl font-bold uppercase tracking-wider text-sm transition-transform disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-95 bg-[var(--primary-color)] text-[var(--bg-color)]"
+            >
+                {isVerifying ? 'Synchronizing…' : 'Verify Links'}
+            </button>
+        {/if}
+
+        {#if claimedRewards}
+            <div
+                class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs font-bold text-amber-400"
+            >
+                ✨ +{claimedRewards.xp} XP & +{claimedRewards.coins} Coins Secured!
+            </div>
+        {/if}
     </div>
 </div>

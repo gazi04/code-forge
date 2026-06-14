@@ -30,6 +30,6 @@
         <AchievementsGrid {achievements} />
         <CertificatesPanel {certificates} />
         <QuestLedger {ledger} />
-        <SystemSettings {preferences} name={hero.name} />
+        <SystemSettings {preferences} name={hero.name} profileUrl={hero.public_url} />
     </div>
 </Layout>

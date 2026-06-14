@@ -1,7 +1,7 @@
 <script>
     import { useForm } from '@inertiajs/svelte';
 
-    let { preferences, name = '' } = $props();
+    let { preferences, name = '', profileUrl = '' } = $props();
 
     const form = useForm({
         background_audio: preferences.background_audio,
@@ -18,7 +18,7 @@
     }
 
     function copyLink() {
-        navigator.clipboard.writeText(`${window.location.origin}/u/${name}`).then(() => {
+        navigator.clipboard.writeText(profileUrl).then(() => {
             copied = true;
             setTimeout(() => (copied = false), 2000);
         });
@@ -31,7 +31,7 @@
     </h2>
 
     <div class="space-y-3">
-        {#each [{ key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' }, { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' }, { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' }, { key: 'public_profile', label: 'Public Profile', icon: '🌐', description: 'Allow anyone to view your profile at /u/' + name }] as setting (setting.key)}
+        {#each [{ key: 'background_audio', label: 'Background Audio', icon: '🎵', description: 'Play ambient music during lessons' }, { key: 'sound_effects', label: 'Sound Effects', icon: '🔊', description: 'Play sounds on interactions and rewards' }, { key: 'accessibility_mode', label: 'Accessibility Mode', icon: '♿', description: 'Increase contrast and reduce motion' }, { key: 'public_profile', label: 'Public Profile', icon: '🌐', description: 'Allow anyone to view your profile at ' + profileUrl }] as setting (setting.key)}
             <div
                 class="flex items-center justify-between gap-4 p-4 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_4%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]"
             >
@@ -69,10 +69,10 @@
         {/each}
     </div>
 
-    {#if name && (preferences.public_profile ?? true)}
+    {#if profileUrl && (preferences.public_profile ?? true)}
         <div class="mt-4 flex items-center gap-3 px-4 py-3 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)]">
             <span class="text-xs font-mono text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] truncate flex-1">
-                {window.location.origin}/u/{name}
+                {profileUrl}
             </span>
             <button
                 type="button"

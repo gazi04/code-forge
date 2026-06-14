@@ -4,11 +4,14 @@
     import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
-    let _claimedRewards = $state(null);
+    let claimedRewards = $state(null);
 
-    const correctOrder = data.correct_sequence.map((item) => item.value);
+    // The server now ships the items pre-shuffled (the correct order is never
+    // sent to the client); we only use them as the starting layout.
+    const startingItems = (data.items ?? []).map((item) => item.value);
     let dynamicList = $state([]);
     let isCleared = $state(isAlreadyCleared);
+    let isVerifying = $state(false);
     let gameFeedback = $state(
         isAlreadyCleared
             ? '✨ Sequence fully restored and verified.'
@@ -21,30 +24,11 @@
     let attemptsCount = $state(0);
 
     onMount(() => {
-        if (isAlreadyCleared) {
-            dynamicList = [...correctOrder];
-
-            return;
-        }
-
-        let shuffled = [...correctOrder];
-
-        // Keep shuffling until it doesn't match the correct answer by absolute accident
-        while (
-            shuffled.join('|||') === correctOrder.join('|||') &&
-            shuffled.length > 1
-        ) {
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-        }
-
-        dynamicList = shuffled;
+        dynamicList = [...startingItems];
     });
 
     function selectItem(idx) {
-        if (isCleared) {
+        if (isCleared || isVerifying) {
             return;
         }
 
@@ -64,44 +48,42 @@
 
             attemptsCount++;
             selectedIndex = null;
-            evaluateSequence();
         }
     }
 
-    function evaluateSequence() {
-        const isCorrect = dynamicList.join('|||') === correctOrder.join('|||');
-
-        if (isCorrect) {
-            isCleared = true;
-            gameFeedback = `🎉 Order Restored! You aligned the sequence perfectly in ${attemptsCount} interactions.`;
-            feedbackStatus = 'success';
-            claimMicroReward(lessonSlug, index, (rewards) => {
-                claimedRewards = rewards;
-            });
-        } else {
-            gameFeedback =
-                'Sequence adjusted. The sequence matrix is still unstable—keep sorting!';
-            feedbackStatus = 'info';
+    function verifySequence() {
+        if (isCleared || isVerifying) {
+            return;
         }
+
+        isVerifying = true;
+        gameFeedback = 'Verifying alignment…';
+        feedbackStatus = 'info';
+
+        claimMicroReward(lessonSlug, index, [...dynamicList], {
+            onCorrect: (rewards) => {
+                isVerifying = false;
+                isCleared = true;
+                gameFeedback = `🎉 Order Restored! You aligned the sequence perfectly in ${attemptsCount} interactions.`;
+                feedbackStatus = 'success';
+
+                if (rewards.xp > 0) {
+                    claimedRewards = rewards;
+                }
+            },
+            onIncorrect: () => {
+                isVerifying = false;
+                gameFeedback =
+                    'The sequence matrix is still unstable—keep sorting!';
+                feedbackStatus = 'info';
+            },
+        });
     }
 
     function resetSequence() {
-        let shuffled = [...correctOrder];
-
-        while (
-            shuffled.join('|||') === correctOrder.join('|||') &&
-            shuffled.length > 1
-        ) {
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-        }
-
-        dynamicList = shuffled;
+        dynamicList = [...startingItems];
         selectedIndex = null;
         attemptsCount = 0;
-        isCleared = false;
         gameFeedback =
             'Click an item to select it, then click another to swap their positions.';
         feedbackStatus = 'info';
@@ -162,7 +144,9 @@
                         {idx + 1}
                     </div>
 
-                    <div class="flex-1 min-w-0 whitespace-pre-wrap break-words tracking-wide">
+                    <div
+                        class="flex-1 min-w-0 whitespace-pre-wrap break-words tracking-wide"
+                    >
                         {elementValue}
                     </div>
 
@@ -186,5 +170,23 @@
         >
             {gameFeedback}
         </div>
+
+        {#if !isCleared}
+            <button
+                onclick={verifySequence}
+                disabled={isVerifying || dynamicList.length === 0}
+                class="w-full mt-4 px-8 py-3 rounded-xl font-bold uppercase tracking-wider text-sm transition-transform disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-95 bg-[var(--primary-color)] text-[var(--bg-color)]"
+            >
+                {isVerifying ? 'Verifying…' : 'Verify Sequence'}
+            </button>
+        {/if}
+
+        {#if claimedRewards}
+            <div
+                class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs font-bold text-amber-400"
+            >
+                ✨ +{claimedRewards.xp} XP & +{claimedRewards.coins} Coins Secured!
+            </div>
+        {/if}
     </div>
 </div>

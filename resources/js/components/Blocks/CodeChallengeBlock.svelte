@@ -89,8 +89,10 @@
             if (allTestsPassed && testResults.length > 0) {
                 terminalOutput +=
                     '\n✨ QUEST COMPLETE! All validations passed. ✨';
-                claimMicroReward(lessonSlug, index, (rewards) => {
-                    claimedRewards = rewards;
+                claimMicroReward(lessonSlug, index, null, {
+                    onCorrect: (rewards) => {
+                        claimedRewards = rewards;
+                    },
                 });
             } else {
                 terminalOutput +=

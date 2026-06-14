@@ -5,13 +5,10 @@
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let claimedRewards = $state(null);
 
-    const correctIndexes = data.answers
-        .map((ans, idx) => (ans.is_correct ? idx : null))
-        .filter((idx) => idx !== null);
-
-    let selectedIndexes = $state(isAlreadyCleared ? correctIndexes : []);
+    let selectedIndexes = $state([]);
     let isSubmitted = $state(isAlreadyCleared);
     let isCorrect = $state(isAlreadyCleared);
+    let isVerifying = $state(false);
     let feedbackMessages = $state(
         isAlreadyCleared
             ? [{ type: 'success', text: 'Sector cleared in a previous run.' }]
@@ -22,7 +19,7 @@
 
     function toggleSelection(ansIndex) {
         // Prevent changing answers after a correct submission
-        if (isCorrect) {
+        if (isCorrect || isVerifying) {
             return;
         }
 
@@ -41,57 +38,38 @@
     }
 
     function submitQuiz() {
-        if (selectedIndexes.length === 0) {
+        if (selectedIndexes.length === 0 || isVerifying) {
             return;
         }
 
+        isVerifying = true;
         isSubmitted = true;
         feedbackMessages = [];
 
-        // Gather correct indexes from the database data
-        const correctIndexes = data.answers
-            .map((ans, idx) => (ans.is_correct ? idx : null))
-            .filter((idx) => idx !== null);
+        // The server is the sole authority on correctness — it validates the
+        // selected indexes against the block's answer keys (which are never
+        // shipped to the client) before granting any reward.
+        claimMicroReward(lessonSlug, index, selectedIndexes, {
+            onCorrect: (rewards) => {
+                isVerifying = false;
+                isCorrect = true;
 
-        // Check if the arrays match exactly (regardless of order for multiple choice)
-        const passed =
-            selectedIndexes.length === correctIndexes.length &&
-            selectedIndexes.every((val) => correctIndexes.includes(val));
-
-        if (passed) {
-            isCorrect = true;
-            claimMicroReward(lessonSlug, index, (rewards) => {
-                claimedRewards = rewards;
-            });
-            feedbackMessages.push({
-                text: 'Correct! You may proceed.',
-                type: 'success',
-            });
-        } else {
-            isCorrect = false;
-            // Show specific feedback for the selected wrong answers, if provided
-            let customFeedbackFound = false;
-            selectedIndexes.forEach((idx) => {
-                if (
-                    !data.answers[idx].is_correct &&
-                    data.answers[idx].feedback
-                ) {
-                    feedbackMessages.push({
-                        text: data.answers[idx].feedback,
-                        type: 'error',
-                    });
-                    customFeedbackFound = true;
+                if (rewards.xp > 0) {
+                    claimedRewards = rewards;
                 }
-            });
 
-            // Default fallback message
-            if (!customFeedbackFound) {
-                feedbackMessages.push({
-                    text: 'Wrong answer, try again.',
-                    type: 'error',
-                });
-            }
-        }
+                feedbackMessages = [
+                    { text: 'Correct! You may proceed.', type: 'success' },
+                ];
+            },
+            onIncorrect: () => {
+                isVerifying = false;
+                isCorrect = false;
+                feedbackMessages = [
+                    { text: 'Wrong answer, try again.', type: 'error' },
+                ];
+            },
+        });
     }
 </script>
 
@@ -143,7 +121,8 @@
                             <span class="text-xs font-black">✓</span>
                         {/if}
                     </div>
-                    <span class="text-[var(--text-color)] opacity-90 min-w-0 break-words"
+                    <span
+                        class="text-[var(--text-color)] opacity-90 min-w-0 break-words"
                         >{answer.text}</span
                     >
                 </div>
@@ -154,13 +133,19 @@
         <div class="mt-8 flex flex-col sm:flex-row items-center gap-4">
             <button
                 onclick={submitQuiz}
-                disabled={selectedIndexes.length === 0 || isCorrect}
+                disabled={selectedIndexes.length === 0 ||
+                    isCorrect ||
+                    isVerifying}
                 class="w-full sm:w-auto px-8 py-3 rounded-xl font-bold uppercase tracking-wider text-sm transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 hover:scale-105 active:scale-95
           {isCorrect
                     ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                     : 'bg-[var(--primary-color)] text-[var(--bg-color)]'}"
             >
-                {isCorrect ? 'Victory Achieved' : 'Submit Answer'}
+                {isCorrect
+                    ? 'Victory Achieved'
+                    : isVerifying
+                      ? 'Verifying…'
+                      : 'Submit Answer'}
             </button>
 
             {#if isSubmitted}

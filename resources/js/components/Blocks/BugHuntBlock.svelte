@@ -4,16 +4,12 @@
     import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
-    let _claimedRewards = $state(null);
+    let claimedRewards = $state(null);
 
     let processedLines = $state([]);
     let activeLineIdx = $state(null);
-    let bugsRemaining = $state(
-        isAlreadyCleared
-            ? 0
-            : data.code_lines.filter((l) => l.type === 'buggy').length,
-    );
     let isCleared = $state(isAlreadyCleared);
+    let isVerifying = $state(false);
     let feedbackMsg = $state(
         isAlreadyCleared
             ? '✨ Codebase verified. Hotfixes are fully integrated.'
@@ -22,50 +18,32 @@
     let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
     let isCorrect = $derived(isCleared);
 
+    // Buggy lines the student still has to pick a patch for. Correctness is
+    // decided server-side — the correct text is never sent to the client.
+    let pendingBuggyLines = $derived(
+        processedLines.filter((l) => l.type === 'buggy' && !l.selected).length,
+    );
+
     onMount(() => {
         initializeChallenge();
     });
 
     function initializeChallenge() {
-        let internalBugs = 0;
-
         processedLines = data.code_lines.map((line, idx) => {
             let isBuggy = line.type === 'buggy';
-            let options = [];
-
-            if (isBuggy) {
-                internalBugs++;
-                // Combine real bug text, correct answer, and decoys, then shuffle them
-                let choices = [
-                    line.displayed_text,
-                    line.correct_text,
-                    line.decoy_1,
-                    line.decoy_2,
-                ];
-
-                for (let i = choices.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [choices[i], choices[j]] = [choices[j], choices[i]];
-                }
-
-                options = choices;
-            }
 
             return {
                 id: idx,
                 type: line.type,
                 initialText: line.displayed_text,
-                correctText: isBuggy ? line.correct_text : line.displayed_text,
-                currentText:
-                    isAlreadyCleared && isBuggy
-                        ? line.correct_text
-                        : line.displayed_text,
-                choices: options,
-                isFixed: isAlreadyCleared ? true : !isBuggy,
+                // Server provides the pre-shuffled choices for buggy lines.
+                currentText: line.displayed_text,
+                choices: isBuggy ? (line.choices ?? []) : [],
+                selected: false,
+                fixed: isAlreadyCleared,
             };
         });
 
-        bugsRemaining = isAlreadyCleared ? 0 : internalBugs;
         activeLineIdx = null;
         isCleared = isAlreadyCleared;
         feedbackMsg = isAlreadyCleared
@@ -75,7 +53,7 @@
     }
 
     function handleLineClick(idx) {
-        if (isCleared) {
+        if (isCleared || isVerifying) {
             return;
         }
 
@@ -89,9 +67,6 @@
             if (targetLine.type === 'clean') {
                 feedbackMsg = `⚡ Line ${idx + 1} looks clean! No syntax abnormalities detected here.`;
                 feedbackStatus = 'info';
-            } else if (targetLine.isFixed) {
-                feedbackMsg = `✅ Line ${idx + 1} has already been patched and resolved.`;
-                feedbackStatus = 'success';
             } else {
                 feedbackMsg = `🔍 Line ${idx + 1} seems corrupted. Select an automated hotfix payload below!`;
                 feedbackStatus = 'warning';
@@ -102,37 +77,59 @@
     function applyHotfix(lineIdx, selectedOption) {
         let line = processedLines[lineIdx];
         line.currentText = selectedOption;
-
-        if (selectedOption === line.correctText) {
-            if (!line.isFixed) {
-                line.isFixed = true;
-                bugsRemaining--;
-            }
-        } else {
-            // If they changed it to an alternate wrong text, mark it unfixed
-            if (line.isFixed) {
-                line.isFixed = false;
-                bugsRemaining++;
-            }
-        }
+        line.selected = true;
 
         activeLineIdx = null; // Close option tray
-        checkWinCondition();
-    }
 
-    function checkWinCondition() {
-        if (bugsRemaining === 0) {
-            isCleared = true;
+        if (pendingBuggyLines === 0) {
             feedbackMsg =
-                '🎉 Integrity Restored! All hidden compilation anomalies have been purged successfully.';
-            feedbackStatus = 'success';
-            claimMicroReward(lessonSlug, index, (rewards) => {
-                claimedRewards = rewards;
-            });
+                'All anomalies patched. Run integrity verification to confirm.';
+            feedbackStatus = 'info';
         } else {
-            feedbackMsg = `Patch deployed. Remaining runtime exceptions tracking count: ${bugsRemaining}.`;
+            feedbackMsg = `Patch staged. Lines still awaiting a fix: ${pendingBuggyLines}.`;
             feedbackStatus = 'info';
         }
+    }
+
+    function verifyPatches() {
+        if (isCleared || isVerifying) {
+            return;
+        }
+
+        isVerifying = true;
+        feedbackMsg = 'Running integrity verification…';
+        feedbackStatus = 'info';
+
+        // Send each buggy line's chosen replacement, keyed by line index.
+        const answer = {};
+        processedLines.forEach((line) => {
+            if (line.type === 'buggy') {
+                answer[line.id] = line.currentText;
+            }
+        });
+
+        claimMicroReward(lessonSlug, index, answer, {
+            onCorrect: (rewards) => {
+                isVerifying = false;
+                isCleared = true;
+                processedLines.forEach((line) => {
+                    line.fixed = true;
+                });
+                feedbackMsg =
+                    '🎉 Integrity Restored! All hidden compilation anomalies have been purged successfully.';
+                feedbackStatus = 'success';
+
+                if (rewards.xp > 0) {
+                    claimedRewards = rewards;
+                }
+            },
+            onIncorrect: () => {
+                isVerifying = false;
+                feedbackMsg =
+                    'Verification failed. One or more patches are incorrect—review the lines and try again.';
+                feedbackStatus = 'warning';
+            },
+        });
     }
 </script>
 
@@ -154,9 +151,9 @@
             <div
                 class="px-3 py-1.5 bg-[var(--surface-color)] border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] rounded-md"
             >
-                Anomalies Found: <span
+                Patches Pending: <span
                     class="font-bold text-[var(--text-color)]"
-                    >{isCleared ? '0' : bugsRemaining}</span
+                    >{isCleared ? '0' : pendingBuggyLines}</span
                 >
             </div>
 
@@ -175,7 +172,7 @@
             {#each processedLines as line, idx (line.id)}
                 {@const isLineActive = activeLineIdx === idx}
                 {@const isLineBuggyAndUnresolved =
-                    line.type === 'buggy' && !line.isFixed}
+                    line.type === 'buggy' && !line.selected}
 
                 <div
                     onclick={() => handleLineClick(idx)}
@@ -192,7 +189,7 @@
 
                     <div
                         class="flex-1 min-w-0 whitespace-pre-wrap break-words tracking-wide transition-colors
-            {line.type === 'buggy' && line.isFixed
+            {line.type === 'buggy' && line.fixed
                             ? 'text-emerald-400'
                             : isLineBuggyAndUnresolved
                               ? 'text-[var(--text-color)] group-hover:text-[var(--primary-color)]'
@@ -202,17 +199,17 @@
                     </div>
 
                     <div class="px-3 text-xs select-none">
-                        {#if line.type === 'buggy' && line.isFixed}
+                        {#if line.type === 'buggy' && line.fixed}
                             <span class="text-emerald-500/80">✨ Patched</span>
-                        {:else if isLineBuggyAndUnresolved && line.currentText !== line.initialText}
-                            <span class="text-rose-400 font-bold animate-pulse"
-                                >⚠️ Warning</span
+                        {:else if line.type === 'buggy' && line.selected}
+                            <span class="text-amber-400 font-bold"
+                                >◌ Staged</span
                             >
                         {/if}
                     </div>
                 </div>
 
-                {#if isLineActive && line.type === 'buggy' && !line.isFixed}
+                {#if isLineActive && line.type === 'buggy' && !line.fixed}
                     <div
                         class="w-full pl-10 pr-4 py-3 bg-[color-mix(in_srgb,var(--bg-color)_60%,transparent)] border-y border-[color-mix(in_srgb,var(--text-color)_5%,transparent)] flex flex-col gap-2 my-1 animate-fadeIn"
                     >
@@ -252,5 +249,23 @@
         >
             {feedbackMsg}
         </div>
+
+        {#if !isCleared}
+            <button
+                onclick={verifyPatches}
+                disabled={isVerifying || pendingBuggyLines > 0}
+                class="w-full mt-4 px-8 py-3 rounded-xl font-bold uppercase tracking-wider text-sm transition-transform disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-95 bg-[var(--primary-color)] text-[var(--bg-color)]"
+            >
+                {isVerifying ? 'Verifying…' : 'Verify Patches'}
+            </button>
+        {/if}
+
+        {#if claimedRewards}
+            <div
+                class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs font-bold text-amber-400"
+            >
+                ✨ +{claimedRewards.xp} XP & +{claimedRewards.coins} Coins Secured!
+            </div>
+        {/if}
     </div>
 </div>
