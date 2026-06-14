@@ -26,7 +26,12 @@ class CoursePolicy
             return Response::deny('Administrators cannot participate in student quests.');
         }
 
-        // 2. Enforce your Horizontal Global Power Level Gating rule!
+        // 2. Reject unpublished courses
+        if (! $course->is_published) {
+            return Response::deny('This course is not available yet.');
+        }
+
+        // 3. Enforce your Horizontal Global Power Level Gating rule!
         if ($user->level < $course->min_level_requirement) {
             return Response::deny("🔒 This world is restricted! Requires Adventure Level {$course->min_level_requirement}.");
         }
