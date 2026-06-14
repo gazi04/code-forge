@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(ThemePackSeeder::class);
+        $this->call(WorldSeeder::class);
+        $this->call(CourseSeeder::class);
+        $this->call(LessonSeeder::class);
         $this->call(LeaderboardSeeder::class);
     }
 }
