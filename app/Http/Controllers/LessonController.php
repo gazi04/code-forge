@@ -50,7 +50,7 @@ class LessonController extends Controller
             ->first();
 
         $isCompleted = LessonSubmission::where('user_id', $user->id)
-            ->where('lesson_id', $lesson->slug)
+            ->where('lesson_id', $lesson->id)
             ->exists();
 
         return Inertia::render('Student/LessonView', [
@@ -146,18 +146,18 @@ class LessonController extends Controller
             return;
         }
 
-        $lessonSlugs = Lesson::whereHas('course', fn ($q) => $q->where('world_id', $world->id))
-            ->pluck('slug');
+        $lessonIds = Lesson::whereHas('course', fn ($q) => $q->where('world_id', $world->id))
+            ->pluck('id');
 
-        if ($lessonSlugs->isEmpty()) {
+        if ($lessonIds->isEmpty()) {
             return;
         }
 
         $completedCount = LessonSubmission::where('user_id', $user->id)
-            ->whereIn('lesson_id', $lessonSlugs)
+            ->whereIn('lesson_id', $lessonIds)
             ->count();
 
-        if ($completedCount >= $lessonSlugs->count()) {
+        if ($completedCount >= $lessonIds->count()) {
             WorldCompleted::dispatch($user, $world);
         }
     }

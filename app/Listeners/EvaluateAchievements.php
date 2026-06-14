@@ -107,9 +107,9 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
                 continue;
             }
 
-            $lessonSlugs = Lesson::where('course_id', $courseId)->pluck('slug');
+            $lessonIds = Lesson::where('course_id', $courseId)->pluck('id');
             $completedCount = LessonSubmission::where('user_id', $user->id)
-                ->whereIn('lesson_id', $lessonSlugs)
+                ->whereIn('lesson_id', $lessonIds)
                 ->count();
 
             $result[$courseId] = $completedCount >= $totalLessons ? 1 : 0;

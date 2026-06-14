@@ -28,12 +28,13 @@ class ProfileController extends Controller
         $xpForNextLevel = $this->progressionService->getXpRequiredForLevel($user->level + 1);
 
         $lessonEntries = LessonSubmission::where('user_id', $user->id)
+            ->with('lesson:id,name')
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
             ->map(fn (LessonSubmission $submission): array => [
                 'type' => 'lesson',
-                'label' => $submission->lesson_id,
+                'label' => $submission->lesson?->name ?? "Lesson #{$submission->lesson_id}",
                 'xp' => $submission->xp_rewarded,
                 'coins' => $submission->coins_rewarded,
                 'completed_at' => $submission->created_at,

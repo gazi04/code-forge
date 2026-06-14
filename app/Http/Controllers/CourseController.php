@@ -29,12 +29,10 @@ class CourseController extends Controller
 
         $user = Auth::user();
         $lessonIds = $course->lessons->pluck('id');
-        $lessonSlugs = $course->lessons->pluck('slug');
 
         $completedIds = LessonSubmission::where('user_id', $user->id)
-            ->whereIn('lesson_id', $lessonSlugs)
-            ->pluck('lesson_id')
-            ->pipe(fn ($slugs) => $course->lessons->whereIn('slug', $slugs)->pluck('id'));
+            ->whereIn('lesson_id', $lessonIds)
+            ->pluck('lesson_id');
 
         $resumeLessonId = BlockSubmission::where('user_id', $user->id)
             ->whereIn('lesson_id', $lessonIds)

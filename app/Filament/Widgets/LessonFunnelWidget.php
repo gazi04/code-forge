@@ -18,8 +18,8 @@ class LessonFunnelWidget extends TableWidget
 
     /**
      * A student "starts" a lesson by completing at least one block, and
-     * "completes" it when a lesson submission exists. Lesson submissions
-     * reference lessons by slug, block submissions by id.
+     * "completes" it when a lesson submission exists. Both tables reference
+     * lessons by id.
      */
     public static function getFunnelQuery(): Builder
     {
@@ -32,7 +32,7 @@ class LessonFunnelWidget extends TableWidget
             )
             ->selectSub(
                 LessonSubmission::selectRaw('COUNT(DISTINCT user_id)')
-                    ->whereColumn('lesson_id', 'lessons.slug'),
+                    ->whereColumn('lesson_id', 'lessons.id'),
                 'completions_count'
             )
             ->orderByDesc('starts_count');

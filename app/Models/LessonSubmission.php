@@ -14,6 +14,11 @@ class LessonSubmission extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function lesson(): BelongsTo
+    {
+        return $this->belongsTo(Lesson::class);
+    }
+
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);

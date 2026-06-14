@@ -20,8 +20,8 @@ class LessonSubmissionInfolist
                         TextEntry::make('course.name')
                             ->label('Course'),
 
-                        TextEntry::make('lesson_id')
-                            ->label('Lesson ID'),
+                        TextEntry::make('lesson.name')
+                            ->label('Lesson'),
                     ]),
 
                 Grid::make(3)
