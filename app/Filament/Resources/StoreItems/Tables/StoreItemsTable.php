@@ -20,6 +20,7 @@ class StoreItemsTable
             ->columns([
                 ImageColumn::make('image')
                     ->label('Image')
+                    ->disk('public')
                     ->square()
                     ->size(40),
 
