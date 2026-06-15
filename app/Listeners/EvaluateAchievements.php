@@ -125,22 +125,34 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
      */
     private function resolveSpecificBlockTypeCompleted(mixed $user, Collection $achievements): array
     {
-        $result = [];
         $targetTypes = $achievements->pluck('target_id')->filter()->unique();
 
-        foreach ($targetTypes as $blockType) {
-            // Cross-reference block_submissions with the lesson JSON payload to count by block type
-            $count = BlockSubmission::where('user_id', $user->id)
-                ->join('lessons', 'block_submissions.lesson_id', '=', 'lessons.id')
-                ->whereRaw(
-                    "json_extract(lessons.blocks, '$[' || block_submissions.block_index || '].type') = ?",
-                    [$blockType]
-                )
-                ->count();
-
-            $result[$blockType] = $count;
+        if ($targetTypes->isEmpty()) {
+            return [];
         }
 
-        return $result;
+        $submissions = BlockSubmission::where('user_id', $user->id)->get(['lesson_id', 'block_index']);
+
+        if ($submissions->isEmpty()) {
+            return $targetTypes->mapWithKeys(fn ($type): array => [$type => 0])->all();
+        }
+
+        // Resolve each submission's block type from the lesson's JSON payload in PHP,
+        // so counting is driver-agnostic (no SQLite-only json_extract path expression).
+        $lessons = Lesson::whereIn('id', $submissions->pluck('lesson_id')->unique())
+            ->get(['id', 'blocks'])
+            ->keyBy('id');
+
+        $counts = [];
+        foreach ($submissions as $submission) {
+            $blocks = $lessons->get($submission->lesson_id)?->blocks ?? [];
+            $type = $blocks[$submission->block_index]['type'] ?? null;
+
+            if ($type !== null) {
+                $counts[$type] = ($counts[$type] ?? 0) + 1;
+            }
+        }
+
+        return $targetTypes->mapWithKeys(fn ($type): array => [$type => $counts[$type] ?? 0])->all();
     }
 }
