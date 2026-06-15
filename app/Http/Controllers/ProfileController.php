@@ -101,7 +101,7 @@ class ProfileController extends Controller
                     'avatar' => $avatarItem ? [
                         'id' => $avatarItem->id,
                         'name' => $avatarItem->name,
-                        'image_url' => $avatarItem->image ? Storage::url($avatarItem->image) : null,
+                        'image_url' => $avatarItem->image ? Storage::disk('public')->url($avatarItem->image) : null,
                     ] : null,
                 ],
             ],

@@ -102,7 +102,7 @@ class LeaderboardController extends Controller
             'avatar' => $avatar ? [
                 'id' => $avatar->id,
                 'name' => $avatar->name,
-                'image_url' => $avatar->image ? Storage::url($avatar->image) : null,
+                'image_url' => $avatar->image ? Storage::disk('public')->url($avatar->image) : null,
             ] : null,
         ];
     }
