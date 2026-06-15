@@ -41,6 +41,7 @@ class User extends Authenticatable implements FilamentUser
             'preferences' => 'array',
             'pending_achievements' => 'array',
             'is_shadowbanned' => 'boolean',
+            'xp_boost_multiplier' => 'float',
         ];
     }
 

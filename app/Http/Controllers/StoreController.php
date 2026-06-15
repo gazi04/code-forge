@@ -123,8 +123,15 @@ class StoreController extends Controller
         if ($item->type === 'streak_freeze') {
             $user->streak_freezes += (int) ($item->effect_config['quantity'] ?? 1);
         } elseif ($item->type === 'xp_boost') {
-            $user->xp_boost_multiplier = (int) ($item->effect_config['multiplier'] ?? 2);
-            $user->xp_boost_lessons_remaining += (int) ($item->effect_config['lessons'] ?? 3);
+            $multiplier = (float) ($item->effect_config['multiplier'] ?? 2);
+            $lessons = (int) ($item->effect_config['lessons'] ?? 3);
+
+            // Stacking: extend the lesson count and keep the stronger multiplier
+            // so activating a weaker boost never downgrades an active stronger one.
+            $user->xp_boost_multiplier = $user->xp_boost_lessons_remaining > 0
+                ? max((float) $user->xp_boost_multiplier, $multiplier)
+                : $multiplier;
+            $user->xp_boost_lessons_remaining += $lessons;
         }
 
         $user->save();

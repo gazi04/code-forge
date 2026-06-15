@@ -103,7 +103,7 @@ class ProgressionService
 
             // Apply active XP boost before awarding
             if ($user->xp_boost_lessons_remaining > 0) {
-                $earnedXp = (int) ($earnedXp * $user->xp_boost_multiplier);
+                $earnedXp = (int) round($earnedXp * $user->xp_boost_multiplier);
                 $user->xp_boost_lessons_remaining--;
                 if ($user->xp_boost_lessons_remaining === 0) {
                     $user->xp_boost_multiplier = 1;
