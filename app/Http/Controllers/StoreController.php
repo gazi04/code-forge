@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\StoreItem;
+use App\Models\User;
 use App\Models\UserInventory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -54,54 +55,62 @@ class StoreController extends Controller
 
     public function purchase(StoreItem $item): RedirectResponse
     {
-        $user = Auth::user();
+        $userId = Auth::id();
 
-        if (! $item->is_active) {
-            return redirect()->back()->with('store_result', ['error' => 'This item is no longer available.']);
-        }
+        // All validation and mutation happen inside one transaction against
+        // row-locked copies, so concurrent purchases can't both pass the checks
+        // (negative coins / oversold stock). `decrement` is an atomic
+        // `coins = coins - x`, avoiding the read-modify-write lost-update window.
+        $result = DB::transaction(function () use ($userId, $item) {
+            $lockedItem = StoreItem::whereKey($item->id)->lockForUpdate()->first();
+            $lockedUser = User::whereKey($userId)->lockForUpdate()->first();
 
-        if ($user->coins < $item->price_coins) {
-            return redirect()->back()->with('store_result', ['error' => 'Not enough coins.']);
-        }
-
-        if ($item->purchase_type === 'permanent') {
-            $alreadyOwned = UserInventory::where('user_id', $user->id)
-                ->where('store_item_id', $item->id)
-                ->exists();
-
-            if ($alreadyOwned) {
-                return redirect()->back()->with('store_result', ['error' => 'You already own this item.']);
+            if (! $lockedItem || ! $lockedItem->is_active) {
+                return ['error' => 'This item is no longer available.'];
             }
-        }
 
-        if ($item->purchase_type === 'one_time' && $item->sold_count >= $item->stock_limit) {
-            return redirect()->back()->with('store_result', ['error' => 'This item is sold out.']);
-        }
+            if ($lockedItem->purchase_type === 'permanent'
+                && UserInventory::where('user_id', $userId)->where('store_item_id', $lockedItem->id)->exists()) {
+                return ['error' => 'You already own this item.'];
+            }
 
-        DB::transaction(function () use ($user, $item) {
-            $user->coins -= $item->price_coins;
-            $user->save();
+            if ($lockedItem->purchase_type === 'one_time'
+                && $lockedItem->stock_limit !== null
+                && $lockedItem->sold_count >= $lockedItem->stock_limit) {
+                return ['error' => 'This item is sold out.'];
+            }
 
-            $item->increment('sold_count');
+            if ($lockedUser->coins < $lockedItem->price_coins) {
+                return ['error' => 'Not enough coins.'];
+            }
 
-            $existing = UserInventory::where('user_id', $user->id)
-                ->where('store_item_id', $item->id)
+            $lockedUser->decrement('coins', $lockedItem->price_coins);
+            $lockedItem->increment('sold_count');
+
+            $existing = UserInventory::where('user_id', $userId)
+                ->where('store_item_id', $lockedItem->id)
                 ->first();
 
             if ($existing) {
                 $existing->increment('quantity');
             } else {
                 UserInventory::create([
-                    'user_id' => $user->id,
-                    'store_item_id' => $item->id,
+                    'user_id' => $userId,
+                    'store_item_id' => $lockedItem->id,
                     'quantity' => 1,
                     'acquired_at' => now(),
                 ]);
             }
+
+            return ['purchased' => $lockedItem->name];
         });
 
+        if (isset($result['error'])) {
+            return redirect()->back()->with('store_result', ['error' => $result['error']]);
+        }
+
         return redirect()->route('student.store.index', ['tab' => 'inventory'])
-            ->with('store_result', ['purchased' => $item->name]);
+            ->with('store_result', ['purchased' => $result['purchased']]);
     }
 
     public function activateItem(UserInventory $inventory): RedirectResponse
