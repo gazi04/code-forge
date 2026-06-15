@@ -151,6 +151,11 @@ class StoreController extends Controller
         abort_if($inventory->user_id !== $user->id, 403);
 
         $item = $inventory->storeItem;
+
+        // Only cosmetic item types are equippable; reject consumables (e.g.
+        // streak_freeze, xp_boost) so they can't create junk equipped_* keys.
+        abort_unless(in_array($item->type, ['title', 'avatar'], true), 422);
+
         $user->preferences = array_merge($user->preferences ?? [], [
             'equipped_'.$item->type => $item->id,
         ]);
