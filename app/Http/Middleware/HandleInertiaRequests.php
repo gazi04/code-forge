@@ -58,16 +58,10 @@ class HandleInertiaRequests extends Middleware
                 'game_result' => fn () => $request->session()->get('game_result'),
                 'store_result' => fn () => $request->session()->get('store_result'),
                 'world_completed' => fn () => $request->session()->get('world_completed'),
-                'achievements_unlocked' => function () use ($request): array {
-                    $user = $request->user();
-                    if (! $user || empty($user->pending_achievements)) {
-                        return [];
-                    }
-                    $pending = $user->pending_achievements;
-                    $user->update(['pending_achievements' => null]);
-
-                    return $pending;
-                },
+                // Read-only: the client clears these via the achievements.acknowledge
+                // endpoint once consumed. Resolving a shared prop must not mutate the
+                // user, or any Inertia response would silently discard pending toasts.
+                'achievements_unlocked' => fn (): array => $request->user()?->pending_achievements ?? [],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
@@ -97,7 +91,7 @@ class HandleInertiaRequests extends Middleware
             'avatar' => $avatar ? [
                 'id' => $avatar->id,
                 'name' => $avatar->name,
-                'image_url' => $avatar->image ? Storage::url($avatar->image) : null,
+                'image_url' => $avatar->image ? Storage::disk('public')->url($avatar->image) : null,
             ] : null,
         ];
     }

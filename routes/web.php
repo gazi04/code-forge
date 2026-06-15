@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\Auth\StudentRegisterController;
 use App\Http\Controllers\CourseController;
@@ -33,6 +34,8 @@ Route::middleware(['auth'])->name('student.')->group(function (): void {
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 
     Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+    Route::post('/achievements/acknowledge', [AchievementController::class, 'acknowledge'])->name('achievements.acknowledge');
 
     Route::name('store.')->group(function (): void {
         Route::get('/store', [StoreController::class, 'index'])->name('index');

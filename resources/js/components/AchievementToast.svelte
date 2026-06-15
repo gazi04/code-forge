@@ -1,6 +1,7 @@
 <script>
-    import { page } from '@inertiajs/svelte';
+    import { page, router } from '@inertiajs/svelte';
     import { untrack } from 'svelte';
+    import { SvelteSet } from 'svelte/reactivity';
 
     const DURATION = 4500;
 
@@ -10,20 +11,44 @@
     let visible = $state(false);
     let timer = null;
     let imageError = $state(false);
+    // Dedup across navigations: the shared prop keeps returning pending toasts
+    // until the server acknowledges them, so track which ids we've already queued.
+    const seenIds = new SvelteSet();
 
     $effect(() => {
         const unlocked = page.props.flash?.achievements_unlocked ?? [];
 
-        if (unlocked.length > 0) {
-            untrack(() => {
-                queue.push(...unlocked);
-
-                if (!visible) {
-                    showNext();
-                }
-            });
+        if (unlocked.length === 0) {
+            return;
         }
+
+        untrack(() => {
+            const fresh = unlocked.filter((a) => !seenIds.has(a.id));
+
+            if (fresh.length === 0) {
+                return;
+            }
+
+            fresh.forEach((a) => seenIds.add(a.id));
+            queue.push(...fresh);
+
+            if (!visible) {
+                showNext();
+            }
+
+            acknowledge();
+        });
     });
+
+    function acknowledge() {
+        // Clear them server-side without disturbing the current page or this
+        // component's queue (preserveState keeps the toast animation running).
+        router.post(
+            '/achievements/acknowledge',
+            {},
+            { preserveScroll: true, preserveState: true },
+        );
+    }
 
     function showNext() {
         if (queue.length === 0) {
@@ -51,8 +76,8 @@
 
     function getImageSrc(imagePath) {
         if (!imagePath) {
-return null;
-}
+            return null;
+        }
 
         if (
             imagePath.startsWith('http://') ||
@@ -104,12 +129,18 @@ return null;
                 style="background: linear-gradient(to right, color-mix(in srgb, var(--primary-color) 20%, transparent), color-mix(in srgb, var(--primary-color) 12%, transparent), color-mix(in srgb, var(--primary-color) 20%, transparent)); border-color: color-mix(in srgb, var(--primary-color) 30%, transparent);"
             >
                 <div class="flex items-center gap-1.5">
-                    <span class="text-[var(--primary-color)] text-xs animate-pulse">✦</span>
+                    <span
+                        class="text-[var(--primary-color)] text-xs animate-pulse"
+                        >✦</span
+                    >
                     <span
                         class="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--primary-color)]"
                         >Achievement Unlocked</span
                     >
-                    <span class="text-[var(--primary-color)] text-xs animate-pulse">✦</span>
+                    <span
+                        class="text-[var(--primary-color)] text-xs animate-pulse"
+                        >✦</span
+                    >
                 </div>
                 <button
                     onclick={dismiss}
@@ -146,7 +177,9 @@ return null;
 
                 <!-- Text -->
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-black text-[var(--text-color)] leading-tight">
+                    <p
+                        class="text-sm font-black text-[var(--text-color)] leading-tight"
+                    >
                         {current.name}
                     </p>
                     {#if current.description}
