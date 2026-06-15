@@ -55,19 +55,26 @@ class ProgressionService
                     // Standard consecutive day
                     $user->streak_count++;
                 } elseif ($lastActive && $lastActive->diffInDays($today) > 1) {
-                    // The user broke their streak!
-                    if ($user->streak_freezes > 0) {
-                        // Mechanic: Consume a freeze to save the streak
-                        $user->streak_freezes--;
+                    // The user skipped at least one day. A freeze covers exactly one
+                    // missed day, so the streak is only saved when they hold enough
+                    // freezes for every missed day in the gap.
+                    $daysSince = (int) round($lastActive->diffInDays($today));
+                    $daysMissed = $daysSince - 1;
+
+                    if ($user->streak_freezes >= $daysMissed) {
+                        // Fully covered: spend one freeze per missed day, preserve the
+                        // streak, and let today extend it by one (frozen days don't count).
+                        $user->streak_freezes -= $daysMissed;
                         $user->streak_count++;
                     } else {
-                        // Reset to day 1
+                        // Not enough freezes: the streak lapsed.
                         $user->streak_count = 1;
-                    }
 
-                    // Mechanic: Rested XP catch-up pool if they were gone for 3+ days
-                    if ($lastActive->diffInDays($today) >= 3) {
-                        $user->rested_xp_balance += 200;
+                        // Rested XP catch-up only when the streak actually broke for 3+ days
+                        // (a freeze-covered gap is not an absence to compensate for).
+                        if ($daysSince >= 3) {
+                            $user->rested_xp_balance += 200;
+                        }
                     }
                 } else {
                     // First time ever playing
