@@ -14,7 +14,12 @@ class WorldController extends Controller
     public function index()
     {
         $worlds = World::published()
-            ->with(['themePack', 'courses' => fn ($query) => $query->published()])
+            ->with([
+                'themePack',
+                'courses' => fn ($query) => $query
+                    ->published()
+                    ->select(['id', 'world_id', 'name', 'slug', 'description', 'min_level_requirement']),
+            ])
             ->get();
 
         return Inertia::render('Student/WorldMap', [

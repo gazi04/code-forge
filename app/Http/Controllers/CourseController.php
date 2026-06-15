@@ -20,7 +20,12 @@ class CourseController extends Controller
             ->with([
                 'world.themePack',
                 'lessons' => function ($query): void {
-                    $query->orderBy('sort_order', 'asc');
+                    // Ship only lesson metadata — never the heavy `blocks` JSON
+                    // (hundreds of KB per page, and it leaks every answer key).
+                    $query->select([
+                        'id', 'course_id', 'name', 'slug', 'xp_reward',
+                        'coin_reward', 'estimated_duration', 'is_boss', 'sort_order',
+                    ])->orderBy('sort_order', 'asc');
                 },
             ])
             ->firstOrFail();
