@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\StoreItems\Schemas;
 
+use App\Enums\PurchaseType;
+use App\Enums\StoreItemType;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
@@ -15,24 +17,6 @@ use Filament\Schemas\Schema;
 
 class StoreItemForm
 {
-    /** @var array<string, string> */
-    public const TYPES = [
-        'title' => 'Title',
-        'avatar' => 'Avatar',
-        'streak_freeze' => 'Streak Freeze',
-        'xp_boost' => 'XP Boost',
-    ];
-
-    /** @var array<string, string> */
-    public const PURCHASE_TYPES = [
-        'permanent' => 'Permanent',
-        'one_time' => 'One-Time (Limited)',
-        'consumable' => 'Consumable',
-    ];
-
-    /** @var array<int, string> */
-    public const CONSUMABLE_TYPES = ['streak_freeze', 'xp_boost'];
-
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
@@ -67,13 +51,13 @@ class StoreItemForm
                 ->columns(2)
                 ->schema([
                     Select::make('type')
-                        ->options(self::TYPES)
+                        ->options(StoreItemType::class)
                         ->required()
                         ->native(false)
                         ->live(),
 
                     Select::make('purchase_type')
-                        ->options(self::PURCHASE_TYPES)
+                        ->options(PurchaseType::class)
                         ->required()
                         ->native(false)
                         ->live(),
@@ -105,7 +89,7 @@ class StoreItemForm
                         ->addActionLabel('Add key')
                         ->reorderable(false),
                 ])
-                ->visible(fn (Get $get): bool => in_array($get('type'), self::CONSUMABLE_TYPES)),
+                ->visible(fn (Get $get): bool => StoreItemType::tryFrom((string) $get('type'))?->isConsumable() ?? false),
 
             Section::make('Title Style')
                 ->schema([
@@ -114,7 +98,7 @@ class StoreItemForm
                         ->helperText('Color shown for the title text under the student\'s name.')
                         ->columnSpanFull(),
                 ])
-                ->visible(fn (Get $get): bool => $get('type') === 'title'),
+                ->visible(fn (Get $get): bool => $get('type') === StoreItemType::Title->value),
         ]);
     }
 }

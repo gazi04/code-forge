@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PurchaseType;
+use App\Enums\StoreItemType;
 use App\Models\StoreItem;
 use App\Models\User;
 use App\Models\UserInventory;
@@ -69,12 +71,12 @@ class StoreController extends Controller
                 return ['error' => 'This item is no longer available.'];
             }
 
-            if ($lockedItem->purchase_type === 'permanent'
+            if ($lockedItem->purchase_type === PurchaseType::Permanent
                 && UserInventory::where('user_id', $userId)->where('store_item_id', $lockedItem->id)->exists()) {
                 return ['error' => 'You already own this item.'];
             }
 
-            if ($lockedItem->purchase_type === 'one_time'
+            if ($lockedItem->purchase_type === PurchaseType::OneTime
                 && $lockedItem->stock_limit !== null
                 && $lockedItem->sold_count >= $lockedItem->stock_limit) {
                 return ['error' => 'This item is sold out.'];
@@ -120,9 +122,9 @@ class StoreController extends Controller
 
         $item = $inventory->storeItem;
 
-        if ($item->type === 'streak_freeze') {
+        if ($item->type === StoreItemType::StreakFreeze) {
             $user->streak_freezes += (int) ($item->effect_config['quantity'] ?? 1);
-        } elseif ($item->type === 'xp_boost') {
+        } elseif ($item->type === StoreItemType::XpBoost) {
             $multiplier = (float) ($item->effect_config['multiplier'] ?? 2);
             $lessons = (int) ($item->effect_config['lessons'] ?? 3);
 
@@ -154,10 +156,10 @@ class StoreController extends Controller
 
         // Only cosmetic item types are equippable; reject consumables (e.g.
         // streak_freeze, xp_boost) so they can't create junk equipped_* keys.
-        abort_unless(in_array($item->type, ['title', 'avatar'], true), 422);
+        abort_unless(in_array($item->type, [StoreItemType::Title, StoreItemType::Avatar], true), 422);
 
         $user->preferences = array_merge($user->preferences ?? [], [
-            'equipped_'.$item->type => $item->id,
+            'equipped_'.$item->type->value => $item->id,
         ]);
         $user->save();
 

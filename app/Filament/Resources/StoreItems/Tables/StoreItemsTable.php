@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\StoreItems\Tables;
 
-use App\Filament\Resources\StoreItems\Schemas\StoreItemForm;
+use App\Enums\PurchaseType;
+use App\Enums\StoreItemType;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
@@ -30,25 +31,10 @@ class StoreItemsTable
                     ->description(fn ($record): string => $record->icon ?? ''),
 
                 TextColumn::make('type')
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => StoreItemForm::TYPES[$state] ?? $state)
-                    ->color(fn (string $state): string => match ($state) {
-                        'title' => 'info',
-                        'avatar' => 'success',
-                        'streak_freeze' => 'warning',
-                        'xp_boost' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->badge(),
 
                 TextColumn::make('purchase_type')
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => StoreItemForm::PURCHASE_TYPES[$state] ?? $state)
-                    ->color(fn (string $state): string => match ($state) {
-                        'permanent' => 'success',
-                        'one_time' => 'warning',
-                        'consumable' => 'info',
-                        default => 'gray',
-                    }),
+                    ->badge(),
 
                 TextColumn::make('price_coins')
                     ->label('Price')
@@ -57,7 +43,7 @@ class StoreItemsTable
 
                 TextColumn::make('sold_count')
                     ->label('Sold / Stock')
-                    ->formatStateUsing(fn (string $state, $record): string => $record->purchase_type === 'one_time'
+                    ->formatStateUsing(fn (string $state, $record): string => $record->purchase_type === PurchaseType::OneTime
                         ? "{$state} / {$record->stock_limit}"
                         : $state)
                     ->alignCenter(),
@@ -67,11 +53,11 @@ class StoreItemsTable
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->options(StoreItemForm::TYPES),
+                    ->options(StoreItemType::class),
 
                 SelectFilter::make('purchase_type')
                     ->label('Purchase Type')
-                    ->options(StoreItemForm::PURCHASE_TYPES),
+                    ->options(PurchaseType::class),
             ])
             ->recordActions([
                 EditAction::make(),

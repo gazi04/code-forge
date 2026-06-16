@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\PurchaseType;
+use App\Enums\StoreItemType;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +16,8 @@ class StoreItem extends Model
     protected function casts(): array
     {
         return [
+            'type' => StoreItemType::class,
+            'purchase_type' => PurchaseType::class,
             'effect_config' => 'array',
             'display_config' => 'array',
             'is_active' => 'boolean',
