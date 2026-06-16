@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StoreItem;
+use App\Concerns\ResolvesEquippedItems;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class LeaderboardController extends Controller
 {
+    use ResolvesEquippedItems;
+
     public function index(Request $request): Response
     {
         $user = Auth::user();
@@ -29,18 +29,11 @@ class LeaderboardController extends Controller
         $ids = array_keys($rawEntries);
         $enrichedUsers = User::whereIn('id', $ids)->get()->keyBy('id');
 
-        $allEquippedIds = $enrichedUsers->flatMap(function (User $u): array {
-            $prefs = $u->preferences ?? [];
+        $allEquippedIds = $enrichedUsers
+            ->flatMap(fn (User $u): array => $this->equippedItemIds($u))
+            ->unique()->values()->all();
 
-            return array_filter([
-                $prefs['equipped_title'] ?? null,
-                $prefs['equipped_avatar'] ?? null,
-            ]);
-        })->unique()->values()->all();
-
-        $equippedItems = $allEquippedIds
-            ? StoreItem::whereIn('id', $allEquippedIds)->select(['id', 'name', 'type', 'image', 'display_config'])->get()->keyBy('id')
-            : collect();
+        $equippedItems = $this->fetchEquippedItems($allEquippedIds);
 
         $mapEquipped = fn (User $u): array => $this->buildEquipped($u, $equippedItems);
 
@@ -82,29 +75,5 @@ class LeaderboardController extends Controller
                 'equipped' => $mapEquipped($user),
             ],
         ]);
-    }
-
-    /** @return array{title: array<string, mixed>|null, avatar: array<string, mixed>|null} */
-    private function buildEquipped(User $user, Collection $equippedItems): array
-    {
-        $prefs = $user->preferences ?? [];
-        $titleId = $prefs['equipped_title'] ?? null;
-        $avatarId = $prefs['equipped_avatar'] ?? null;
-
-        $title = $titleId && $equippedItems->has($titleId) ? $equippedItems->get($titleId) : null;
-        $avatar = $avatarId && $equippedItems->has($avatarId) ? $equippedItems->get($avatarId) : null;
-
-        return [
-            'title' => $title ? [
-                'id' => $title->id,
-                'name' => $title->name,
-                'color' => $title->display_config['color'] ?? null,
-            ] : null,
-            'avatar' => $avatar ? [
-                'id' => $avatar->id,
-                'name' => $avatar->name,
-                'image_url' => $avatar->image ? Storage::disk('public')->url($avatar->image) : null,
-            ] : null,
-        ];
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Achievement;
+use App\Concerns\BuildsAchievementList;
+use App\Concerns\ResolvesEquippedItems;
 use App\Models\BlockSubmission;
 use App\Models\LessonSubmission;
-use App\Models\StoreItem;
 use App\Models\UserInventory;
 use App\Models\UserWorldCompletion;
 use App\Services\ProgressionService;
@@ -18,6 +18,8 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    use BuildsAchievementList, ResolvesEquippedItems;
+
     public function __construct(protected ProgressionService $progressionService) {}
 
     public function show(): Response
@@ -57,30 +59,7 @@ class ProfileController extends Controller
             ->take(10)
             ->values();
 
-        $earnedAchievements = $user->achievements()->withPivot('unlocked_at')->get()->keyBy('id');
-
-        $achievements = Achievement::all()->map(fn (Achievement $achievement): array => [
-            'id' => $achievement->id,
-            'name' => $achievement->name,
-            'description' => $achievement->description,
-            'image_path' => $achievement->image_path,
-            'metric_type' => $achievement->metric_type,
-            'threshold' => $achievement->threshold,
-            'unlocked' => $earnedAchievements->has($achievement->id),
-            'unlocked_at' => $earnedAchievements->get($achievement->id)?->pivot?->unlocked_at,
-        ]);
-
         $prefs = $user->preferences ?? [];
-        $titleId = $prefs['equipped_title'] ?? null;
-        $avatarId = $prefs['equipped_avatar'] ?? null;
-        $ids = array_filter([$titleId, $avatarId]);
-
-        $equippedItems = $ids
-            ? StoreItem::whereIn('id', $ids)->select(['id', 'name', 'type', 'image', 'display_config'])->get()->keyBy('id')
-            : collect();
-
-        $titleItem = $titleId ? $equippedItems->get($titleId) : null;
-        $avatarItem = $avatarId ? $equippedItems->get($avatarId) : null;
 
         return Inertia::render('Student/Profile/Index', [
             'hero' => [
@@ -92,21 +71,10 @@ class ProfileController extends Controller
                 'xp_for_next_level' => $xpForNextLevel,
                 'coins' => $user->coins,
                 'streak_count' => $user->streak_count,
-                'equipped' => [
-                    'title' => $titleItem ? [
-                        'id' => $titleItem->id,
-                        'name' => $titleItem->name,
-                        'color' => $titleItem->display_config['color'] ?? null,
-                    ] : null,
-                    'avatar' => $avatarItem ? [
-                        'id' => $avatarItem->id,
-                        'name' => $avatarItem->name,
-                        'image_url' => $avatarItem->image ? Storage::disk('public')->url($avatarItem->image) : null,
-                    ] : null,
-                ],
+                'equipped' => $this->resolveEquipped($user),
             ],
             'ledger' => $ledger,
-            'achievements' => $achievements,
+            'achievements' => $this->buildAchievementList($user),
             'inventory' => UserInventory::where('user_id', $user->id)
                 ->with('storeItem')
                 ->get()
