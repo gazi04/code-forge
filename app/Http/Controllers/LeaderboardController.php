@@ -20,7 +20,11 @@ class LeaderboardController extends Controller
         $scope = $request->query('scope', 'weekly');
         $redisKey = $scope === 'all_time' ? 'leaderboard:all_time' : 'leaderboard:weekly';
 
-        $rawEntries = Redis::zrevrange($redisKey, 0, 49, ['withscores' => true]);
+        [$rawEntries, $userRank, $userScore] = Redis::pipeline(function ($pipe) use ($redisKey, $user): void {
+            $pipe->zrevrange($redisKey, 0, 49, ['withscores' => true]);
+            $pipe->zrevrank($redisKey, $user->id);
+            $pipe->zscore($redisKey, $user->id);
+        });
 
         $ids = array_keys($rawEntries);
         $enrichedUsers = User::whereIn('id', $ids)->get()->keyBy('id');
@@ -58,9 +62,6 @@ class LeaderboardController extends Controller
                 'equipped' => $mapEquipped($dbUser),
             ];
         }
-
-        $userRank = Redis::zrevrank($redisKey, $user->id);
-        $userScore = Redis::zscore($redisKey, $user->id);
 
         if ($userRank === null) {
             if ($scope === 'all_time') {
