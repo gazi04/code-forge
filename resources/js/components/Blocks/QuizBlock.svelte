@@ -88,7 +88,7 @@
     />
 
     <!-- Question Body -->
-    <div class="p-6">
+    <div class="p-4 sm:p-6">
         <h3
             class="text-lg font-medium text-[var(--text-color)] mb-6 leading-relaxed"
         >

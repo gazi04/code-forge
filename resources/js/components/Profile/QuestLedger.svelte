@@ -3,7 +3,9 @@
 
     const INITIAL_COUNT = 5;
     let showAll = $state(false);
-    let visibleEntries = $derived(showAll ? ledger : ledger.slice(0, INITIAL_COUNT));
+    let visibleEntries = $derived(
+        showAll ? ledger : ledger.slice(0, INITIAL_COUNT),
+    );
 
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -54,7 +56,9 @@
         <div class="space-y-2.5">
             {#each visibleEntries as entry, i (i)}
                 {@const config = TYPE_CONFIG[entry.type] ?? TYPE_CONFIG.block}
-                <div class="entry-row group flex items-center gap-4 px-4 py-3.5 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_7%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] transition-all duration-200">
+                <div
+                    class="entry-row group flex items-center gap-4 px-4 py-3.5 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_3%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_7%,transparent)] hover:border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] transition-all duration-200"
+                >
                     <!-- Icon -->
                     <div
                         class="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-500"
@@ -106,7 +110,9 @@
                 onclick={() => (showAll = !showAll)}
                 class="mt-4 w-full text-xs font-bold uppercase tracking-widest py-2 rounded-xl border transition-all duration-200 text-[var(--primary-color)] border-[color-mix(in_srgb,var(--primary-color)_25%,transparent)] bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] hover:bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)]"
             >
-                {showAll ? 'Show less' : `Show ${ledger.length - INITIAL_COUNT} more`}
+                {showAll
+                    ? 'Show less'
+                    : `Show ${ledger.length - INITIAL_COUNT} more`}
             </button>
         {/if}
     {/if}
@@ -121,6 +127,7 @@
     }
     .entry-row:hover {
         transform: translateX(2px);
-        box-shadow: 0 0 16px color-mix(in srgb, var(--primary-color) 8%, transparent);
+        box-shadow: 0 0 16px
+            color-mix(in srgb, var(--primary-color) 8%, transparent);
     }
 </style>

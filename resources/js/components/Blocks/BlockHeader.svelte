@@ -11,15 +11,15 @@
 </script>
 
 <div
-    class="bg-[var(--surface-color)] px-6 py-4 border-b border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] flex justify-between items-center"
+    class="bg-[var(--surface-color)] px-4 py-3 sm:px-6 sm:py-4 border-b border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] flex justify-between items-center gap-3"
 >
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3 sm:gap-4 min-w-0">
         <div
-            class="w-10 h-10 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] flex items-center justify-center text-xl shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_20%,transparent)]"
+            class="w-10 h-10 shrink-0 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_30%,transparent)] flex items-center justify-center text-xl shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_20%,transparent)]"
         >
             {icon}
         </div>
-        <div>
+        <div class="min-w-0">
             <h4
                 class="font-serif font-bold text-[var(--text-color)] text-lg tracking-wide"
             >
@@ -43,7 +43,7 @@
     </div>
 
     {#if (xpReward > 0 || coinReward > 0) && !isCorrect}
-        <div class="flex gap-2 text-s font-mono opacity-70">
+        <div class="flex gap-2 text-sm font-mono opacity-70 shrink-0">
             {#if xpReward > 0}<span>✨ +{xpReward}</span>{/if}
             {#if coinReward > 0}<span>💰 +{coinReward}</span>{/if}
         </div>

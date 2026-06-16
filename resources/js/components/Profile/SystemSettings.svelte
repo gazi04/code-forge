@@ -1,7 +1,7 @@
 <script>
     import { useForm } from '@inertiajs/svelte';
 
-    let { preferences, name = '', profileUrl = '' } = $props();
+    let { preferences, name: _name = '', profileUrl = '' } = $props();
 
     const form = useForm({
         background_audio: preferences.background_audio,
@@ -26,7 +26,9 @@
 </script>
 
 <div class="bg-surface rounded-2xl p-6">
-    <h2 class="text-base font-black text-[var(--text-color)] tracking-tight mb-5">
+    <h2
+        class="text-base font-black text-[var(--text-color)] tracking-tight mb-5"
+    >
         System Settings
     </h2>
 
@@ -35,13 +37,19 @@
             <div
                 class="flex items-center justify-between gap-4 p-4 rounded-xl bg-[color-mix(in_srgb,var(--text-color)_4%,transparent)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]"
             >
-                <div class="flex items-center gap-3">
-                    <span class="text-xl leading-none">{setting.icon}</span>
-                    <div>
-                        <p class="text-base font-semibold text-[var(--text-color)]">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span class="text-xl leading-none shrink-0"
+                        >{setting.icon}</span
+                    >
+                    <div class="min-w-0">
+                        <p
+                            class="text-sm sm:text-base font-semibold text-[var(--text-color)]"
+                        >
                             {setting.label}
                         </p>
-                        <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] font-mono mt-0.5">
+                        <p
+                            class="text-xs text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] font-mono mt-0.5 break-words"
+                        >
                             {setting.description}
                         </p>
                     </div>
@@ -53,7 +61,7 @@
                     aria-checked={form[setting.key]}
                     onclick={() => toggle(setting.key)}
                     disabled={form.processing}
-                    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50
+                    class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50
                         {form[setting.key]
                         ? 'bg-[var(--primary-color)]'
                         : 'bg-white/10'}"
@@ -70,8 +78,12 @@
     </div>
 
     {#if profileUrl && (preferences.public_profile ?? true)}
-        <div class="mt-4 flex items-center gap-3 px-4 py-3 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)]">
-            <span class="text-xs font-mono text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] truncate flex-1">
+        <div
+            class="mt-4 flex items-center gap-3 px-4 py-3 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_5%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)]"
+        >
+            <span
+                class="text-xs font-mono text-[color-mix(in_srgb,var(--text-color)_45%,transparent)] truncate flex-1"
+            >
                 {profileUrl}
             </span>
             <button

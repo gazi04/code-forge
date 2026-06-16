@@ -5,8 +5,8 @@
 
     function formatDate(dateStr) {
         if (!dateStr) {
-return '';
-}
+            return '';
+        }
 
         return new Date(dateStr).toLocaleDateString(undefined, {
             year: 'numeric',
@@ -57,8 +57,8 @@ return '';
                     >
                         <span
                             class="text-lg font-black"
-                            style="color: {cert.primary_color};"
-                        >◆</span>
+                            style="color: {cert.primary_color};">◆</span
+                        >
                     </div>
 
                     <!-- World name + date -->
@@ -90,7 +90,8 @@ return '';
                             class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-yellow-400/10 border border-yellow-400/20"
                         >
                             <span class="text-xs">💰</span>
-                            <span class="text-xs font-black font-mono text-yellow-400"
+                            <span
+                                class="text-xs font-black font-mono text-yellow-400"
                                 >+{cert.coins_bonus}</span
                             >
                         </div>

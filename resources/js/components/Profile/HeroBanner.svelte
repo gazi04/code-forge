@@ -6,22 +6,25 @@
         hero.xp_for_next_level - hero.xp_for_current_level,
     );
     let xpPercent = $derived(
-        Math.min(100, Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100)),
+        Math.min(
+            100,
+            Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100),
+        ),
     );
     let xpToNext = $derived(hero.xp_for_next_level - hero.xp);
 
     function getTitle(level) {
         if (level < 5) {
-return 'Novice';
-}
+            return 'Novice';
+        }
 
         if (level < 10) {
-return 'Apprentice';
-}
+            return 'Apprentice';
+        }
 
         if (level < 20) {
-return 'Logic Adept';
-}
+            return 'Logic Adept';
+        }
 
         return 'Master Hacker';
     }
@@ -32,7 +35,9 @@ return 'Logic Adept';
         class="absolute inset-0 rounded-2xl bg-gradient-to-br from-[color-mix(in_srgb,var(--primary-color)_8%,transparent)] to-transparent pointer-events-none"
     ></div>
 
-    <div class="relative flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+    <div
+        class="relative flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6"
+    >
         <!-- Avatar with glow -->
         <div class="relative shrink-0">
             <div
@@ -60,13 +65,20 @@ return 'Logic Adept';
             <div
                 class="mb-2 flex items-center justify-center sm:justify-start gap-2 flex-wrap"
             >
-                <h1 class="text-2xl font-black text-[var(--text-color)] tracking-tight">
+                <h1
+                    class="text-2xl font-black text-[var(--text-color)] tracking-tight"
+                >
                     {hero.name}
                 </h1>
                 {#if hero.equipped?.title}
                     <span
                         class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border"
-                        style="color: {hero.equipped.title.color ?? 'var(--text-color)'}; border-color: {hero.equipped.title.color ?? 'var(--text-color)'}; background-color: color-mix(in srgb, {hero.equipped.title.color ?? 'var(--text-color)'} 12%, transparent);"
+                        style="color: {hero.equipped.title.color ??
+                            'var(--text-color)'}; border-color: {hero.equipped
+                            .title.color ??
+                            'var(--text-color)'}; background-color: color-mix(in srgb, {hero
+                            .equipped.title.color ??
+                            'var(--text-color)'} 12%, transparent);"
                     >
                         {hero.equipped.title.name}
                     </span>
@@ -110,13 +122,17 @@ return 'Logic Adept';
     </div>
 
     <!-- Stats -->
-    <div class="relative mt-6 grid gap-2 sm:gap-3 {hero.coins != null ? 'grid-cols-3' : 'grid-cols-2'}">
+    <div
+        class="relative mt-6 grid gap-2 sm:gap-3 {hero.coins != null
+            ? 'grid-cols-3'
+            : 'grid-cols-2'}"
+    >
         <div
-            class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl bg-[color-mix(in_srgb,var(--primary-color)_7%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-500"
+            class="flex flex-col items-center gap-1.5 px-2 py-3 sm:px-3 sm:py-4 rounded-xl min-w-0 bg-[color-mix(in_srgb,var(--primary-color)_7%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] transition-colors duration-500"
         >
             <span class="text-lg leading-none">✨</span>
             <span
-                class="text-base font-black text-[var(--primary-color)] font-mono transition-colors duration-500"
+                class="max-w-full truncate text-base font-black text-[var(--primary-color)] font-mono transition-colors duration-500"
                 >{hero.xp.toLocaleString()}</span
             >
             <span
@@ -127,10 +143,11 @@ return 'Logic Adept';
 
         {#if hero.coins != null}
             <div
-                class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl bg-yellow-400/5 border border-yellow-400/20"
+                class="flex flex-col items-center gap-1.5 px-2 py-3 sm:px-3 sm:py-4 rounded-xl min-w-0 bg-yellow-400/5 border border-yellow-400/20"
             >
                 <span class="text-lg leading-none">💰</span>
-                <span class="text-base font-black text-yellow-400 font-mono"
+                <span
+                    class="max-w-full truncate text-base font-black text-yellow-400 font-mono"
                     >{hero.coins.toLocaleString()}</span
                 >
                 <span
@@ -141,10 +158,11 @@ return 'Logic Adept';
         {/if}
 
         <div
-            class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl bg-orange-400/5 border border-orange-400/20"
+            class="flex flex-col items-center gap-1.5 px-2 py-3 sm:px-3 sm:py-4 rounded-xl min-w-0 bg-orange-400/5 border border-orange-400/20"
         >
             <span class="text-lg leading-none">🔥</span>
-            <span class="text-base font-black text-orange-400 font-mono"
+            <span
+                class="max-w-full truncate text-base font-black text-orange-400 font-mono"
                 >{hero.streak_count}</span
             >
             <span

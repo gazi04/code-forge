@@ -209,14 +209,14 @@
                 class="flex-1 flex items-center justify-center bg-[color-mix(in_srgb,var(--bg-color)_80%,black)] rounded-xl p-6 border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)] shadow-inner overflow-x-auto"
             >
                 <div
-                    style="display: grid; grid-template-columns: repeat({width}, minmax(1.75rem, 3rem)); gap: 0.35rem;"
+                    style="display: grid; grid-template-columns: repeat({width}, minmax(1.5rem, 2.5rem)); gap: 0.35rem;"
                     class="mx-auto w-full max-w-fit"
                 >
                     {#each grid as row, r (r)}
                         {#each row as cell, c (c)}
                             {@const isPlayer = playerX === c && playerY === r}
                             <div
-                                class="w-full aspect-square min-w-7 rounded-md flex items-center justify-center text-base sm:text-xl select-none relative transition-colors duration-300
+                                class="w-full aspect-square min-w-6 sm:min-w-7 rounded-md flex items-center justify-center text-base sm:text-xl select-none relative transition-colors duration-300
                                 {cell === '#'
                                     ? 'bg-[color-mix(in_srgb,var(--surface-color)_80%,black)] border border-[color-mix(in_srgb,var(--text-color)_15%,transparent)]'
                                     : 'bg-[color-mix(in_srgb,var(--bg-color)_90%,black)] border border-[color-mix(in_srgb,var(--text-color)_8%,transparent)]'}"

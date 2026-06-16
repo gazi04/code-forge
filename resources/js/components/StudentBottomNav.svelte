@@ -31,7 +31,10 @@
             class="{tabClass} {isWorlds ? activeClass : inactiveClass}"
         >
             <span class="text-xl leading-none">🌍</span>
-            <span class="text-[10px] font-black uppercase tracking-wide">Worlds</span>
+            <span
+                class="text-[10px] font-black uppercase tracking-wide whitespace-nowrap"
+                >Worlds</span
+            >
         </Link>
 
         <button
@@ -40,7 +43,10 @@
             class="{tabClass} {inactiveClass}"
         >
             <span class="text-xl leading-none">🔍</span>
-            <span class="text-[10px] font-black uppercase tracking-wide">Search</span>
+            <span
+                class="text-[10px] font-black uppercase tracking-wide whitespace-nowrap"
+                >Search</span
+            >
         </button>
 
         <Link
@@ -48,7 +54,10 @@
             class="{tabClass} {isLeaderboard ? activeClass : inactiveClass}"
         >
             <span class="text-xl leading-none">🏆</span>
-            <span class="text-[10px] font-black uppercase tracking-wide">Ranks</span>
+            <span
+                class="text-[10px] font-black uppercase tracking-wide whitespace-nowrap"
+                >Ranks</span
+            >
         </Link>
 
         <Link
@@ -56,7 +65,10 @@
             class="{tabClass} {isStore ? activeClass : inactiveClass}"
         >
             <span class="text-xl leading-none">🛍️</span>
-            <span class="text-[10px] font-black uppercase tracking-wide">Store</span>
+            <span
+                class="text-[10px] font-black uppercase tracking-wide whitespace-nowrap"
+                >Store</span
+            >
         </Link>
 
         <Link
@@ -82,7 +94,10 @@
                     </div>
                 {/if}
             </div>
-            <span class="text-[10px] font-black uppercase tracking-wide">Profile</span>
+            <span
+                class="text-[10px] font-black uppercase tracking-wide whitespace-nowrap"
+                >Profile</span
+            >
         </Link>
     </div>
 </nav>

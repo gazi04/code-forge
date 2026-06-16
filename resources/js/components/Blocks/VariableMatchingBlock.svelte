@@ -162,7 +162,7 @@
         coinReward={data.coin_reward}
     />
 
-    <div class="p-6 w-full">
+    <div class="p-4 sm:p-6 w-full">
         <div class="flex justify-between items-center mb-6 text-xs font-mono">
             <div
                 class="px-3 py-1.5 bg-[var(--surface-color)] border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] text-[color-mix(in_srgb,var(--text-color)_60%,transparent)] rounded-md"

@@ -131,7 +131,7 @@
         >
             <textarea
                 bind:value={userCode}
-                class="w-full h-56 sm:h-72 lg:h-[400px] bg-transparent p-4 sm:p-6 font-mono text-base sm:text-sm text-[var(--text-color)] focus:outline-none resize-none"
+                class="w-full h-40 sm:h-72 lg:h-[400px] bg-transparent p-4 sm:p-6 font-mono text-base sm:text-sm text-[var(--text-color)] focus:outline-none resize-none"
                 spellcheck="false"
             ></textarea>
 
@@ -150,7 +150,7 @@
             </div>
         </div>
 
-        <div class="flex flex-col h-56 sm:h-72 lg:h-[400px]">
+        <div class="flex flex-col h-40 sm:h-72 lg:h-[400px]">
             <div
                 class="flex-1 p-4 sm:p-6 bg-[color-mix(in_srgb,var(--bg-color)_70%,black)] overflow-y-auto"
             >
