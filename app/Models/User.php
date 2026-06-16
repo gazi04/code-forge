@@ -55,8 +55,11 @@ class User extends Authenticatable implements FilamentUser
 
     public function getActivitylogOptions(): LogOptions
     {
+        // Log only admin-meaningful identity/profile fields. The high-churn
+        // gamification columns (xp, coins, streak, boosts, ...) are written on
+        // every victory and would otherwise make activity_log the largest table.
         return LogOptions::defaults()
-            ->logFillable()
+            ->logOnly(['name', 'forename', 'lastname', 'birthday', 'gender', 'email', 'role'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }
