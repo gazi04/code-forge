@@ -10,5 +10,5 @@ class ProgressRegistered
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public User $user) {}
+    public function __construct(public User $user, public ?string $source = null) {}
 }

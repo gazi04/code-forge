@@ -29,6 +29,25 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
 
         $grouped = $pending->groupBy('metric_type');
 
+        // Skip metric groups the triggering event cannot affect. Scalar XP/coin/level/streak
+        // metrics change on any processVictory (both sources award XP+coins and run streak
+        // logic), so they stay relevant to both. A null source evaluates everything.
+        $relevant = match ($event->source) {
+            'block' => ['total_xp_earned', 'level_reached', 'daily_streak_count',
+                'total_coins_earned', 'total_blocks_completed',
+                'specific_block_type_completed'],
+            'lesson' => ['total_xp_earned', 'level_reached', 'daily_streak_count',
+                'total_coins_earned', 'total_lessons_completed',
+                'specific_course_completed'],
+            default => null,
+        };
+
+        if ($relevant !== null) {
+            // Note: $grouped is an Eloquent collection, whose only() filters by model key.
+            // Filter on the metric_type group key instead.
+            $grouped = $grouped->filter(fn ($achievements, string $metricType): bool => in_array($metricType, $relevant, true));
+        }
+
         $newlyUnlocked = collect();
 
         foreach ($grouped as $metricType => $achievements) {
@@ -40,7 +59,9 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
                     : $metricValue;
 
                 if ($value >= $achievement->threshold) {
-                    $user->achievements()->attach($achievement->id, ['unlocked_at' => now()]);
+                    // Idempotent: the pivot PK (user_id, achievement_id) blocks duplicates;
+                    // syncWithoutDetaching avoids throwing if a concurrent evaluation already inserted it.
+                    $user->achievements()->syncWithoutDetaching([$achievement->id => ['unlocked_at' => now()]]);
                     $newlyUnlocked->push($achievement);
                 }
             }
@@ -91,28 +112,31 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
      */
     private function resolveSpecificCourseCompleted(mixed $user, Collection $achievements): array
     {
+        $courseIds = $achievements->pluck('target_id')->filter()->unique();
+
+        if ($courseIds->isEmpty()) {
+            return [];
+        }
+
+        // Two grouped queries for all target courses at once (portable selectRaw + groupBy),
+        // instead of three queries per achievement.
+        $totals = Lesson::whereIn('course_id', $courseIds)
+            ->selectRaw('course_id, COUNT(*) as c')
+            ->groupBy('course_id')
+            ->pluck('c', 'course_id');
+
+        $completed = LessonSubmission::query()
+            ->where('lesson_submissions.user_id', $user->id)
+            ->join('lessons', 'lessons.id', '=', 'lesson_submissions.lesson_id')
+            ->whereIn('lessons.course_id', $courseIds)
+            ->selectRaw('lessons.course_id as course_id, COUNT(*) as c')
+            ->groupBy('lessons.course_id')
+            ->pluck('c', 'course_id');
+
         $result = [];
-
-        foreach ($achievements as $achievement) {
-            $courseId = $achievement->target_id;
-            if (! $courseId) {
-                continue;
-            }
-
-            $totalLessons = Lesson::where('course_id', $courseId)->count();
-
-            if ($totalLessons === 0) {
-                $result[$courseId] = 0;
-
-                continue;
-            }
-
-            $lessonIds = Lesson::where('course_id', $courseId)->pluck('id');
-            $completedCount = LessonSubmission::where('user_id', $user->id)
-                ->whereIn('lesson_id', $lessonIds)
-                ->count();
-
-            $result[$courseId] = $completedCount >= $totalLessons ? 1 : 0;
+        foreach ($courseIds as $courseId) {
+            $total = (int) ($totals[$courseId] ?? 0);
+            $result[$courseId] = $total > 0 && (int) ($completed[$courseId] ?? 0) >= $total ? 1 : 0;
         }
 
         return $result;

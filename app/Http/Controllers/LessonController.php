@@ -129,7 +129,7 @@ class LessonController extends Controller
             return $result;
         });
 
-        ProgressRegistered::dispatch($user);
+        ProgressRegistered::dispatch($user, 'lesson');
 
         $this->checkWorldCompletion($user, $lesson);
 
@@ -241,7 +241,7 @@ class LessonController extends Controller
             return $result;
         });
 
-        ProgressRegistered::dispatch($user);
+        ProgressRegistered::dispatch($user, 'block');
 
         // 6. Intercept & Celebrate:
         // Flashing this data means if this 15 XP pushes them over the edge,
