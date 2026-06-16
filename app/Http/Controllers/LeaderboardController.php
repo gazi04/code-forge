@@ -17,7 +17,11 @@ class LeaderboardController extends Controller
     public function index(Request $request): Response
     {
         $user = Auth::user();
-        $scope = $request->query('scope', 'weekly');
+
+        $validated = $request->validate([
+            'scope' => ['sometimes', 'in:weekly,all_time'],
+        ]);
+        $scope = $validated['scope'] ?? 'weekly';
         $redisKey = $scope === 'all_time' ? 'leaderboard:all_time' : 'leaderboard:weekly';
 
         [$rawEntries, $userRank, $userScore] = Redis::pipeline(function ($pipe) use ($redisKey, $user): void {
