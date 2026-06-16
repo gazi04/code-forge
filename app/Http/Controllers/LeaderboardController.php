@@ -24,10 +24,11 @@ class LeaderboardController extends Controller
         $scope = $validated['scope'] ?? 'weekly';
         $redisKey = $scope === 'all_time' ? 'leaderboard:all_time' : 'leaderboard:weekly';
 
-        [$rawEntries, $userRank, $userScore] = Redis::pipeline(function ($pipe) use ($redisKey, $user): void {
+        [$rawEntries, $userRank, $userScore, $totalRanked] = Redis::pipeline(function ($pipe) use ($redisKey, $user): void {
             $pipe->zrevrange($redisKey, 0, 49, ['withscores' => true]);
             $pipe->zrevrank($redisKey, $user->id);
             $pipe->zscore($redisKey, $user->id);
+            $pipe->zcard($redisKey);
         });
 
         $ids = array_keys($rawEntries);
@@ -63,6 +64,8 @@ class LeaderboardController extends Controller
         if ($userRank === null) {
             if ($scope === 'all_time') {
                 $userRank = User::where('xp', '>', $user->xp)->where('is_shadowbanned', false)->count();
+            } else {
+                $userRank = (int) $totalRanked; // weekly: ranked just below everyone with a weekly score
             }
         } else {
             $userRank = (int) $userRank;
