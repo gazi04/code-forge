@@ -14,6 +14,7 @@ class WorldController extends Controller
     public function index()
     {
         $worlds = World::published()
+            ->ordered()
             ->with([
                 'themePack',
                 'courses' => fn ($query) => $query

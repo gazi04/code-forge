@@ -47,6 +47,25 @@ it('hides unpublished worlds from the world map', function () {
             ->where('worlds.data.0.slug', $published->slug));
 });
 
+it('orders the world map by sort_order', function () {
+    $first = makeWorld(true, 'a');
+    $second = makeWorld(true, 'b');
+    $third = makeWorld(true, 'c');
+
+    // Assign sort_order out of insertion order.
+    $first->forceFill(['sort_order' => 3])->save();
+    $second->forceFill(['sort_order' => 1])->save();
+    $third->forceFill(['sort_order' => 2])->save();
+
+    $this->actingAs(User::factory()->create())
+        ->get('/worlds')
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('worlds.data', 3)
+            ->where('worlds.data.0.slug', $second->slug)
+            ->where('worlds.data.1.slug', $third->slug)
+            ->where('worlds.data.2.slug', $first->slug));
+});
+
 it('shows only published courses on the world detail page', function () {
     $world = makeWorld(true, 'detail');
     $live = makeCourse($world, true, 'live');
@@ -57,6 +76,15 @@ it('shows only published courses on the world detail page', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->has('world.data.courses', 1)
             ->where('world.data.courses.0.slug', $live->slug));
+});
+
+it('denies access to an unpublished course accessed directly by slug', function () {
+    $world = makeWorld(true, 'pub2');
+    $draft = makeCourse($world, false, 'draft2');
+
+    $this->actingAs(User::factory()->create())
+        ->get("/course/{$draft->slug}")
+        ->assertForbidden();
 });
 
 it('returns 404 for an unpublished world accessed directly', function () {
