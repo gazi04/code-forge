@@ -33,7 +33,9 @@ Route::middleware(['auth'])->name('student.')->group(function (): void {
 
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 
-    Route::get('/search', [SearchController::class, 'index'])->name('search');
+    Route::get('/search', [SearchController::class, 'index'])
+        ->middleware('throttle:60,1')
+        ->name('search');
 
     Route::post('/achievements/acknowledge', [AchievementController::class, 'acknowledge'])->name('achievements.acknowledge');
 

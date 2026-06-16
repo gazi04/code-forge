@@ -18,9 +18,12 @@ class SearchController extends Controller
             return response()->json(['worlds' => [], 'courses' => [], 'lessons' => []]);
         }
 
+        $escape = '\\';
+        $term = '%'.addcslashes((string) $query, '%_\\').'%';
+
         $worlds = World::where('is_published', true)
-            ->where(fn ($q) => $q->where('name', 'like', "%{$query}%")
-                ->orWhere('description', 'like', "%{$query}%"))
+            ->where(fn ($q) => $q->whereRaw('name LIKE ? ESCAPE ?', [$term, $escape])
+                ->orWhereRaw('description LIKE ? ESCAPE ?', [$term, $escape]))
             ->with('themePack')
             ->limit(5)
             ->get()
@@ -34,8 +37,8 @@ class SearchController extends Controller
 
         $courses = Course::where('is_published', true)
             ->whereHas('world', fn ($q) => $q->where('is_published', true))
-            ->where(fn ($q) => $q->where('name', 'like', "%{$query}%")
-                ->orWhere('description', 'like', "%{$query}%"))
+            ->where(fn ($q) => $q->whereRaw('name LIKE ? ESCAPE ?', [$term, $escape])
+                ->orWhereRaw('description LIKE ? ESCAPE ?', [$term, $escape]))
             ->with('world')
             ->limit(5)
             ->get()
@@ -49,7 +52,7 @@ class SearchController extends Controller
                 'difficulty' => $c->difficulty,
             ]);
 
-        $lessons = Lesson::where('name', 'like', "%{$query}%")
+        $lessons = Lesson::whereRaw('name LIKE ? ESCAPE ?', [$term, $escape])
             ->whereHas('course', fn ($q) => $q->where('is_published', true)
                 ->whereHas('world', fn ($q) => $q->where('is_published', true)))
             ->with('course.world')
