@@ -69,11 +69,10 @@ class LessonController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user->level < $lesson->course->min_level_requirement) {
-            return back()->withErrors([
-                'error' => "Your current level ({$user->level}) is insufficient to unlock this sector.",
-            ]);
-        }
+        // Same gate as show()/submitBlockClaim(): role + publish + world publish
+        // + level + prerequisite via CoursePolicy. Closes the unpublished-course
+        // reward path on the highest-value (lesson-completion) endpoint.
+        $this->authorize('view', $lesson->course);
 
         $requiredBlockIndices = collect($lesson->blocks ?? [])
             ->filter(fn (array $block): bool => ($block['data']['is_required'] ?? false) === true)
