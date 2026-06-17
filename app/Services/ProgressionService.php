@@ -139,8 +139,14 @@ class ProgressionService
             }
 
             if (! $user->is_shadowbanned) {
-                Redis::zincrby('leaderboard:all_time', $earnedXp, $user->id);
-                Redis::zincrby('leaderboard:weekly', $earnedXp, $user->id);
+                // Defer the leaderboard writes until the outermost DB transaction
+                // commits — the controller callers wrap processVictory in an outer
+                // transaction plus the submission write. If that rolls back, the XP
+                // is reverted in the DB and Redis must not keep the increment.
+                DB::afterCommit(function () use ($user, $earnedXp): void {
+                    Redis::zincrby('leaderboard:all_time', $earnedXp, $user->id);
+                    Redis::zincrby('leaderboard:weekly', $earnedXp, $user->id);
+                });
             }
 
             // Return the payload formatted perfectly for Svelte
