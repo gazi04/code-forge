@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsStudent;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Auth\AuthenticationException;
@@ -22,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+        ]);
+
+        $middleware->alias([
+            'student' => EnsureUserIsStudent::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
