@@ -122,6 +122,11 @@ class StoreController extends Controller
 
         $item = $inventory->storeItem;
 
+        // Only consumables can be "activated". Guard before any inventory mutation
+        // so activating a cosmetic (or unknown type) can't silently destroy it via
+        // the delete/decrement fall-through below.
+        abort_unless(in_array($item->type, [StoreItemType::StreakFreeze, StoreItemType::XpBoost], true), 422);
+
         if ($item->type === StoreItemType::StreakFreeze) {
             $user->streak_freezes += (int) ($item->effect_config['quantity'] ?? 1);
         } elseif ($item->type === StoreItemType::XpBoost) {
