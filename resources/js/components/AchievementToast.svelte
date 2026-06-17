@@ -36,16 +36,19 @@
                 showNext();
             }
 
-            acknowledge();
+            acknowledge(fresh.map((a) => a.id));
         });
     });
 
-    function acknowledge() {
-        // Clear them server-side without disturbing the current page or this
-        // component's queue (preserveState keeps the toast animation running).
+    /** @param {number[]} ids */
+    function acknowledge(ids) {
+        // Clear only the ids we've consumed, server-side, without disturbing the
+        // current page or this component's queue (preserveState keeps the toast
+        // animation running). Sending the explicit ids avoids nulling a newer
+        // achievement that arrived after the server built this prop.
         router.post(
             '/achievements/acknowledge',
-            {},
+            { ids },
             { preserveScroll: true, preserveState: true },
         );
     }
