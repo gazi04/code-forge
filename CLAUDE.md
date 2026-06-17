@@ -93,7 +93,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Run Artisan commands directly via the command line (e.g., `php artisan route:list`). Use `php artisan list` to discover available commands and `php artisan [command] --help` to check parameters.
 - Inspect routes with `php artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
 - Read configuration values using dot notation: `php artisan config:show app.name`, `php artisan config:show database.default`. Or read config files directly from the `config/` directory.
-- To check environment variables, read the `.env` file directly.
 
 ## Tinker
 
@@ -207,3 +206,100 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 - IMPORTANT: Activate `inertia-svelte-development` when working with Inertia Svelte client-side patterns.
 
 </laravel-boost-guidelines>
+
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+# Start full dev environment (Laravel + Vite + queue + Pail logs)
+composer run dev
+
+# Run all tests
+php artisan test --compact
+
+# Run a single test or filter by name
+php artisan test --compact --filter=TestName
+
+# PHP linting (fix)
+composer run lint              # or: vendor/bin/pint --parallel
+
+# PHP lint check only (no write)
+composer run lint:check
+
+# Frontend formatting
+npm run format                 # prettier write
+npm run format:check           # prettier check
+npm run lint                   # eslint fix
+npm run lint:check             # eslint check only
+npm run types:check            # svelte-check
+
+# Full CI check (lint + format + types + tests)
+composer run ci:check
+
+# Build frontend assets
+npm run build
+```
+
+After any PHP file change: `vendor/bin/pint --dirty --format agent` must be run before finishing.
+
+## Architecture
+
+### App Hierarchy
+
+```
+World  (themed environment)
+  └── Course  (topic, min_level_requirement gate)
+        └── Lesson  (one unit, xp_reward + coin_reward, blocks JSON)
+              └── blocks[]  (typed interactive content cells)
+```
+
+Blocks are stored as `lessons.blocks` — a JSON array of `{ type, data }` objects. Seven types exist: `text_content`, `quiz`, `code_challenge`, `labyrinth_challenge`, `sequence_challenge`, `bughunt_challenge`, `variable_matching_challenge`. Block completion is tracked per-user-per-index in `block_submissions`.
+
+### Two Surfaces
+
+| Surface | Stack | Auth |
+|---|---|---|
+| Student-facing | Inertia v3 + Svelte 5 + Tailwind v4 | `auth` middleware, `student.` route prefix |
+| Admin dashboard | Filament v5 | `role === 'admin'` via `canAccessPanel()` |
+
+Student pages live in `resources/js/pages/Student/`. Reusable components go in `resources/js/components/`. Block-specific components are in `resources/js/components/Blocks/`.
+
+### Filament Resource Structure
+
+Every Filament resource follows this directory pattern — check siblings before creating:
+
+```
+app/Filament/Resources/ModelName/
+  ├── ModelNameResource.php      ← resource entry point
+  ├── Pages/                     ← List, Create, Edit, View pages
+  ├── Schemas/                   ← form and infolist schemas
+  ├── Tables/                    ← table columns, filters, actions
+  └── RelationManagers/          ← relation manager classes
+```
+
+### Gamification Engine
+
+All XP/coins/level/streak logic runs through `ProgressionService::processVictory(User, int $xp, int $coins)`. This is the single place where:
+- Streak logic executes (consecutive days, freeze mechanic, rested XP pool)
+- XP multipliers apply (streak bonuses)
+- Level-up detection fires (`UserLeveledUp` event → `LogUserLevelUp` listener)
+- Redis leaderboard sets are incremented (`leaderboard:all_time`, `leaderboard:weekly`) — skipped for `is_shadowbanned` users
+
+Flash key `game_result` (set on back responses) is consumed by `StudentLayout.svelte` to trigger the level-up modal and confetti. The `AchievementToast` component listens for a separate achievements flash.
+
+### Theming
+
+Each World has a `ThemePack` with a `config` JSON (`palette`, `ui`, `background`, `audio`). `StudentLayout.svelte` converts it into CSS custom properties (`--primary-color`, `--surface-color`, `--bg-color`, etc.) on the root wrapper. **Never hardcode hex values in Svelte components** — always use these vars.
+
+The global `.bg-surface` CSS class (defined in `StudentLayout.svelte`) applies the theme's card style (border-radius, shadow, border, backdrop) in one shot.
+
+### Leaderboard
+
+Redis sorted sets (`leaderboard:all_time`, `leaderboard:weekly`) use `$user->name` as the member key. `LeaderboardController` fetches top 50, enriches with DB `level`, and returns the player's own rank via `zrevrank`. Weekly reset runs every Monday midnight via `app:reset-weekly-leaderboard` scheduled command.
+
+### User Roles
+
+`User.role` is either `admin` or `student`. Admins access Filament; students access the Inertia frontend. Shadowbanned users (`is_shadowbanned = true`) are hidden from leaderboards but can still use the platform.
