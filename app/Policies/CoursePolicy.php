@@ -3,6 +3,8 @@
 namespace App\Policies;
 
 use App\Models\Course;
+use App\Models\Lesson;
+use App\Models\LessonSubmission;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -31,9 +33,31 @@ class CoursePolicy
             return Response::deny('This course is not available yet.');
         }
 
-        // 3. Enforce your Horizontal Global Power Level Gating rule!
+        // 3. Reject courses whose parent world is still a draft (a published
+        // course inside an unpublished world must not leak via direct slug access).
+        if (! $course->world?->is_published) {
+            return Response::deny('This course is not available yet.');
+        }
+
+        // 4. Enforce your Horizontal Global Power Level Gating rule!
         if ($user->level < $course->min_level_requirement) {
             return Response::deny("🔒 This world is restricted! Requires Adventure Level {$course->min_level_requirement}.");
+        }
+
+        // 5. Enforce the configured course prerequisite: the student must have
+        // completed every lesson of the prerequisite course before this one opens.
+        if ($course->prerequisite_course_id) {
+            $prereqLessonIds = Lesson::where('course_id', $course->prerequisite_course_id)->pluck('id');
+
+            if ($prereqLessonIds->isNotEmpty()) {
+                $completedCount = LessonSubmission::whereIn('lesson_id', $prereqLessonIds)
+                    ->where('user_id', $user->id)
+                    ->count();
+
+                if ($completedCount < $prereqLessonIds->count()) {
+                    return Response::deny("Finish {$course->prerequisite->name} first.");
+                }
+            }
         }
 
         return Response::allow();
