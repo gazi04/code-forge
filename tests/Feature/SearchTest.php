@@ -104,3 +104,24 @@ it('redirects unauthenticated users', function () {
     $this->getJson('/search?q=Python')
         ->assertUnauthorized();
 });
+
+it('treats LIKE wildcards as literals so they cannot match everything', function () {
+    $this->actingAs($this->student)
+        ->getJson('/search?q='.urlencode('%'))
+        ->assertOk()
+        ->assertJson(['worlds' => [], 'courses' => [], 'lessons' => []]);
+
+    $this->actingAs($this->student)
+        ->getJson('/search?q='.urlencode('__'))
+        ->assertOk()
+        ->assertJson(['worlds' => [], 'courses' => [], 'lessons' => []]);
+});
+
+it('matches a literal wildcard character present in a name', function () {
+    $this->world->update(['name' => '100% Python']);
+
+    $this->actingAs($this->student)
+        ->getJson('/search?q='.urlencode('100%'))
+        ->assertOk()
+        ->assertJsonPath('worlds.0.name', '100% Python');
+});

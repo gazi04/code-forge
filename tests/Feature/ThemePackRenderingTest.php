@@ -47,6 +47,7 @@ function makeThemeLessonStack(ThemePack $theme, string $suffix = ''): array
         'name' => 'Theme World '.$suffix,
         'slug' => 'theme-world-'.$suffix,
         'theme_pack_id' => $theme->id,
+        'is_published' => true,
     ]);
     $course = Course::create([
         'world_id' => $world->id,
@@ -56,6 +57,7 @@ function makeThemeLessonStack(ThemePack $theme, string $suffix = ''): array
         'difficulty' => 1,
         'estimated_duration' => 30,
         'min_level_requirement' => 1,
+        'is_published' => true,
     ]);
     $lesson = Lesson::create([
         'course_id' => $course->id,

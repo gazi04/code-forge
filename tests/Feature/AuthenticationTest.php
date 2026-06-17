@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Hash;
 function makeCourseAuth(int $minLevel = 1): array
 {
     $theme = ThemePack::create(['name' => 'Auth Theme', 'identifier' => 'theme_auth_'.uniqid(), 'config' => []]);
-    $world = World::create(['name' => 'Auth World', 'slug' => 'auth-world-'.uniqid(), 'theme_pack_id' => $theme->id]);
-    $course = Course::create(['world_id' => $world->id, 'name' => 'Auth Course', 'slug' => 'auth-course-'.uniqid(), 'age_tier' => 'junior', 'difficulty' => 1, 'estimated_duration' => 30, 'min_level_requirement' => $minLevel]);
+    $world = World::create(['name' => 'Auth World', 'slug' => 'auth-world-'.uniqid(), 'theme_pack_id' => $theme->id, 'is_published' => true]);
+    $course = Course::create(['world_id' => $world->id, 'name' => 'Auth Course', 'slug' => 'auth-course-'.uniqid(), 'age_tier' => 'junior', 'difficulty' => 1, 'estimated_duration' => 30, 'min_level_requirement' => $minLevel, 'is_published' => true]);
     $lesson = Lesson::create(['course_id' => $course->id, 'name' => 'Auth Lesson', 'slug' => 'auth-lesson-'.uniqid(), 'xp_reward' => 10, 'coin_reward' => 5, 'estimated_duration' => 5, 'blocks' => []]);
 
     return compact('theme', 'world', 'course', 'lesson');
@@ -110,15 +110,38 @@ it('admin login via student form is rejected with an error message', function ()
     $this->assertGuest();
 });
 
+it('throttles repeated failed student login attempts', function () {
+    $user = User::factory()->create([
+        'role' => 'student',
+        'password' => Hash::make('correct-password'),
+    ]);
+
+    // The `login` limiter allows 5 attempts per minute keyed by email + ip.
+    foreach (range(1, 5) as $attempt) {
+        $this->post(route('student.login.submit'), [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ])->assertRedirect();
+    }
+
+    $this->post(route('student.login.submit'), [
+        'email' => $user->email,
+        'password' => 'wrong-password',
+    ])->assertStatus(429);
+
+    $this->assertGuest();
+});
+
 // ─── CoursePolicy ─────────────────────────────────────────────────────────────
 
-it('admin is forbidden from viewing a course page', function () {
+it('admin is redirected away from a student course page to the admin panel', function () {
     ['course' => $course] = makeCourseAuth(minLevel: 1);
     $admin = User::factory()->create(['role' => 'admin', 'level' => 99]);
 
+    // The `student` route middleware bounces admins to Filament before the policy runs.
     $this->actingAs($admin)
         ->get(route('student.course.show', $course->slug))
-        ->assertForbidden();
+        ->assertRedirect(route('filament.admin.pages.dashboard'));
 });
 
 it('student below the level requirement is forbidden from viewing a course', function () {

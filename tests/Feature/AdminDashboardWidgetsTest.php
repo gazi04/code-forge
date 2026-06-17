@@ -94,7 +94,7 @@ it('computes lesson starts and completions in the funnel query', function () {
     LessonSubmission::create([
         'user_id' => $users[0]->id,
         'course_id' => $lesson->course_id,
-        'lesson_id' => $lesson->slug,
+        'lesson_id' => $lesson->id,
         'xp_rewarded' => 50,
         'coins_rewarded' => 10,
     ]);
@@ -114,7 +114,7 @@ it('charts average xp per active student per day', function () {
     LessonSubmission::create([
         'user_id' => $alice->id,
         'course_id' => $lesson->course_id,
-        'lesson_id' => $lesson->slug,
+        'lesson_id' => $lesson->id,
         'xp_rewarded' => 100,
         'coins_rewarded' => 10,
     ]);

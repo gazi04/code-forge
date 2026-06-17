@@ -4,10 +4,12 @@ use App\Filament\Resources\Users\Pages\EditUser;
 use App\Models\StoreItem;
 use App\Models\User;
 use App\Models\UserInventory;
+use Illuminate\Support\Facades\Redis;
 use Livewire\Livewire;
 
 beforeEach(function () {
     $this->admin = User::factory()->create(['role' => 'admin']);
+    Redis::shouldReceive('zrem')->andReturn(0)->byDefault();
 });
 
 it('nulls out equipped_title and equipped_avatar when resetting progress', function () {
@@ -104,4 +106,36 @@ it('resets xp_boost_multiplier and xp_boost_lessons_remaining when resetting pro
 
     expect((float) $student->xp_boost_multiplier)->toBe(1.0)
         ->and($student->xp_boost_lessons_remaining)->toBe(0);
+});
+
+it('resets streak, rested xp and pending achievements when resetting progress', function () {
+    $student = User::factory()->create([
+        'role' => 'student',
+        'streak_count' => 12,
+        'streak_freezes' => 3,
+        'rested_xp_balance' => 400,
+        'pending_achievements' => [['name' => 'First Steps']],
+    ]);
+
+    Livewire::actingAs($this->admin)
+        ->test(EditUser::class, ['record' => $student->getRouteKey()])
+        ->callAction('resetProgress');
+
+    $student->refresh();
+
+    expect($student->streak_count)->toBe(0)
+        ->and($student->streak_freezes)->toBe(0)
+        ->and($student->rested_xp_balance)->toBe(0)
+        ->and($student->pending_achievements)->toBeNull();
+});
+
+it('removes the student from both Redis leaderboards when resetting progress', function () {
+    $student = User::factory()->create(['role' => 'student']);
+
+    Redis::shouldReceive('zrem')->once()->with('leaderboard:all_time', $student->id)->andReturn(1);
+    Redis::shouldReceive('zrem')->once()->with('leaderboard:weekly', $student->id)->andReturn(1);
+
+    Livewire::actingAs($this->admin)
+        ->test(EditUser::class, ['record' => $student->getRouteKey()])
+        ->callAction('resetProgress');
 });

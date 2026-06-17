@@ -1,6 +1,8 @@
 <?php
 
+use App\Events\ProgressRegistered;
 use App\Events\WorldCompleted;
+use App\Listeners\HandleWorldCompletion;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\ThemePack;
@@ -23,6 +25,7 @@ function createWorldWithOneLesson(string $suffix = ''): array
         'name' => 'Test World '.$suffix,
         'slug' => 'test-world-'.$suffix.'-'.uniqid(),
         'theme_pack_id' => $theme->id,
+        'is_published' => true,
     ]);
     $course = Course::create([
         'world_id' => $world->id,
@@ -32,6 +35,7 @@ function createWorldWithOneLesson(string $suffix = ''): array
         'difficulty' => 1,
         'estimated_duration' => 30,
         'min_level_requirement' => 1,
+        'is_published' => true,
     ]);
     $lesson = Lesson::create([
         'course_id' => $course->id,
@@ -92,6 +96,21 @@ it('does not dispatch WorldCompleted when world has remaining uncompleted lesson
         ->assertRedirect();
 
     Event::assertNotDispatched(WorldCompleted::class);
+});
+
+it('dispatches ProgressRegistered after awarding the world-completion bonus', function () {
+    Event::fake([ProgressRegistered::class]);
+
+    $user = User::factory()->create();
+    ['world' => $world] = createWorldWithOneLesson('bonus-eval');
+
+    app(HandleWorldCompletion::class)->handle(new WorldCompleted($user, $world));
+
+    // The bonus XP/coins must re-trigger achievement evaluation so threshold
+    // unlocks fire immediately instead of waiting for the next ordinary claim.
+    Event::assertDispatched(ProgressRegistered::class, function (ProgressRegistered $event) use ($user) {
+        return $event->user->id === $user->id;
+    });
 });
 
 // ─── DB persistence ───────────────────────────────────────────────────────────

@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Course;
+use App\Models\Lesson;
+use App\Models\LessonSubmission;
 use App\Models\ThemePack;
 use App\Models\User;
 use App\Models\World;
@@ -93,4 +95,56 @@ it('returns 404 for an unpublished world accessed directly', function () {
     $this->actingAs(User::factory()->create())
         ->get("/worlds/{$world->slug}")
         ->assertNotFound();
+});
+
+it('denies a published course whose parent world is unpublished', function () {
+    $draftWorld = makeWorld(false, 'draftworld');
+    $course = makeCourse($draftWorld, true, 'live-in-draft');
+
+    $this->actingAs(User::factory()->create(['role' => 'student', 'level' => 9]))
+        ->get("/course/{$course->slug}")
+        ->assertForbidden();
+});
+
+it('denies a course with an uncompleted prerequisite, then allows it once complete', function () {
+    $world = makeWorld(true, 'prereqworld');
+    $prereq = makeCourse($world, true, 'prereq');
+    $advanced = Course::create([
+        'world_id' => $world->id,
+        'name' => 'Advanced',
+        'slug' => 'advanced-'.uniqid(),
+        'age_tier' => 'junior',
+        'difficulty' => 1,
+        'estimated_duration' => 30,
+        'min_level_requirement' => 1,
+        'is_published' => true,
+        'prerequisite_course_id' => $prereq->id,
+    ]);
+    $prereqLesson = Lesson::create([
+        'course_id' => $prereq->id,
+        'name' => 'Prereq Lesson',
+        'slug' => 'prereq-lesson-'.uniqid(),
+        'xp_reward' => 10,
+        'coin_reward' => 5,
+        'estimated_duration' => 5,
+        'blocks' => [],
+    ]);
+
+    $user = User::factory()->create(['role' => 'student', 'level' => 5]);
+
+    $this->actingAs($user)
+        ->get("/course/{$advanced->slug}")
+        ->assertForbidden();
+
+    LessonSubmission::create([
+        'user_id' => $user->id,
+        'course_id' => $prereq->id,
+        'lesson_id' => $prereqLesson->id,
+        'xp_rewarded' => 0,
+        'coins_rewarded' => 0,
+    ]);
+
+    $this->actingAs($user)
+        ->get("/course/{$advanced->slug}")
+        ->assertOk();
 });

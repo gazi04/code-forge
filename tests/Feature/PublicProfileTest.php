@@ -11,7 +11,7 @@ it('renders the public profile for a visible student', function () {
         'streak_count' => 6,
     ]);
 
-    $this->get("/u/{$student->name}")
+    $this->get("/u/{$student->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('Student/Profile/Public')
@@ -26,7 +26,7 @@ it('renders the public profile for a visible student', function () {
 it('does not expose coins on the public profile', function () {
     $student = User::factory()->create(['coins' => 999]);
 
-    $this->get("/u/{$student->name}")
+    $this->get("/u/{$student->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page->where('hero.coins', null));
 });
@@ -34,7 +34,7 @@ it('does not expose coins on the public profile', function () {
 it('treats a missing public_profile preference as public by default', function () {
     $student = User::factory()->create(['preferences' => []]);
 
-    $this->get("/u/{$student->name}")->assertOk();
+    $this->get("/u/{$student->id}")->assertOk();
 });
 
 it('returns 404 when the student disabled their public profile', function () {
@@ -42,7 +42,7 @@ it('returns 404 when the student disabled their public profile', function () {
         'preferences' => ['public_profile' => false],
     ]);
 
-    $this->get("/u/{$student->name}")->assertNotFound();
+    $this->get("/u/{$student->id}")->assertNotFound();
 });
 
 it('returns 404 for shadowbanned students', function () {
@@ -51,13 +51,13 @@ it('returns 404 for shadowbanned students', function () {
         'preferences' => ['public_profile' => true],
     ]);
 
-    $this->get("/u/{$student->name}")->assertNotFound();
+    $this->get("/u/{$student->id}")->assertNotFound();
 });
 
 it('returns 404 for admin users', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
-    $this->get("/u/{$admin->name}")->assertNotFound();
+    $this->get("/u/{$admin->id}")->assertNotFound();
 });
 
 it('returns 404 for a non-existent username', function () {
@@ -82,7 +82,7 @@ it('marks earned achievements as unlocked and the rest as locked', function () {
 
     $student->achievements()->attach($earned->id, ['unlocked_at' => now()]);
 
-    $this->get("/u/{$student->name}")
+    $this->get("/u/{$student->id}")
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->has('achievements', 2)
@@ -109,5 +109,5 @@ it('allows a student to toggle public profile visibility', function () {
 
     expect($student->refresh()->preferences['public_profile'])->toBeFalse();
 
-    $this->get("/u/{$student->name}")->assertNotFound();
+    $this->get("/u/{$student->id}")->assertNotFound();
 });

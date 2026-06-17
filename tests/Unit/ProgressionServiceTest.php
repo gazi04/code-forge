@@ -94,6 +94,56 @@ it('consumes a freeze and preserves streak on 2-day gap', function () {
         ->and($user->fresh()->streak_freezes)->toBe(1);
 });
 
+it('does not save the streak when one freeze cannot cover a multi-day gap', function () {
+    Redis::shouldReceive('zincrby')->andReturn(0);
+
+    // 5-day gap = 4 missed days, but only 1 freeze → streak lapses, freeze untouched.
+    $user = User::factory()->create([
+        'last_active_at' => now()->subDays(5),
+        'streak_count' => 10,
+        'streak_freezes' => 1,
+        'rested_xp_balance' => 0,
+    ]);
+    (new ProgressionService)->processVictory($user, 0, 0);
+
+    expect($user->fresh()->streak_count)->toBe(1)
+        ->and($user->fresh()->streak_freezes)->toBe(1)
+        ->and($user->fresh()->rested_xp_balance)->toBe(200);
+});
+
+it('consumes one freeze per missed day to cover a multi-day gap', function () {
+    Redis::shouldReceive('zincrby')->andReturn(0);
+
+    // 3-day gap = 2 missed days, 3 freezes → consume 2, preserve + extend streak.
+    $user = User::factory()->create([
+        'last_active_at' => now()->subDays(3),
+        'streak_count' => 5,
+        'streak_freezes' => 3,
+        'rested_xp_balance' => 0,
+    ]);
+    (new ProgressionService)->processVictory($user, 0, 0);
+
+    expect($user->fresh()->streak_count)->toBe(6)
+        ->and($user->fresh()->streak_freezes)->toBe(1);
+});
+
+it('does not add rested XP when freezes cover a 3+ day gap', function () {
+    Redis::shouldReceive('zincrby')->andReturn(0);
+
+    // 4-day gap = 3 missed days, 3 freezes → fully covered, no rested-XP compensation.
+    $user = User::factory()->create([
+        'last_active_at' => now()->subDays(4),
+        'streak_count' => 8,
+        'streak_freezes' => 3,
+        'rested_xp_balance' => 0,
+    ]);
+    (new ProgressionService)->processVictory($user, 0, 0);
+
+    expect($user->fresh()->streak_count)->toBe(9)
+        ->and($user->fresh()->streak_freezes)->toBe(0)
+        ->and($user->fresh()->rested_xp_balance)->toBe(0);
+});
+
 it('adds 200 rested XP on a 3+ day gap', function () {
     Redis::shouldReceive('zincrby')->andReturn(0);
 
@@ -196,7 +246,22 @@ it('applies xp boost multiplier and decrements remaining count', function () {
 
     expect($result['total_xp_earned'])->toBe(200)
         ->and($user->fresh()->xp_boost_lessons_remaining)->toBe(2)
-        ->and($user->fresh()->xp_boost_multiplier)->toBe(2);
+        ->and($user->fresh()->xp_boost_multiplier)->toBe(2.0);
+});
+
+it('applies a fractional xp boost multiplier with rounding', function () {
+    Redis::shouldReceive('zincrby')->andReturn(0);
+
+    $user = User::factory()->create([
+        'last_active_at' => now(),
+        'streak_count' => 0,
+        'xp_boost_multiplier' => 1.5,
+        'xp_boost_lessons_remaining' => 1,
+    ]);
+    $result = (new ProgressionService)->processVictory($user, 33, 0);
+
+    // 33 * 1.5 = 49.5 → round = 50 (would have floored to 49 before the fix)
+    expect($result['total_xp_earned'])->toBe(50);
 });
 
 it('resets xp boost when last lesson is consumed', function () {
@@ -210,7 +275,7 @@ it('resets xp boost when last lesson is consumed', function () {
     (new ProgressionService)->processVictory($user, 100, 0);
 
     expect($user->fresh()->xp_boost_lessons_remaining)->toBe(0)
-        ->and($user->fresh()->xp_boost_multiplier)->toBe(1);
+        ->and($user->fresh()->xp_boost_multiplier)->toBe(1.0);
 });
 
 // ─── processVictory — level engine ───────────────────────────────────────────
@@ -271,4 +336,36 @@ it('shadowbanned user does not update Redis leaderboard', function () {
     $user->refresh();
 
     (new ProgressionService)->processVictory($user, 100, 0);
+});
+
+// ─── processVictory — leaderboard write is transaction-safe (6.5) ──────────────
+
+it('does not increment the leaderboard when the surrounding transaction rolls back', function () {
+    Redis::shouldReceive('zincrby')->never();
+
+    $user = User::factory()->create(['last_active_at' => now(), 'xp' => 0]);
+
+    try {
+        DB::transaction(function () use ($user): void {
+            (new ProgressionService)->processVictory($user, 50, 10);
+            throw new RuntimeException('boom');
+        });
+    } catch (RuntimeException) {
+        // expected
+    }
+
+    // The DB write is rolled back too — XP must be untouched.
+    expect($user->fresh()->xp)->toBe(0);
+});
+
+it('increments both leaderboards after the surrounding transaction commits', function () {
+    Redis::shouldReceive('zincrby')->twice()->andReturn(0);
+
+    $user = User::factory()->create(['last_active_at' => now(), 'xp' => 0]);
+
+    DB::transaction(function () use ($user): void {
+        (new ProgressionService)->processVictory($user, 50, 10);
+    });
+
+    expect($user->fresh()->xp)->toBeGreaterThan(0);
 });

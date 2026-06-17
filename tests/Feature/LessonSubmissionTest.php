@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Redis;
 function createLessonHierarchy(array $blocks = [], string $worldSlug = 'test-world', string $courseSlug = 'test-course', string $lessonSlug = 'test-lesson', int $minLevel = 1): array
 {
     $theme = ThemePack::create(['name' => 'Test Theme', 'identifier' => 'theme_test_'.uniqid(), 'config' => []]);
-    $world = World::create(['name' => 'Test World', 'slug' => $worldSlug, 'theme_pack_id' => $theme->id]);
+    $world = World::create(['name' => 'Test World', 'slug' => $worldSlug, 'theme_pack_id' => $theme->id, 'is_published' => true]);
     $course = Course::create([
         'world_id' => $world->id,
         'name' => 'Test Course',
@@ -25,6 +25,7 @@ function createLessonHierarchy(array $blocks = [], string $worldSlug = 'test-wor
         'difficulty' => 1,
         'estimated_duration' => 30,
         'min_level_requirement' => $minLevel,
+        'is_published' => true,
     ]);
     $lesson = Lesson::create([
         'course_id' => $course->id,
@@ -149,6 +150,263 @@ it('uses default 15 XP reward when block has no explicit xp_reward', function ()
     expect($user->fresh()->xp)->toBe(15);
 });
 
+it('rejects a block claim when user level is below the course requirement', function () {
+    $user = User::factory()->create(['level' => 1, 'xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => ['is_required' => false, 'xp_reward' => 20, 'coin_reward' => 5]],
+    ], 'gated-world', 'high-course', 'locked-lesson', 5);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim")
+        ->assertForbidden();
+
+    expect($user->fresh()->xp)->toBe(0);
+    expect(BlockSubmission::where('user_id', $user->id)->exists())->toBeFalse();
+});
+
+it('forbids viewing a lesson when user level is below the course requirement', function () {
+    $user = User::factory()->create(['level' => 1]);
+    ['lesson' => $lesson] = createLessonHierarchy([], 'gated-world', 'high-course', 'locked-lesson', 5);
+
+    $this->actingAs($user)
+        ->get("/lessons/{$lesson->slug}")
+        ->assertForbidden();
+});
+
+it('forbids claiming a block on an unpublished course', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson, 'course' => $course] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => ['is_required' => false, 'xp_reward' => 20]],
+    ]);
+    $course->update(['is_published' => false]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim")
+        ->assertForbidden();
+
+    expect($user->fresh()->xp)->toBe(0);
+});
+
+// ─── Server-side answer validation ─────────────────────────────────────────────
+
+it('rejects a quiz block claim with a wrong answer and awards nothing', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => [
+            'xp_reward' => 20,
+            'coin_reward' => 5,
+            'answers' => [
+                ['text' => 'A', 'is_correct' => false],
+                ['text' => 'B', 'is_correct' => true],
+            ],
+        ]],
+    ]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [0]])
+        ->assertRedirect()
+        ->assertSessionHas('game_result.status', 'incorrect');
+
+    expect($user->fresh()->xp)->toBe(0);
+    expect(BlockSubmission::where('user_id', $user->id)->exists())->toBeFalse();
+});
+
+it('awards a quiz block claim with the correct answer', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => [
+            'xp_reward' => 20,
+            'coin_reward' => 5,
+            'answers' => [
+                ['text' => 'A', 'is_correct' => false],
+                ['text' => 'B', 'is_correct' => true],
+            ],
+        ]],
+    ]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [1]])
+        ->assertRedirect();
+
+    expect($user->fresh()->xp)->toBe(20);
+    expect(BlockSubmission::where('user_id', $user->id)->where('block_index', 0)->exists())->toBeTrue();
+});
+
+it('validates a sequence block against the stored order', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'sequence_challenge', 'data' => [
+            'xp_reward' => 20,
+            'coin_reward' => 5,
+            'correct_sequence' => [['value' => 'one'], ['value' => 'two'], ['value' => 'three']],
+        ]],
+    ]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => ['two', 'one', 'three']])
+        ->assertSessionHas('game_result.status', 'incorrect');
+
+    expect($user->fresh()->xp)->toBe(0);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => ['one', 'two', 'three']])
+        ->assertRedirect();
+
+    expect($user->fresh()->xp)->toBe(20);
+});
+
+it('validates a bughunt block against the correct line fixes', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'bughunt_challenge', 'data' => [
+            'xp_reward' => 20,
+            'coin_reward' => 5,
+            'code_lines' => [
+                ['type' => 'clean', 'displayed_text' => 'a = 1'],
+                ['type' => 'buggy', 'displayed_text' => 'b = 2', 'correct_text' => 'b = 3', 'decoy_1' => 'x', 'decoy_2' => 'y'],
+            ],
+        ]],
+    ]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [1 => 'x']])
+        ->assertSessionHas('game_result.status', 'incorrect');
+
+    expect($user->fresh()->xp)->toBe(0);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [1 => 'b = 3']])
+        ->assertRedirect();
+
+    expect($user->fresh()->xp)->toBe(20);
+});
+
+it('validates a variable matching block against the stored pairs', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'variable_matching_challenge', 'data' => [
+            'xp_reward' => 20,
+            'coin_reward' => 5,
+            'pairs' => [
+                ['left_item' => 'L1', 'right_item' => 'R1'],
+                ['left_item' => 'L2', 'right_item' => 'R2'],
+            ],
+        ]],
+    ]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [
+            ['left' => 'L1', 'right' => 'R2'],
+            ['left' => 'L2', 'right' => 'R1'],
+        ]])
+        ->assertSessionHas('game_result.status', 'incorrect');
+
+    expect($user->fresh()->xp)->toBe(0);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [
+            ['left' => 'L1', 'right' => 'R1'],
+            ['left' => 'L2', 'right' => 'R2'],
+        ]])
+        ->assertRedirect();
+
+    expect($user->fresh()->xp)->toBe(20);
+});
+
+it('does not re-validate an already-cleared block', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => [
+            'answers' => [
+                ['text' => 'A', 'is_correct' => false],
+                ['text' => 'B', 'is_correct' => true],
+            ],
+        ]],
+    ]);
+
+    BlockSubmission::create([
+        'user_id' => $user->id,
+        'lesson_id' => $lesson->id,
+        'block_index' => 0,
+        'xp_rewarded' => 15,
+        'coins_rewarded' => 5,
+    ]);
+
+    // A wrong answer still resolves to already_completed (no re-validation).
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [0]])
+        ->assertSessionHas('game_result.status', 'already_completed');
+});
+
+// ─── Double-reward gate (1.5) ──────────────────────────────────────────────────
+
+it('awards a block reward only once across repeated claims', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy([
+        ['type' => 'quiz', 'data' => [
+            'xp_reward' => 20,
+            'coin_reward' => 5,
+            'answers' => [
+                ['text' => 'A', 'is_correct' => false],
+                ['text' => 'B', 'is_correct' => true],
+            ],
+        ]],
+    ]);
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [1]])
+        ->assertRedirect();
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/blocks/0/claim", ['answer' => [1]])
+        ->assertSessionHas('game_result.status', 'already_completed');
+
+    expect($user->fresh()->xp)->toBe(20);
+    expect(BlockSubmission::where('user_id', $user->id)
+        ->where('lesson_id', $lesson->id)
+        ->where('block_index', 0)
+        ->count()
+    )->toBe(1);
+});
+
+it('awards a lesson reward only once across repeated submits', function () {
+    $user = User::factory()->create(['xp' => 0]);
+    ['lesson' => $lesson] = createLessonHierarchy();
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/submit")
+        ->assertSessionHas('game_result.status', 'success');
+
+    // XP after the first (genuine) submit — includes any world-completion bonus.
+    $xpAfterFirst = $user->fresh()->xp;
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/submit")
+        ->assertSessionHas('game_result.status', 'already_completed');
+
+    // Second submit must award nothing and must not insert a duplicate row.
+    expect($user->fresh()->xp)->toBe($xpAfterFirst);
+    expect(LessonSubmission::where('user_id', $user->id)
+        ->where('lesson_id', $lesson->id)
+        ->count()
+    )->toBe(1);
+});
+
 // ─── Lesson submission ────────────────────────────────────────────────────────
 
 it('creates a LessonSubmission when all required blocks are cleared', function () {
@@ -172,7 +430,7 @@ it('creates a LessonSubmission when all required blocks are cleared', function (
         ->assertSessionHas('game_result.status', 'success');
 
     expect(LessonSubmission::where('user_id', $user->id)
-        ->where('lesson_id', $lesson->slug)
+        ->where('lesson_id', $lesson->id)
         ->exists()
     )->toBeTrue();
 });
@@ -196,11 +454,14 @@ it('rejects lesson submission when user level is below the course requirement', 
     $user = User::factory()->create(['level' => 1]);
     ['lesson' => $lesson] = createLessonHierarchy([], 'gated-world', 'high-course', 'locked-lesson', 5);
 
+    // submitClaim now authorizes via CoursePolicy::view (the level gate denies → 403)
+    // instead of returning a redirect with an error bag.
     $this->actingAs($user)
         ->from("/lessons/{$lesson->slug}")
         ->post("/lessons/{$lesson->slug}/submit")
-        ->assertRedirect()
-        ->assertSessionHasErrors('error');
+        ->assertForbidden();
+
+    expect(LessonSubmission::where('user_id', $user->id)->where('lesson_id', $lesson->id)->exists())->toBeFalse();
 });
 
 it('returns already_completed flash without creating a duplicate LessonSubmission', function () {
@@ -210,7 +471,7 @@ it('returns already_completed flash without creating a duplicate LessonSubmissio
     LessonSubmission::create([
         'user_id' => $user->id,
         'course_id' => $lesson->course_id,
-        'lesson_id' => $lesson->slug,
+        'lesson_id' => $lesson->id,
         'xp_rewarded' => 50,
         'coins_rewarded' => 10,
     ]);
@@ -222,7 +483,7 @@ it('returns already_completed flash without creating a duplicate LessonSubmissio
         ->assertSessionHas('game_result.status', 'already_completed');
 
     expect(LessonSubmission::where('user_id', $user->id)
-        ->where('lesson_id', $lesson->slug)
+        ->where('lesson_id', $lesson->id)
         ->count()
     )->toBe(1);
 });
