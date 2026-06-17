@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\ProgressRegistered;
 use App\Events\WorldCompleted;
 use App\Models\UserWorldCompletion;
 use App\Services\ProgressionService;
@@ -34,6 +35,11 @@ class HandleWorldCompletion
             'xp_bonus_awarded' => $result['total_xp_earned'],
             'coins_bonus_awarded' => $result['coins_earned'],
         ]);
+
+        // The bonus can cross an XP/level/total_coins achievement threshold; without
+        // this the unlock would wait for the next ordinary claim. EvaluateAchievements
+        // is idempotent, so re-dispatching here is safe.
+        ProgressRegistered::dispatch($user, 'lesson');
 
         session()->flash('world_completed', [
             'world_id' => $world->id,
