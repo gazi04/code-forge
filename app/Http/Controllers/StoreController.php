@@ -127,29 +127,49 @@ class StoreController extends Controller
         // the delete/decrement fall-through below.
         abort_unless(in_array($item->type, [StoreItemType::StreakFreeze, StoreItemType::XpBoost], true), 422);
 
-        if ($item->type === StoreItemType::StreakFreeze) {
-            $user->streak_freezes += (int) ($item->effect_config['quantity'] ?? 1);
-        } elseif ($item->type === StoreItemType::XpBoost) {
-            $multiplier = (float) ($item->effect_config['multiplier'] ?? 2);
-            $lessons = (int) ($item->effect_config['lessons'] ?? 3);
+        // Re-fetch both rows under a lock inside one transaction so two concurrent
+        // activations of the same quantity-1 item can't both apply the effect before
+        // either consumes the row (effect duplication). Mutate the locked user copy,
+        // not Auth::user(), to avoid a read-modify-write lost update.
+        $result = DB::transaction(function () use ($inventory, $item, $user) {
+            $lockedInventory = UserInventory::whereKey($inventory->id)->lockForUpdate()->first();
+            $lockedUser = User::whereKey($user->id)->lockForUpdate()->first();
 
-            // Stacking: extend the lesson count and keep the stronger multiplier
-            // so activating a weaker boost never downgrades an active stronger one.
-            $user->xp_boost_multiplier = $user->xp_boost_lessons_remaining > 0
-                ? max((float) $user->xp_boost_multiplier, $multiplier)
-                : $multiplier;
-            $user->xp_boost_lessons_remaining += $lessons;
+            // A concurrent activation may have consumed the row between binding and lock.
+            if (! $lockedInventory || $lockedInventory->quantity < 1) {
+                return ['error' => 'This item is no longer available.'];
+            }
+
+            if ($item->type === StoreItemType::StreakFreeze) {
+                $lockedUser->streak_freezes += (int) ($item->effect_config['quantity'] ?? 1);
+            } elseif ($item->type === StoreItemType::XpBoost) {
+                $multiplier = (float) ($item->effect_config['multiplier'] ?? 2);
+                $lessons = (int) ($item->effect_config['lessons'] ?? 3);
+
+                // Stacking: extend the lesson count and keep the stronger multiplier
+                // so activating a weaker boost never downgrades an active stronger one.
+                $lockedUser->xp_boost_multiplier = $lockedUser->xp_boost_lessons_remaining > 0
+                    ? max((float) $lockedUser->xp_boost_multiplier, $multiplier)
+                    : $multiplier;
+                $lockedUser->xp_boost_lessons_remaining += $lessons;
+            }
+
+            $lockedUser->save();
+
+            if ($lockedInventory->quantity <= 1) {
+                $lockedInventory->delete();
+            } else {
+                $lockedInventory->decrement('quantity');
+            }
+
+            return ['activated' => $item->name];
+        });
+
+        if (isset($result['error'])) {
+            return redirect()->back()->with('store_result', ['error' => $result['error']]);
         }
 
-        $user->save();
-
-        if ($inventory->quantity <= 1) {
-            $inventory->delete();
-        } else {
-            $inventory->decrement('quantity');
-        }
-
-        return redirect()->back()->with('store_result', ['activated' => $item->name]);
+        return redirect()->back()->with('store_result', ['activated' => $result['activated']]);
     }
 
     public function equip(UserInventory $inventory): RedirectResponse
