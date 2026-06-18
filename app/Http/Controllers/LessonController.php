@@ -113,6 +113,8 @@ class LessonController extends Controller
             ]);
         }
 
+        $levelBefore = $user->level;
+
         $result = DB::transaction(function () use ($user, $lesson, $submission) {
             $result = $this->progressionService->processVictory(
                 $user,
@@ -131,6 +133,14 @@ class LessonController extends Controller
         ProgressRegistered::dispatch($user, 'lesson');
 
         $this->checkWorldCompletion($user, $lesson);
+
+        // The synchronous world-completion bonus (HandleWorldCompletion) may award XP
+        // after $result was computed, crossing a level boundary the lesson reward alone
+        // didn't. Re-read the final level so a bonus-driven level-up still fires the
+        // level-up modal/confetti (which the layout keys off game_result).
+        $user->refresh();
+        $result['leveled_up'] = $user->level > $levelBefore;
+        $result['new_level'] = $user->level;
 
         // Flash the result payload to the session for Svelte to intercept
         return back()->with('game_result', $result);
