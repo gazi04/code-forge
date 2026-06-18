@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Concerns\BuildsAchievementList;
 use App\Concerns\ResolvesEquippedItems;
+use App\Http\Requests\UpdateProfileSettingsRequest;
 use App\Models\BlockSubmission;
 use App\Models\LessonSubmission;
 use App\Models\UserInventory;
 use App\Models\UserWorldCompletion;
 use App\Services\ProgressionService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -112,16 +112,9 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function updateSettings(Request $request): RedirectResponse
+    public function updateSettings(UpdateProfileSettingsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'background_audio' => ['required', 'boolean'],
-            'sound_effects' => ['required', 'boolean'],
-            'accessibility_mode' => ['required', 'boolean'],
-            'public_profile' => ['required', 'boolean'],
-        ]);
-
-        $prefs = array_merge(Auth::user()->preferences ?? [], $validated);
+        $prefs = array_merge(Auth::user()->preferences ?? [], $request->validated());
         Auth::user()->update(['preferences' => $prefs]);
 
         return back();

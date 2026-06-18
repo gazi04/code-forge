@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AcknowledgeAchievementRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AchievementController extends Controller
@@ -18,14 +18,9 @@ class AchievementController extends Controller
      * achievement queued between the client rendering its toasts and POSTing this
      * acknowledgement is preserved instead of being silently discarded.
      */
-    public function acknowledge(Request $request): RedirectResponse
+    public function acknowledge(AcknowledgeAchievementRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'ids' => ['required', 'array'],
-            'ids.*' => ['integer'],
-        ]);
-
-        $acknowledgedIds = $validated['ids'];
+        $acknowledgedIds = $request->validated('ids');
 
         DB::transaction(function () use ($request, $acknowledgedIds): void {
             /** @var User $user */

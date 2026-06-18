@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Concerns\ResolvesEquippedItems;
+use App\Http\Requests\LeaderboardRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
 use Inertia\Inertia;
@@ -14,14 +14,11 @@ class LeaderboardController extends Controller
 {
     use ResolvesEquippedItems;
 
-    public function index(Request $request): Response
+    public function index(LeaderboardRequest $request): Response
     {
         $user = Auth::user();
 
-        $validated = $request->validate([
-            'scope' => ['sometimes', 'in:weekly,all_time'],
-        ]);
-        $scope = $validated['scope'] ?? 'weekly';
+        $scope = $request->validated('scope', 'weekly');
         $redisKey = $scope === 'all_time' ? 'leaderboard:all_time' : 'leaderboard:weekly';
 
         [$rawEntries, $userRank, $userScore, $totalRanked] = Redis::pipeline(function ($pipe) use ($redisKey, $user): void {
