@@ -2,14 +2,14 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\StoreItem;
-use App\Models\User;
+use App\Concerns\ResolvesEquippedItems;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
+    use ResolvesEquippedItems;
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -64,35 +64,6 @@ class HandleInertiaRequests extends Middleware
                 'achievements_unlocked' => fn (): array => $request->user()?->pending_achievements ?? [],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-        ];
-    }
-
-    /** @return array{title: array<string, mixed>|null, avatar: array<string, mixed>|null} */
-    private function resolveEquipped(User $user): array
-    {
-        $prefs = $user->preferences ?? [];
-        $titleId = $prefs['equipped_title'] ?? null;
-        $avatarId = $prefs['equipped_avatar'] ?? null;
-        $ids = array_filter([$titleId, $avatarId]);
-
-        $items = $ids
-            ? StoreItem::whereIn('id', $ids)->select(['id', 'name', 'type', 'image', 'display_config'])->get()->keyBy('id')
-            : collect();
-
-        $title = $titleId && $items->has($titleId) ? $items->get($titleId) : null;
-        $avatar = $avatarId && $items->has($avatarId) ? $items->get($avatarId) : null;
-
-        return [
-            'title' => $title ? [
-                'id' => $title->id,
-                'name' => $title->name,
-                'color' => $title->display_config['color'] ?? null,
-            ] : null,
-            'avatar' => $avatar ? [
-                'id' => $avatar->id,
-                'name' => $avatar->name,
-                'image_url' => $avatar->image ? Storage::disk('public')->url($avatar->image) : null,
-            ] : null,
         ];
     }
 }
