@@ -7,6 +7,7 @@ use App\Models\World;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class WorldController extends Controller
@@ -51,12 +52,25 @@ class WorldController extends Controller
         $world->load('themePack', 'courses');
         $primaryColor = $world->themePack?->config['palette']['primary'] ?? '#8b5cf6';
 
-        return Pdf::loadView('certificates.world', [
-            'user' => $user,
-            'world' => $world,
-            'courses' => $world->courses,
-            'completedAt' => $completion->completed_at,
-            'primaryColor' => $primaryColor,
-        ])->setPaper('a4', 'landscape')->download("codeforge-{$world->slug}-certificate.pdf");
+        // The certificate is deterministic per (user, world) — a completion is a
+        // one-time event with a fixed completed_at — so cache the rendered PDF and
+        // serve from cache, avoiding a fresh DomPDF render (and abuse vector) on
+        // every request. The route is also throttled.
+        $pdf = Cache::remember(
+            "certificate-pdf:{$user->id}:{$world->id}",
+            now()->addDay(),
+            fn (): string => Pdf::loadView('certificates.world', [
+                'user' => $user,
+                'world' => $world,
+                'courses' => $world->courses,
+                'completedAt' => $completion->completed_at,
+                'primaryColor' => $primaryColor,
+            ])->setPaper('a4', 'landscape')->output(),
+        );
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="codeforge-'.$world->slug.'-certificate.pdf"',
+        ]);
     }
 }
