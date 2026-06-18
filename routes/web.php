@@ -25,7 +25,9 @@ Route::post('/login/student', [StudentLoginController::class, 'store'])
     ->name('student.login.submit');
 
 Route::get('/register', [StudentRegisterController::class, 'show'])->name('register');
-Route::post('/register/student', [StudentRegisterController::class, 'store'])->name('student.register.submit');
+Route::post('/register/student', [StudentRegisterController::class, 'store'])
+    ->middleware('throttle:login')
+    ->name('student.register.submit');
 
 Route::get('/u/{user}', [PublicProfileController::class, 'show'])->name('public.profile.show');
 
@@ -61,6 +63,7 @@ Route::middleware(['auth', 'student'])->name('student.')->group(function (): voi
             ->name('show');
 
         Route::get('/worlds/{world:slug}/certificate', [WorldController::class, 'certificate'])
+            ->middleware('throttle:certificate')
             ->name('certificate');
     });
 
