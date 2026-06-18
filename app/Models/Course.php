@@ -26,6 +26,7 @@ class Course extends Model implements Sortable
         'is_published' => 'boolean',
         'difficulty' => 'integer',
         'estimated_duration' => 'integer',
+        'min_level_requirement' => 'integer',
         'sort_order' => 'integer',
     ];
 
@@ -42,6 +43,34 @@ class Course extends Model implements Sortable
     public function prerequisite(): BelongsTo
     {
         return $this->belongsTo(Course::class, 'prerequisite_course_id');
+    }
+
+    /**
+     * Ids of courses that (transitively) list this course as a prerequisite.
+     * Choosing any of them as this course's prerequisite would form a cycle.
+     *
+     * @return array<int>
+     */
+    public function transitiveDependentIds(): array
+    {
+        $dependents = [];
+        $frontier = [$this->id];
+
+        while ($frontier !== []) {
+            $next = static::whereIn('prerequisite_course_id', $frontier)
+                ->whereNotIn('id', array_merge($dependents, [$this->id]))
+                ->pluck('id')
+                ->all();
+
+            if ($next === []) {
+                break;
+            }
+
+            $dependents = array_merge($dependents, $next);
+            $frontier = $next;
+        }
+
+        return $dependents;
     }
 
     public function scopePublished(Builder $query): void

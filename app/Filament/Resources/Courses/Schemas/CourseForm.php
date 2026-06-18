@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Courses\Schemas;
 
+use App\Models\Course;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -9,6 +10,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class CourseForm
@@ -69,7 +71,14 @@ class CourseForm
                         ->required(),
 
                     Select::make('prerequisite_course_id')
-                        ->relationship('prerequisite', 'name')
+                        ->relationship(
+                            name: 'prerequisite',
+                            titleAttribute: 'name',
+                            ignoreRecord: true, // a course can't require itself
+                            modifyQueryUsing: fn (Builder $query, ?Course $record): Builder => $record
+                                ? $query->whereNotIn('id', $record->transitiveDependentIds())
+                                : $query,
+                        )
                         ->label('Prerequisite')
                         ->placeholder('No prerequisite'),
 
