@@ -11,18 +11,17 @@
     ];
 @endphp
 
-<div class="flex items-center gap-1.5">
+<div style="display: flex; align-items: center; gap: 6px;">
     @foreach ($swatches as $label => $color)
         @if ($color)
             <div
                 title="{{ ucfirst($label) }}: {{ $color }}"
-                class="h-5 w-5 rounded-full border border-white/20 shadow-sm ring-1 ring-black/10"
-                style="background-color: {{ $color }};"
+                style="width: 20px; height: 20px; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); background-color: {{ $color }};"
             ></div>
         @else
             <div
                 title="{{ ucfirst($label) }}: not set"
-                class="h-5 w-5 rounded-full border border-dashed border-gray-300 bg-gray-100"
+                style="width: 20px; height: 20px; border-radius: 9999px; border: 1px dashed #d1d5db; background: #f3f4f6;"
             ></div>
         @endif
     @endforeach
