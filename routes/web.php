@@ -31,7 +31,7 @@ Route::post('/register/student', [StudentRegisterController::class, 'store'])
 
 Route::get('/u/{user}', [PublicProfileController::class, 'show'])->name('public.profile.show');
 
-Route::middleware(['auth', 'student'])->name('student.')->group(function (): void {
+Route::middleware(['auth', 'student', 'verified'])->name('student.')->group(function (): void {
 
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 
