@@ -20,7 +20,7 @@ class ActivityLogResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::PencilSquare;
 
-    protected static ?string $recordTitleAttribute = 'ActivityLog';
+    protected static ?string $recordTitleAttribute = 'description';
 
     public static function form(Schema $schema): Schema
     {
