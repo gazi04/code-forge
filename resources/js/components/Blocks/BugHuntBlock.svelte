@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, untrack } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
@@ -8,14 +8,16 @@
 
     let processedLines = $state([]);
     let activeLineIdx = $state(null);
-    let isCleared = $state(isAlreadyCleared);
+    let isCleared = $state(untrack(() => isAlreadyCleared));
     let isVerifying = $state(false);
     let feedbackMsg = $state(
-        isAlreadyCleared
+        untrack(() => isAlreadyCleared)
             ? '✨ Codebase verified. Hotfixes are fully integrated.'
             : 'Inspect the codebase thoroughly.',
     );
-    let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
+    let feedbackStatus = $state(
+        untrack(() => isAlreadyCleared) ? 'success' : 'info',
+    );
     let isCorrect = $derived(isCleared);
 
     // Buggy lines the student still has to pick a patch for. Correctness is
@@ -175,7 +177,15 @@
                     line.type === 'buggy' && !line.selected}
 
                 <div
+                    role="button"
+                    tabindex="0"
                     onclick={() => handleLineClick(idx)}
+                    onkeydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleLineClick(idx);
+                        }
+                    }}
                     class="group w-full flex items-start cursor-pointer transition-colors border-l-2 py-0.5
             {isLineActive
                         ? 'bg-[color-mix(in_srgb,var(--primary-color)_10%,transparent)] border-[var(--primary-color)]'

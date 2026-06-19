@@ -7,7 +7,15 @@
     import SystemSettings from '@/components/Profile/SystemSettings.svelte';
     import Layout from '../../../layouts/StudentLayout.svelte';
 
-    let { hero, ledger, achievements, inventory, equipped, preferences, certificates = [] } = $props();
+    let {
+        hero,
+        ledger,
+        achievements,
+        inventory,
+        equipped,
+        preferences,
+        certificates = [],
+    } = $props();
 </script>
 
 <Layout>
@@ -30,6 +38,10 @@
         <AchievementsGrid {achievements} />
         <CertificatesPanel {certificates} />
         <QuestLedger {ledger} />
-        <SystemSettings {preferences} name={hero.name} profileUrl={hero.public_url} />
+        <SystemSettings
+            {preferences}
+            name={hero.name}
+            profileUrl={hero.public_url}
+        />
     </div>
 </Layout>

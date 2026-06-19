@@ -1,4 +1,5 @@
 <script>
+    import { untrack } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
@@ -6,15 +7,17 @@
     let _claimedRewards = $state(null);
 
     let statusMessage = $state(
-        isAlreadyCleared
+        untrack(() => isAlreadyCleared)
             ? '✨ Sector cleared! Your instruction routine is fully optimized.'
             : 'Build your instructions queue.',
     );
-    let statusType = $state(isAlreadyCleared ? 'success' : 'info');
-    let levelCleared = $state(isAlreadyCleared);
+    let statusType = $state(
+        untrack(() => isAlreadyCleared) ? 'success' : 'info',
+    );
+    let levelCleared = $state(untrack(() => isAlreadyCleared));
     let isCorrect = $derived(levelCleared);
 
-    const rawRows = data.map_layout.trim().split('\n');
+    const rawRows = untrack(() => data.map_layout.trim().split('\n'));
     const grid = rawRows.map((row) => row.trim().split(/\s+/));
     const height = grid.length;
     const width = grid[0]?.length || 0;
@@ -322,7 +325,15 @@
                         {#each commandQueue as cmd, idx (idx)}
                             {@const isActive = activeCommandIndex === idx}
                             <div
+                                role="button"
+                                tabindex="0"
                                 onclick={() => removeCommand(idx)}
+                                onkeydown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        removeCommand(idx);
+                                    }
+                                }}
                                 class="px-3 py-2 bg-[var(--surface-color)] hover:bg-rose-950/40 hover:border-rose-800/60 hover:text-rose-300 border text-xs font-mono rounded-lg flex items-center gap-2 cursor-pointer transition-all
                                 {isActive
                                     ? 'bg-[var(--primary-color)] text-[var(--bg-color)] border-[color-mix(in_srgb,var(--primary-color)_70%,transparent)] shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_50%,transparent)] scale-105'

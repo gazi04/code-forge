@@ -1,13 +1,15 @@
 <script>
     import { useForm } from '@inertiajs/svelte';
+    import { untrack } from 'svelte';
 
     let { preferences, name: _name = '', profileUrl = '' } = $props();
 
+    const initialPreferences = untrack(() => preferences);
     const form = useForm({
-        background_audio: preferences.background_audio,
-        sound_effects: preferences.sound_effects,
-        accessibility_mode: preferences.accessibility_mode,
-        public_profile: preferences.public_profile ?? true,
+        background_audio: initialPreferences.background_audio,
+        sound_effects: initialPreferences.sound_effects,
+        accessibility_mode: initialPreferences.accessibility_mode,
+        public_profile: initialPreferences.public_profile ?? true,
     });
 
     let copied = $state(false);
@@ -58,6 +60,7 @@
                 <button
                     type="button"
                     role="switch"
+                    aria-label={setting.label}
                     aria-checked={form[setting.key]}
                     onclick={() => toggle(setting.key)}
                     disabled={form.processing}

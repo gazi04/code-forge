@@ -1,4 +1,5 @@
 <script>
+    import { untrack } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
@@ -6,16 +7,16 @@
     let claimedRewards = $state(null);
 
     let selectedIndexes = $state([]);
-    let isSubmitted = $state(isAlreadyCleared);
-    let isCorrect = $state(isAlreadyCleared);
+    let isSubmitted = $state(untrack(() => isAlreadyCleared));
+    let isCorrect = $state(untrack(() => isAlreadyCleared));
     let isVerifying = $state(false);
     let feedbackMessages = $state(
-        isAlreadyCleared
+        untrack(() => isAlreadyCleared)
             ? [{ type: 'success', text: 'Sector cleared in a previous run.' }]
             : [],
     );
 
-    const isMultiple = data.question_type === 'multiple';
+    let isMultiple = $derived(data.question_type === 'multiple');
 
     function toggleSelection(ansIndex) {
         // Prevent changing answers after a correct submission

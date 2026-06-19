@@ -56,7 +56,8 @@
             const el = blockRefs[firstIncompleteIndex];
 
             if (el) {
-                const top = el.getBoundingClientRect().top + window.scrollY - 96;
+                const top =
+                    el.getBoundingClientRect().top + window.scrollY - 96;
                 window.scrollTo({ top, behavior: 'smooth' });
             }
         }
@@ -142,7 +143,10 @@
             </div>
         {:else}
             {#each blocks as block, index (index)}
-                <div bind:this={blockRefs[index]} class="block-wrapper relative">
+                <div
+                    bind:this={blockRefs[index]}
+                    class="block-wrapper relative"
+                >
                     {#if index === firstIncompleteIndex && firstIncompleteIndex > 0}
                         <div
                             class="absolute -top-3 left-6 z-30 pointer-events-none bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] backdrop-blur border border-[color-mix(in_srgb,var(--primary-color)_40%,transparent)] text-[var(--primary-color)] text-[10px] font-mono tracking-widest uppercase px-2.5 py-1 rounded-md shadow-[0_0_15px_color-mix(in_srgb,var(--primary-color)_15%,transparent)]"
@@ -159,8 +163,8 @@
                     {/if}
 
                     {#if blockRegistry[block.type]}
-                        <svelte:component
-                            this={blockRegistry[block.type]}
+                        {@const BlockComponent = blockRegistry[block.type]}
+                        <BlockComponent
                             data={block.data}
                             {index}
                             lessonSlug={actualLesson.slug}

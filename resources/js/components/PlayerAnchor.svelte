@@ -26,20 +26,40 @@
             </div>
 
             <div class="flex-1 min-w-0">
-                <p class="text-sm font-bold text-[var(--text-color)] truncate">{player.name}</p>
-                <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono">Lv. {player.level}</p>
+                <p class="text-sm font-bold text-[var(--text-color)] truncate">
+                    {player.name}
+                </p>
+                <p
+                    class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] font-mono"
+                >
+                    Lv. {player.level}
+                </p>
             </div>
 
             <div class="flex items-center gap-4 shrink-0">
                 <div class="text-right">
-                    <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest font-mono">Rank</p>
-                    <p class="font-black text-[var(--primary-color)] text-lg leading-none">
+                    <p
+                        class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest font-mono"
+                    >
+                        Rank
+                    </p>
+                    <p
+                        class="font-black text-[var(--primary-color)] text-lg leading-none"
+                    >
                         {player.rank !== null ? `#${player.rank}` : '—'}
                     </p>
                 </div>
                 <div class="text-right">
-                    <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest font-mono">XP</p>
-                    <p class="font-black text-[var(--text-color)] text-lg leading-none">{player.xp.toLocaleString()}</p>
+                    <p
+                        class="text-xs text-[color-mix(in_srgb,var(--text-color)_40%,transparent)] uppercase tracking-widest font-mono"
+                    >
+                        XP
+                    </p>
+                    <p
+                        class="font-black text-[var(--text-color)] text-lg leading-none"
+                    >
+                        {player.xp.toLocaleString()}
+                    </p>
                 </div>
             </div>
         </div>

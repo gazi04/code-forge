@@ -12,23 +12,33 @@
             href="/course/{course_slug}"
             class="w-10 h-10 rounded-md bg-surface flex items-center justify-center border border-[color-mix(in_srgb,var(--text-color)_10%,transparent)] shadow-inner hover:border-[var(--primary-color)] transition-colors group"
         >
-            <span class="text-xl group-hover:scale-110 transition-transform">↩️</span>
+            <span class="text-xl group-hover:scale-110 transition-transform"
+                >↩️</span
+            >
         </Link>
 
         <div>
-            <h1 class="text-xl font-bold tracking-wide text-[var(--text-color)]">
+            <h1
+                class="text-xl font-bold tracking-wide text-[var(--text-color)]"
+            >
                 {lesson.name}
             </h1>
-            <p class="text-xs text-[var(--text-color)] opacity-50 uppercase tracking-wider">
+            <p
+                class="text-xs text-[var(--text-color)] opacity-50 uppercase tracking-wider"
+            >
                 Estimated: {lesson.estimated_duration}m
             </p>
         </div>
     </div>
 
     {#if is_completed}
-        <div class="flex items-center gap-2 px-4 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)]">
+        <div
+            class="flex items-center gap-2 px-4 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+        >
             <span>✓</span>
-            <span class="text-sm font-black uppercase tracking-widest">Lesson Completed</span>
+            <span class="text-sm font-black uppercase tracking-widest"
+                >Lesson Completed</span
+            >
         </div>
     {:else}
         <div class="flex gap-3 text-sm font-medium">

@@ -1,23 +1,26 @@
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, untrack } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
     let { data, index, lessonSlug, isAlreadyCleared = false } = $props();
     let _claimedRewards = $state(null);
 
-    let userCode = $state(data.initial_code || '');
+    let userCode = $state(untrack(() => data.initial_code) || '');
     let terminalOutput = $state(
-        isAlreadyCleared
+        untrack(() => isAlreadyCleared)
             ? '> Validation sequence secure. All test cases passed successfully.\n'
             : '',
     );
     let isExecuting = $state(false);
     let testResults = $state(
-        data.test_cases?.map((tc) => ({
-            ...tc,
-            passed: isAlreadyCleared ? true : null,
-        })) || [],
+        untrack(
+            () =>
+                data.test_cases?.map((tc) => ({
+                    ...tc,
+                    passed: isAlreadyCleared ? true : null,
+                })) || [],
+        ),
     );
     let isCorrect = $derived(
         isAlreadyCleared ||

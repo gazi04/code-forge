@@ -3,13 +3,7 @@
     import { onMount } from 'svelte';
     import { certificate } from '@/actions/App/Http/Controllers/WorldController';
 
-    let {
-        worldSlug,
-        worldName,
-        bonusXp,
-        bonusCoins,
-        onclose,
-    } = $props();
+    let { worldSlug, worldName, bonusXp, bonusCoins, onclose } = $props();
 
     onMount(() => {
         triggerConfetti();
@@ -18,7 +12,12 @@
     function triggerConfetti() {
         const duration = 4000;
         const animationEnd = Date.now() + duration;
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000 };
+        const defaults = {
+            startVelocity: 30,
+            spread: 360,
+            ticks: 60,
+            zIndex: 10000,
+        };
 
         function randomInRange(min, max) {
             return Math.random() * (max - min) + min;
@@ -36,19 +35,27 @@
             confetti(
                 Object.assign({}, defaults, {
                     particleCount,
-                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                    origin: {
+                        x: randomInRange(0.1, 0.3),
+                        y: Math.random() - 0.2,
+                    },
                 }),
             );
             confetti(
                 Object.assign({}, defaults, {
                     particleCount,
-                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                    origin: {
+                        x: randomInRange(0.7, 0.9),
+                        y: Math.random() - 0.2,
+                    },
                 }),
             );
         }, 250);
     }
 
-    let certificateUrl = $derived(worldSlug ? certificate.url({ world: worldSlug }) : '#');
+    let certificateUrl = $derived(
+        worldSlug ? certificate.url({ world: worldSlug }) : '#',
+    );
 </script>
 
 <div
@@ -79,13 +86,25 @@
 
         <div class="flex justify-center gap-6 mb-8">
             <div class="text-center">
-                <div class="font-black text-xl text-[var(--primary-color)]">+{bonusXp}</div>
-                <div class="text-[var(--text-color)] opacity-50 text-xs font-mono uppercase tracking-wider">Bonus XP</div>
+                <div class="font-black text-xl text-[var(--primary-color)]">
+                    +{bonusXp}
+                </div>
+                <div
+                    class="text-[var(--text-color)] opacity-50 text-xs font-mono uppercase tracking-wider"
+                >
+                    Bonus XP
+                </div>
             </div>
             <div class="w-px bg-[var(--primary-color)] opacity-20"></div>
             <div class="text-center">
-                <div class="text-amber-400 font-black text-xl">+{bonusCoins}</div>
-                <div class="text-[var(--text-color)] opacity-50 text-xs font-mono uppercase tracking-wider">Coins</div>
+                <div class="text-amber-400 font-black text-xl">
+                    +{bonusCoins}
+                </div>
+                <div
+                    class="text-[var(--text-color)] opacity-50 text-xs font-mono uppercase tracking-wider"
+                >
+                    Coins
+                </div>
             </div>
         </div>
 

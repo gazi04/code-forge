@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, untrack } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
@@ -13,19 +13,21 @@
     let rightNodes = $state([]);
     // Provisional links the student proposes: { leftId: rightId }.
     let bonds = $state({});
-    let isCleared = $state(isAlreadyCleared);
+    let isCleared = $state(untrack(() => isAlreadyCleared));
     let isVerifying = $state(false);
     let networkFeedback = $state(
-        isAlreadyCleared
+        untrack(() => isAlreadyCleared)
             ? '✨ All node alignments secured and stable.'
             : 'Select a node from the left matrix...',
     );
-    let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
+    let feedbackStatus = $state(
+        untrack(() => isAlreadyCleared) ? 'success' : 'info',
+    );
     let isCorrect = $derived(isCleared);
 
     let selectedLeftId = $state(null);
 
-    let totalPairsCount = (data.left_items ?? []).length;
+    let totalPairsCount = untrack(() => (data.left_items ?? []).length);
     let movesCount = $state(0);
     let bondedCount = $derived(Object.keys(bonds).length);
 
@@ -200,7 +202,15 @@
                         isCleared || isLeftBonded(leftItem.id)}
 
                     <div
+                        role="button"
+                        tabindex="0"
                         onclick={() => handleLeftClick(leftItem.id)}
+                        onkeydown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleLeftClick(leftItem.id);
+                            }
+                        }}
                         class="p-4 rounded-xl font-mono text-xs border text-left transition-all select-none cursor-pointer
               {isAlreadyMatched
                             ? 'bg-emerald-950/20 border-emerald-900/50 text-emerald-400/60 opacity-60'
@@ -239,7 +249,15 @@
                         selectedLeftId !== null && !isAlreadyMatched}
 
                     <div
+                        role="button"
+                        tabindex="0"
                         onclick={() => handleRightClick(rightItem.id)}
+                        onkeydown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleRightClick(rightItem.id);
+                            }
+                        }}
                         class="p-4 rounded-xl font-mono text-xs border text-left transition-all select-none
               {isAlreadyMatched
                             ? 'bg-emerald-950/20 border-emerald-900/50 text-emerald-400/60 opacity-50 pointer-events-none'

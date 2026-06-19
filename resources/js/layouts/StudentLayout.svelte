@@ -7,7 +7,7 @@
     import WorldCompletionModal from '@/components/WorldCompletionModal.svelte';
 
     // Prop declaration in Svelte 5 format
-    let { theme = null } = $props();
+    let { theme = null, children } = $props();
 
     // Reactively watch Inertia's flash data
     let flash = $derived(page.props.flash);
@@ -56,8 +56,8 @@
             const timeLeft = animationEnd - Date.now();
 
             if (timeLeft <= 0) {
-return clearInterval(interval);
-}
+                return clearInterval(interval);
+            }
 
             const particleCount = 50 * (timeLeft / duration);
 
@@ -84,16 +84,16 @@ return clearInterval(interval);
 
     function getTitle(level) {
         if (level < 5) {
-return 'The Novice';
-}
+            return 'The Novice';
+        }
 
         if (level < 10) {
-return 'Apprentice Coder';
-}
+            return 'Apprentice Coder';
+        }
 
         if (level < 20) {
-return 'Logic Adept';
-}
+            return 'Logic Adept';
+        }
 
         return 'Master Hacker';
     }
@@ -240,7 +240,7 @@ return 'Logic Adept';
                 in:fade={{ duration: 400, delay: 150 }}
                 out:fade={{ duration: 300 }}
             >
-                <slot />
+                {@render children?.()}
             </div>
         {/key}
     </main>
@@ -285,9 +285,12 @@ return 'Logic Adept';
                 <h3 class="text-2xl font-bold text-[var(--text-color)] mb-1">
                     {getTitle(newLevel)}
                 </h3>
-                <p class="text-[var(--text-color)] opacity-60 mb-8 font-mono text-sm">
+                <p
+                    class="text-[var(--text-color)] opacity-60 mb-8 font-mono text-sm"
+                >
                     Your logical reasoning has expanded.<br />
-                    <span class="font-bold block mt-2 opacity-100 text-[var(--primary-color)]"
+                    <span
+                        class="font-bold block mt-2 opacity-100 text-[var(--primary-color)]"
                         >+ {coinBonus} Gold Coins</span
                     >
                 </p>

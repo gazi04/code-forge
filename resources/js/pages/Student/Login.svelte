@@ -20,25 +20,43 @@
 
 <div class="min-h-screen bg-[#080510] flex items-center justify-center px-4">
     <div class="w-full max-w-sm">
-
         <!-- Brand -->
         <div class="text-center mb-10">
-            <p class="text-xs font-mono uppercase tracking-[0.3em] text-indigo-400/60 mb-3">Arcane.dev</p>
-            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Student Portal</h1>
-            <p class="text-sm font-mono text-white/25 mt-2 uppercase tracking-widest">Enter your credentials</p>
+            <p
+                class="text-xs font-mono uppercase tracking-[0.3em] text-indigo-400/60 mb-3"
+            >
+                Arcane.dev
+            </p>
+            <h1
+                class="text-2xl sm:text-3xl font-black text-white tracking-tight"
+            >
+                Student Portal
+            </h1>
+            <p
+                class="text-sm font-mono text-white/25 mt-2 uppercase tracking-widest"
+            >
+                Enter your credentials
+            </p>
         </div>
 
         {#if authMessage}
-            <div class="mb-6 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-center text-sm text-amber-200/90">
+            <div
+                class="mb-6 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-center text-sm text-amber-200/90"
+            >
                 {authMessage}
             </div>
         {/if}
 
         <!-- Card -->
-        <div class="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 shadow-[0_0_60px_rgba(99,102,241,0.06)]">
+        <div
+            class="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 shadow-[0_0_60px_rgba(99,102,241,0.06)]"
+        >
             <form onsubmit={submitLogin} class="space-y-5">
                 <div>
-                    <label for="email" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                    <label
+                        for="email"
+                        class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                    >
                         Email
                     </label>
                     <input
@@ -50,12 +68,19 @@
                         class="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 font-mono focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all"
                     />
                     {#if form.errors.email}
-                        <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.email}</p>
+                        <p
+                            class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                        >
+                            {form.errors.email}
+                        </p>
                     {/if}
                 </div>
 
                 <div>
-                    <label for="password" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                    <label
+                        for="password"
+                        class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                    >
                         Password
                     </label>
                     <input
@@ -67,7 +92,11 @@
                         class="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 font-mono focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all"
                     />
                     {#if form.errors.password}
-                        <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.password}</p>
+                        <p
+                            class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                        >
+                            {form.errors.password}
+                        </p>
                     {/if}
                 </div>
 
@@ -85,8 +114,11 @@
 
         <p class="text-center text-xs font-mono text-white/30 mt-6">
             New here?
-            <a href="/register" class="text-indigo-400/80 hover:text-indigo-300 font-bold transition-colors">Create an account</a>
+            <a
+                href="/register"
+                class="text-indigo-400/80 hover:text-indigo-300 font-bold transition-colors"
+                >Create an account</a
+            >
         </p>
-
     </div>
 </div>

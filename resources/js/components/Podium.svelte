@@ -62,7 +62,10 @@
             <div class="{medal.size} relative">
                 {#if leader.equipped?.avatar?.image_url}
                     <div
-                        class="absolute inset-0 rounded-full border-2 {medal.border} {medal.glow} overflow-hidden {i === 0 ? 'pulse-ring' : ''}"
+                        class="absolute inset-0 rounded-full border-2 {medal.border} {medal.glow} overflow-hidden {i ===
+                        0
+                            ? 'pulse-ring'
+                            : ''}"
                     >
                         <img
                             src={leader.equipped.avatar.image_url}
@@ -72,7 +75,10 @@
                     </div>
                 {:else}
                     <div
-                        class="absolute inset-0 rounded-full {medal.bg} border-2 {medal.border} {medal.glow} flex items-center justify-center font-black {medal.text} uppercase tracking-wider {i === 0 ? 'pulse-ring' : ''}"
+                        class="absolute inset-0 rounded-full {medal.bg} border-2 {medal.border} {medal.glow} flex items-center justify-center font-black {medal.text} uppercase tracking-wider {i ===
+                        0
+                            ? 'pulse-ring'
+                            : ''}"
                     >
                         {leader.name.slice(0, 2).toUpperCase()}
                     </div>
@@ -80,14 +86,32 @@
             </div>
 
             <div class="text-center mt-2 mb-2">
-                <p class="font-bold text-[var(--text-color)] text-sm truncate max-w-[100px]">{leader.name}</p>
+                <p
+                    class="font-bold text-[var(--text-color)] text-sm truncate max-w-[100px]"
+                >
+                    {leader.name}
+                </p>
                 {#if leader.equipped?.title}
-                    <p class="text-[10px] font-mono" style="color: {leader.equipped.title.color ?? 'inherit'}">{leader.equipped.title.name}</p>
+                    <p
+                        class="text-[10px] font-mono"
+                        style="color: {leader.equipped.title.color ??
+                            'inherit'}"
+                    >
+                        {leader.equipped.title.name}
+                    </p>
                 {/if}
-                <p class="text-xs {medal.text} font-mono font-bold">Lv. {leader.level}</p>
-                <p class="text-xs text-[color-mix(in_srgb,var(--text-color)_50%,transparent)] font-mono">{leader.xp.toLocaleString()} XP</p>
+                <p class="text-xs {medal.text} font-mono font-bold">
+                    Lv. {leader.level}
+                </p>
+                <p
+                    class="text-xs text-[color-mix(in_srgb,var(--text-color)_50%,transparent)] font-mono"
+                >
+                    {leader.xp.toLocaleString()} XP
+                </p>
                 {#if isPlayer}
-                    <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] text-[var(--primary-color)] text-[10px] font-black uppercase tracking-widest">
+                    <span
+                        class="inline-block mt-1 px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--primary-color)_20%,transparent)] border border-[color-mix(in_srgb,var(--primary-color)_50%,transparent)] text-[var(--primary-color)] text-[10px] font-black uppercase tracking-widest"
+                    >
                         You
                     </span>
                 {/if}
@@ -99,7 +123,9 @@
                 #{leader.rank}
             </div>
 
-            <div class="w-20 sm:w-24 {medal.platformHeight} {medal.platformBg} border-t-2 border-x {medal.platformBorder} rounded-t-md"></div>
+            <div
+                class="w-20 sm:w-24 {medal.platformHeight} {medal.platformBg} border-t-2 border-x {medal.platformBorder} rounded-t-md"
+            ></div>
         </div>
     {/each}
 </div>

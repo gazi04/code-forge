@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, untrack } from 'svelte';
     import BlockHeader from '@/components/Blocks/BlockHeader.svelte';
     import { claimMicroReward } from '@/lib/utils';
 
@@ -8,16 +8,20 @@
 
     // The server now ships the items pre-shuffled (the correct order is never
     // sent to the client); we only use them as the starting layout.
-    const startingItems = (data.items ?? []).map((item) => item.value);
+    const startingItems = untrack(() =>
+        (data.items ?? []).map((item) => item.value),
+    );
     let dynamicList = $state([]);
-    let isCleared = $state(isAlreadyCleared);
+    let isCleared = $state(untrack(() => isAlreadyCleared));
     let isVerifying = $state(false);
     let gameFeedback = $state(
-        isAlreadyCleared
+        untrack(() => isAlreadyCleared)
             ? '✨ Sequence fully restored and verified.'
             : 'Click an item to select it...',
     );
-    let feedbackStatus = $state(isAlreadyCleared ? 'success' : 'info');
+    let feedbackStatus = $state(
+        untrack(() => isAlreadyCleared) ? 'success' : 'info',
+    );
     let isCorrect = $derived(isCleared);
 
     let selectedIndex = $state(null);
@@ -130,7 +134,15 @@
                 {@const isCurrentSelection = selectedIndex === idx}
 
                 <div
+                    role="button"
+                    tabindex="0"
                     onclick={() => selectItem(idx)}
+                    onkeydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            selectItem(idx);
+                        }
+                    }}
                     class="w-full p-3 sm:p-4 rounded-xl border font-mono text-sm transition-all duration-200 flex items-center gap-3 sm:gap-4 select-none cursor-pointer
             {isCleared
                         ? 'bg-emerald-950/30 border-emerald-800/80 text-emerald-300 shadow-[0_0_10px_color-mix(in_srgb,var(--primary-color)_5%,transparent)]'

@@ -65,11 +65,8 @@
                     </p>
                 </div>
             {:else}
-                <svelte:component
-                    this={layoutRegistry[layoutPreference]}
-                    {courses}
-                    {userLevel}
-                />
+                {@const CourseLayout = layoutRegistry[layoutPreference]}
+                <CourseLayout {courses} {userLevel} />
             {/if}
         </div>
     </div>

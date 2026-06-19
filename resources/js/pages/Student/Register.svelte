@@ -22,21 +22,39 @@
     }
 </script>
 
-<div class="min-h-screen bg-[#080510] flex items-center justify-center px-4 py-10">
+<div
+    class="min-h-screen bg-[#080510] flex items-center justify-center px-4 py-10"
+>
     <div class="w-full max-w-sm">
-
         <!-- Brand -->
         <div class="text-center mb-8">
-            <p class="text-xs font-mono uppercase tracking-[0.3em] text-indigo-400/60 mb-3">Arcane.dev</p>
-            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Create Account</h1>
-            <p class="text-sm font-mono text-white/25 mt-2 uppercase tracking-widest">Join the academy</p>
+            <p
+                class="text-xs font-mono uppercase tracking-[0.3em] text-indigo-400/60 mb-3"
+            >
+                Arcane.dev
+            </p>
+            <h1
+                class="text-2xl sm:text-3xl font-black text-white tracking-tight"
+            >
+                Create Account
+            </h1>
+            <p
+                class="text-sm font-mono text-white/25 mt-2 uppercase tracking-widest"
+            >
+                Join the academy
+            </p>
         </div>
 
         <!-- Card -->
-        <div class="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 shadow-[0_0_60px_rgba(99,102,241,0.06)]">
+        <div
+            class="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 shadow-[0_0_60px_rgba(99,102,241,0.06)]"
+        >
             <form onsubmit={submitRegister} class="space-y-5">
                 <div>
-                    <label for="name" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                    <label
+                        for="name"
+                        class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                    >
                         Username
                     </label>
                     <input
@@ -48,13 +66,20 @@
                         class="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 font-mono focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all"
                     />
                     {#if form.errors.name}
-                        <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.name}</p>
+                        <p
+                            class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                        >
+                            {form.errors.name}
+                        </p>
                     {/if}
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="forename" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                        <label
+                            for="forename"
+                            class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                        >
                             First Name
                         </label>
                         <input
@@ -66,12 +91,19 @@
                             class="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 font-mono focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all"
                         />
                         {#if form.errors.forename}
-                            <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.forename}</p>
+                            <p
+                                class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                            >
+                                {form.errors.forename}
+                            </p>
                         {/if}
                     </div>
 
                     <div>
-                        <label for="lastname" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                        <label
+                            for="lastname"
+                            class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                        >
                             Last Name
                         </label>
                         <input
@@ -83,14 +115,21 @@
                             class="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 font-mono focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all"
                         />
                         {#if form.errors.lastname}
-                            <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.lastname}</p>
+                            <p
+                                class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                            >
+                                {form.errors.lastname}
+                            </p>
                         {/if}
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="birthday" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                        <label
+                            for="birthday"
+                            class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                        >
                             Birthday
                         </label>
                         <input
@@ -101,12 +140,19 @@
                             class="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 font-mono focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all [color-scheme:dark]"
                         />
                         {#if form.errors.birthday}
-                            <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.birthday}</p>
+                            <p
+                                class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                            >
+                                {form.errors.birthday}
+                            </p>
                         {/if}
                     </div>
 
                     <div>
-                        <label for="gender" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                        <label
+                            for="gender"
+                            class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                        >
                             Gender
                         </label>
                         <select
@@ -119,13 +165,20 @@
                             <option value="female">Female</option>
                         </select>
                         {#if form.errors.gender}
-                            <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.gender}</p>
+                            <p
+                                class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                            >
+                                {form.errors.gender}
+                            </p>
                         {/if}
                     </div>
                 </div>
 
                 <div>
-                    <label for="email" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                    <label
+                        for="email"
+                        class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                    >
                         Email
                     </label>
                     <input
@@ -137,12 +190,19 @@
                         class="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 font-mono focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all"
                     />
                     {#if form.errors.email}
-                        <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.email}</p>
+                        <p
+                            class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                        >
+                            {form.errors.email}
+                        </p>
                     {/if}
                 </div>
 
                 <div>
-                    <label for="password" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                    <label
+                        for="password"
+                        class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                    >
                         Password
                     </label>
                     <input
@@ -154,12 +214,19 @@
                         class="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 font-mono focus:border-indigo-500/60 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all"
                     />
                     {#if form.errors.password}
-                        <p class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold">{form.errors.password}</p>
+                        <p
+                            class="text-rose-400 text-[11px] mt-1.5 font-mono font-bold"
+                        >
+                            {form.errors.password}
+                        </p>
                     {/if}
                 </div>
 
                 <div>
-                    <label for="password_confirmation" class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2">
+                    <label
+                        for="password_confirmation"
+                        class="block text-[10px] font-black uppercase tracking-widest text-indigo-400/70 mb-2"
+                    >
                         Confirm Password
                     </label>
                     <input
@@ -186,8 +253,11 @@
 
         <p class="text-center text-xs font-mono text-white/30 mt-6">
             Already have an account?
-            <a href="/login" class="text-indigo-400/80 hover:text-indigo-300 font-bold transition-colors">Sign in</a>
+            <a
+                href="/login"
+                class="text-indigo-400/80 hover:text-indigo-300 font-bold transition-colors"
+                >Sign in</a
+            >
         </p>
-
     </div>
 </div>
