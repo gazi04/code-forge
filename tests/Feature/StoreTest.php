@@ -272,6 +272,33 @@ it('rejects activating a cosmetic item and leaves the inventory row intact', fun
     expect(UserInventory::whereKey($inventory->id)->exists())->toBeTrue();
 });
 
+it('applies a quantity-1 consumable effect only once', function () {
+    $user = User::factory()->create(['streak_freezes' => 0]);
+    $item = makeItem(['type' => 'streak_freeze', 'effect_config' => ['quantity' => 1]]);
+    $inventory = UserInventory::create([
+        'user_id' => $user->id,
+        'store_item_id' => $item->id,
+        'quantity' => 1,
+        'acquired_at' => now(),
+    ]);
+
+    // First activation applies the effect and consumes the row.
+    $this->actingAs($user)
+        ->from(route('student.store.index'))
+        ->post(route('student.inventory.activate', $inventory));
+
+    expect($user->fresh()->streak_freezes)->toBe(1);
+    expect(UserInventory::find($inventory->id))->toBeNull();
+
+    // A second activation of the now-consumed row must not re-apply the effect.
+    $this->actingAs($user)
+        ->from(route('student.store.index'))
+        ->post(route('student.inventory.activate', $inventory))
+        ->assertStatus(404);
+
+    expect($user->fresh()->streak_freezes)->toBe(1);
+});
+
 // ─── Equip / Unequip ─────────────────────────────────────────────────────────
 
 it('equips a title item into user preferences', function () {

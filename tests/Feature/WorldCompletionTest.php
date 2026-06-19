@@ -9,6 +9,7 @@ use App\Models\ThemePack;
 use App\Models\User;
 use App\Models\UserWorldCompletion;
 use App\Models\World;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Redis;
 
@@ -196,6 +197,48 @@ it('returns a PDF download for a completed world', function () {
     $response->assertHeader('content-type', 'application/pdf');
 });
 
+it('caches the rendered certificate PDF', function () {
+    $user = User::factory()->create();
+    ['world' => $world] = createWorldWithOneLesson('cert-cache');
+
+    UserWorldCompletion::create([
+        'user_id' => $user->id,
+        'world_id' => $world->id,
+        'completed_at' => now(),
+        'xp_bonus_awarded' => 500,
+        'coins_bonus_awarded' => 250,
+    ]);
+
+    Cache::forget("certificate-pdf:{$user->id}:{$world->id}");
+
+    $this->actingAs($user)
+        ->get("/worlds/{$world->slug}/certificate")
+        ->assertOk();
+
+    expect(Cache::has("certificate-pdf:{$user->id}:{$world->id}"))->toBeTrue();
+});
+
+it('serves the certificate from cache when present', function () {
+    $user = User::factory()->create();
+    ['world' => $world] = createWorldWithOneLesson('cert-cache-hit');
+
+    UserWorldCompletion::create([
+        'user_id' => $user->id,
+        'world_id' => $world->id,
+        'completed_at' => now(),
+        'xp_bonus_awarded' => 500,
+        'coins_bonus_awarded' => 250,
+    ]);
+
+    Cache::put("certificate-pdf:{$user->id}:{$world->id}", 'CACHED-PDF-BYTES', now()->addDay());
+
+    $response = $this->actingAs($user)
+        ->get("/worlds/{$world->slug}/certificate");
+
+    $response->assertOk();
+    expect($response->getContent())->toBe('CACHED-PDF-BYTES');
+});
+
 // ─── Bonus XP awarded ─────────────────────────────────────────────────────────
 
 it('awards bonus XP and coins when world is first completed', function () {
@@ -210,4 +253,19 @@ it('awards bonus XP and coins when world is first completed', function () {
 
     // Lesson XP (50) + world bonus (500) should both be applied
     expect($user->fresh()->xp)->toBeGreaterThan($xpBefore + 50);
+});
+
+it('flashes a bonus-driven level-up in game_result', function () {
+    // Level 1, xp 0: the lesson reward (50) stays under L2 (100), but the 500 world
+    // bonus pushes total to 550 → level 4 (L4 = 450). The flashed game_result must
+    // reflect the post-bonus level so the level-up modal fires.
+    $user = User::factory()->create(['level' => 1, 'xp' => 0]);
+    ['lesson' => $lesson] = createWorldWithOneLesson('bonus-levelup');
+
+    $this->actingAs($user)
+        ->from("/lessons/{$lesson->slug}")
+        ->post("/lessons/{$lesson->slug}/submit")
+        ->assertSessionHas('game_result', fn ($result): bool => $result['leveled_up'] === true && $result['new_level'] === 4);
+
+    expect($user->fresh()->level)->toBe(4);
 });

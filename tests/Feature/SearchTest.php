@@ -79,6 +79,34 @@ it('excludes courses from unpublished worlds', function () {
         ->assertJsonCount(0, 'courses');
 });
 
+it('tags a course above the student level as locked with a reason', function () {
+    $this->course->update(['min_level_requirement' => 99]);
+
+    $this->actingAs($this->student)
+        ->getJson('/search?q=Python')
+        ->assertOk()
+        ->assertJsonPath('courses.0.locked', true)
+        ->assertJsonPath('courses.0.lock_reason', '🔒 This world is restricted! Requires Adventure Level 99.');
+});
+
+it('marks an accessible course as not locked', function () {
+    $this->actingAs($this->student)
+        ->getJson('/search?q=Python')
+        ->assertOk()
+        ->assertJsonPath('courses.0.locked', false)
+        ->assertJsonPath('courses.0.lock_reason', null);
+});
+
+it('tags a lesson in a locked course as locked', function () {
+    $this->course->update(['min_level_requirement' => 99]);
+
+    $this->actingAs($this->student)
+        ->getJson('/search?q=Variables')
+        ->assertOk()
+        ->assertJsonPath('lessons.0.locked', true)
+        ->assertJsonPath('lessons.0.lock_reason', '🔒 This world is restricted! Requires Adventure Level 99.');
+});
+
 it('returns lessons matching the query', function () {
     $this->actingAs($this->student)
         ->getJson('/search?q=Variables')

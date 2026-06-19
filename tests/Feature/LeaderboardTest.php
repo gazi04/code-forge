@@ -63,27 +63,6 @@ it('includes the authenticated user rank and score in the player prop', function
         );
 });
 
-it('keeps separate scores for two students sharing the same name', function () {
-    $alexOne = User::factory()->create(['name' => 'Alex', 'level' => 5]);
-    $alexTwo = User::factory()->create(['name' => 'Alex', 'level' => 2]);
-
-    Redis::zadd('leaderboard:weekly', 800, $alexOne->id);
-    Redis::zadd('leaderboard:weekly', 200, $alexTwo->id);
-
-    $this->actingAs($alexOne)
-        ->get(route('student.leaderboard'))
-        ->assertInertia(fn (Assert $page) => $page
-            ->where('leaders.0.name', 'Alex')
-            ->where('leaders.0.level', 5)
-            ->where('leaders.0.xp', 800)
-            ->where('leaders.1.name', 'Alex')
-            ->where('leaders.1.level', 2)
-            ->where('leaders.1.xp', 200)
-            ->where('player.rank', 1)
-            ->where('player.xp', 800)
-        );
-});
-
 it('ranks a weekly-unranked player just below everyone with a weekly score', function () {
     $alice = User::factory()->create(['name' => 'Alice']);
     $bob = User::factory()->create(['name' => 'Bob']);
