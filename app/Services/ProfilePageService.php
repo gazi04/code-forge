@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Services;
+
+use App\Concerns\BuildsAchievementList;
+use App\Concerns\ResolvesEquippedItems;
+use App\Models\BlockSubmission;
+use App\Models\LessonSubmission;
+use App\Models\User;
+use App\Models\UserWorldCompletion;
+use Illuminate\Support\Collection;
+
+class ProfilePageService
+{
+    use BuildsAchievementList, ResolvesEquippedItems;
+
+    public function __construct(
+        protected ProgressionService $progressionService,
+        protected StoreService $storeService,
+    ) {}
+
+    /**
+     * Everything the authenticated profile page renders.
+     *
+     * @return array<string, mixed>
+     */
+    public function getProfilePageData(User $user): array
+    {
+        $prefs = $user->preferences ?? [];
+
+        return [
+            'hero' => [
+                'name' => $user->name,
+                'public_url' => route('public.profile.show', $user),
+                'level' => $user->level,
+                'xp' => $user->xp,
+                'xp_for_current_level' => $this->progressionService->getXpRequiredForLevel($user->level),
+                'xp_for_next_level' => $this->progressionService->getXpRequiredForLevel($user->level + 1),
+                'coins' => $user->coins,
+                'streak_count' => $user->streak_count,
+                'equipped' => $this->resolveEquipped($user),
+            ],
+            'ledger' => $this->recentLedger($user),
+            'achievements' => $this->buildAchievementList($user),
+            'inventory' => $this->storeService->listInventory($user),
+            'equipped' => [
+                'title' => $prefs['equipped_title'] ?? null,
+                'avatar' => $prefs['equipped_avatar'] ?? null,
+            ],
+            'preferences' => array_merge([
+                'background_audio' => true,
+                'sound_effects' => true,
+                'accessibility_mode' => false,
+                'public_profile' => true,
+            ], $prefs),
+            'certificates' => $this->certificates($user),
+        ];
+    }
+
+    /**
+     * The 10 most recent lesson + block reward entries, merged and sorted.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    public function recentLedger(User $user): Collection
+    {
+        $lessonEntries = LessonSubmission::where('user_id', $user->id)
+            ->with('lesson:id,name')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(fn (LessonSubmission $submission): array => [
+                'type' => 'lesson',
+                'label' => $submission->lesson?->name ?? "Lesson #{$submission->lesson_id}",
+                'xp' => $submission->xp_rewarded,
+                'coins' => $submission->coins_rewarded,
+                'completed_at' => $submission->created_at,
+            ]);
+
+        $blockEntries = BlockSubmission::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(fn (BlockSubmission $submission): array => [
+                'type' => 'block',
+                'label' => $submission->block_title ?? "Block #{$submission->block_index}",
+                'xp' => $submission->xp_rewarded,
+                'coins' => $submission->coins_rewarded,
+                'completed_at' => $submission->created_at,
+            ]);
+
+        return $lessonEntries->concat($blockEntries)
+            ->sortByDesc('completed_at')
+            ->take(10)
+            ->values();
+    }
+
+    /**
+     * The user's earned world-completion certificates, newest first.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    public function certificates(User $user): Collection
+    {
+        return $user->worldCompletions()
+            ->with('world.themePack')
+            ->orderByDesc('completed_at')
+            ->get()
+            ->map(fn (UserWorldCompletion $c): array => [
+                'world_name' => $c->world->name,
+                'world_slug' => $c->world->slug,
+                'primary_color' => $c->world->themePack?->config['palette']['primary'] ?? '#8b5cf6',
+                'completed_at' => $c->completed_at,
+                'xp_bonus' => $c->xp_bonus_awarded,
+                'coins_bonus' => $c->coins_bonus_awarded,
+            ]);
+    }
+}
