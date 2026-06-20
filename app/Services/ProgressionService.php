@@ -46,14 +46,23 @@ class ProgressionService
     public function processVictory(User $user, int $baseXp, int $baseCoins): array
     {
         return DB::transaction(function () use ($user, $baseXp, $baseCoins) {
+            // Re-fetch the row under a lock and run every read/mutation against this
+            // copy. Eloquent's save() writes dirty columns from the in-memory value,
+            // so processing the passed-in (possibly stale) instance lets two
+            // concurrent claims for the same user clobber each other's XP/coins
+            // (lost update). lockForUpdate serializes them on MySQL/Postgres (no-op
+            // on SQLite). The committed state is synced back onto $user at the end so
+            // callers and downstream events see the fresh values.
+            $lockedUser = User::whereKey($user->id)->lockForUpdate()->first() ?? $user;
+
             $today = Carbon::today();
-            $lastActive = $user->last_active_at ? Carbon::parse($user->last_active_at)->startOfDay() : null;
+            $lastActive = $lockedUser->last_active_at ? Carbon::parse($lockedUser->last_active_at)->startOfDay() : null;
 
             // --- A. Streak & Daily Login Logic ---
             if (! $lastActive || $lastActive->isBefore($today)) {
                 if ($lastActive && $lastActive->isYesterday()) {
                     // Standard consecutive day
-                    $user->streak_count++;
+                    $lockedUser->streak_count++;
                 } elseif ($lastActive && $lastActive->diffInDays($today) > 1) {
                     // The user skipped at least one day. A freeze covers exactly one
                     // missed day, so the streak is only saved when they hold enough
@@ -61,78 +70,84 @@ class ProgressionService
                     $daysSince = (int) round($lastActive->diffInDays($today));
                     $daysMissed = $daysSince - 1;
 
-                    if ($user->streak_freezes >= $daysMissed) {
+                    if ($lockedUser->streak_freezes >= $daysMissed) {
                         // Fully covered: spend one freeze per missed day, preserve the
                         // streak, and let today extend it by one (frozen days don't count).
-                        $user->streak_freezes -= $daysMissed;
-                        $user->streak_count++;
+                        $lockedUser->streak_freezes -= $daysMissed;
+                        $lockedUser->streak_count++;
                     } else {
                         // Not enough freezes: the streak lapsed.
-                        $user->streak_count = 1;
+                        $lockedUser->streak_count = 1;
 
                         // Rested XP catch-up only when the streak actually broke for 3+ days
                         // (a freeze-covered gap is not an absence to compensate for).
                         if ($daysSince >= 3) {
-                            $user->rested_xp_balance += 200;
+                            $lockedUser->rested_xp_balance += 200;
                         }
                     }
                 } else {
                     // First time ever playing
-                    $user->streak_count = 1;
+                    $lockedUser->streak_count = 1;
                 }
 
                 // Update their last active timestamp to right now
-                $user->last_active_at = now();
+                $lockedUser->last_active_at = now();
             }
 
             // --- B. Experience Multipliers ---
             $multiplier = 1.0;
-            if ($user->streak_count >= 7) {
+            if ($lockedUser->streak_count >= 7) {
                 $multiplier = 1.15; // 15% bonus for a week-long streak
-            } elseif ($user->streak_count >= 3) {
+            } elseif ($lockedUser->streak_count >= 3) {
                 $multiplier = 1.05; // 5% bonus for a 3-day streak
             }
 
             $earnedXp = (int) round($baseXp * $multiplier);
 
             // Drain the Rested XP pool (grants a 50% bonus on top of their earnings until the pool is empty)
-            if ($user->rested_xp_balance > 0) {
+            if ($lockedUser->rested_xp_balance > 0) {
                 $restedBonus = (int) round($earnedXp * 0.5);
 
-                if ($user->rested_xp_balance >= $restedBonus) {
+                if ($lockedUser->rested_xp_balance >= $restedBonus) {
                     $earnedXp += $restedBonus;
-                    $user->rested_xp_balance -= $restedBonus;
+                    $lockedUser->rested_xp_balance -= $restedBonus;
                 } else {
-                    $earnedXp += $user->rested_xp_balance;
-                    $user->rested_xp_balance = 0;
+                    $earnedXp += $lockedUser->rested_xp_balance;
+                    $lockedUser->rested_xp_balance = 0;
                 }
             }
 
             // Apply active XP boost before awarding
-            if ($user->xp_boost_lessons_remaining > 0) {
-                $earnedXp = (int) round($earnedXp * $user->xp_boost_multiplier);
-                $user->xp_boost_lessons_remaining--;
-                if ($user->xp_boost_lessons_remaining === 0) {
-                    $user->xp_boost_multiplier = 1;
+            if ($lockedUser->xp_boost_lessons_remaining > 0) {
+                $earnedXp = (int) round($earnedXp * $lockedUser->xp_boost_multiplier);
+                $lockedUser->xp_boost_lessons_remaining--;
+                if ($lockedUser->xp_boost_lessons_remaining === 0) {
+                    $lockedUser->xp_boost_multiplier = 1;
                 }
             }
 
             // --- C. Award Loot ---
-            $user->xp += $earnedXp;
-            $user->coins += $baseCoins; // We keep coins flat and predictable
-            $user->total_coins_earned += $baseCoins;
+            $lockedUser->xp += $earnedXp;
+            $lockedUser->coins += $baseCoins; // We keep coins flat and predictable
+            $lockedUser->total_coins_earned += $baseCoins;
 
             // --- D. Level Up Engine ---
             $leveledUp = false;
-            $startingLevel = $user->level;
+            $startingLevel = $lockedUser->level;
 
             // We use a while loop just in case they earn massive XP and jump two levels at once
-            while ($user->xp >= $this->getXpRequiredForLevel($user->level + 1)) {
-                $user->level++;
+            while ($lockedUser->xp >= $this->getXpRequiredForLevel($lockedUser->level + 1)) {
+                $lockedUser->level++;
                 $leveledUp = true;
             }
 
-            $user->save();
+            $lockedUser->save();
+
+            // Sync the committed state back onto the caller's instance so downstream
+            // consumers (e.g. ProgressRegistered -> EvaluateAchievements, submitClaim's
+            // level/refresh flow) read the fresh values, not the stale pre-call ones.
+            $user->setRawAttributes($lockedUser->getAttributes());
+            $user->syncOriginal();
 
             if ($leveledUp) {
                 event(new UserLeveledUp($user, $startingLevel, $user->level));
@@ -156,8 +171,8 @@ class ProgressionService
                 'total_xp_earned' => $earnedXp,
                 'coins_earned' => $baseCoins,
                 'leveled_up' => $leveledUp,
-                'new_level' => $user->level,
-                'streak_count' => $user->streak_count,
+                'new_level' => $lockedUser->level,
+                'streak_count' => $lockedUser->streak_count,
             ];
         });
     }
