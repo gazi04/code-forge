@@ -29,17 +29,7 @@ class ProfilePageService
         $prefs = $user->preferences ?? [];
 
         return [
-            'hero' => [
-                'name' => $user->name,
-                'public_url' => route('public.profile.show', $user),
-                'level' => $user->level,
-                'xp' => $user->xp,
-                'xp_for_current_level' => $this->progressionService->getXpRequiredForLevel($user->level),
-                'xp_for_next_level' => $this->progressionService->getXpRequiredForLevel($user->level + 1),
-                'coins' => $user->coins,
-                'streak_count' => $user->streak_count,
-                'equipped' => $this->resolveEquipped($user),
-            ],
+            'hero' => $this->hero($user),
             'ledger' => $this->recentLedger($user),
             'achievements' => $this->buildAchievementList($user),
             'inventory' => $this->storeService->listInventory($user),
@@ -54,6 +44,27 @@ class ProfilePageService
                 'public_profile' => true,
             ], $prefs),
             'certificates' => $this->certificates($user),
+        ];
+    }
+
+    /**
+     * The hero banner block. `$public` hides coins and the share URL for the
+     * publicly-viewable profile; the private dashboard gets both.
+     *
+     * @return array<string, mixed>
+     */
+    public function hero(User $user, bool $public = false): array
+    {
+        return [
+            'name' => $user->name,
+            'level' => $user->level,
+            'xp' => $user->xp,
+            'xp_for_current_level' => $this->progressionService->getXpRequiredForLevel($user->level),
+            'xp_for_next_level' => $this->progressionService->getXpRequiredForLevel($user->level + 1),
+            'coins' => $public ? null : $user->coins,
+            'streak_count' => $user->streak_count,
+            'equipped' => $this->resolveEquipped($user),
+            ...($public ? [] : ['public_url' => route('public.profile.show', $user)]),
         ];
     }
 
