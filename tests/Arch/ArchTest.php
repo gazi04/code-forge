@@ -12,7 +12,10 @@
 */
 
 arch()->preset()->php();
-arch()->preset()->security();
+arch()->preset()->security()
+    // Non-crypto randomness: seeder demo data (rand) and quiz option
+    // shuffling (shuffle) — not security concerns.
+    ->ignoring(['Database\Seeders', 'App\Support\BlockSanitizer']);
 
 arch('no debug statements')
     ->expect(['dd', 'dump', 'ray', 'var_dump', 'var_export', 'die', 'exit'])
@@ -31,7 +34,14 @@ arch('controllers')
 
 arch('services')
     ->expect('App\Services')
-    ->toHaveSuffix('Service');
+    ->toHaveSuffix('Service')
+    // Command/validator/builder classes named for their role, not the Service suffix.
+    ->ignoring([
+        'App\Services\BlockValidator',
+        'App\Services\AchievementAcknowledger',
+        'App\Services\EquippedItemResolver',
+        'App\Services\AchievementListBuilder',
+    ]);
 
 arch('enums')
     ->expect('App\Enums')
@@ -44,3 +54,10 @@ arch('commands')
 arch('models avoid http layer')
     ->expect('App\Models')
     ->not->toUse('App\Http');
+
+arch('controllers do not query the database')
+    ->expect('App\Http\Controllers')
+    ->not->toUse([
+        'Illuminate\Support\Facades\DB',
+        'Illuminate\Support\Facades\Redis',
+    ]);
