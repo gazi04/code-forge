@@ -2,13 +2,15 @@
 
 namespace App\Http\Middleware;
 
-use App\Concerns\ResolvesEquippedItems;
+use App\Services\EquippedItemResolver;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    use ResolvesEquippedItems;
+    public function __construct(
+        protected EquippedItemResolver $equipped,
+    ) {}
 
     /**
      * The root template that's loaded on the first page visit.
@@ -50,7 +52,7 @@ class HandleInertiaRequests extends Middleware
                     'coins' => $request->user()->coins,
                     'streak_count' => $request->user()->streak_count,
                     'streak_at_risk' => $request->user()->isStreakAtRisk(),
-                    'equipped' => fn () => $this->resolveEquipped($request->user()),
+                    'equipped' => fn () => $this->equipped->resolveEquipped($request->user()),
                 ] : null,
             ],
             'flash' => [

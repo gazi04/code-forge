@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Services;
 
 use App\Models\StoreItem;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
-trait ResolvesEquippedItems
+class EquippedItemResolver
 {
     /**
      * The equipped store-item ids (title + avatar) for a user.
      *
      * @return array<int, mixed>
      */
-    protected function equippedItemIds(User $user): array
+    public function equippedItemIds(User $user): array
     {
         $prefs = $user->preferences ?? [];
 
@@ -30,7 +30,7 @@ trait ResolvesEquippedItems
      * @param  array<int, mixed>  $ids
      * @return Collection<int, StoreItem>
      */
-    protected function fetchEquippedItems(array $ids): Collection
+    public function fetchEquippedItems(array $ids): Collection
     {
         return $ids
             ? StoreItem::whereIn('id', $ids)->select(['id', 'name', 'type', 'image', 'display_config'])->get()->keyBy('id')
@@ -42,7 +42,7 @@ trait ResolvesEquippedItems
      *
      * @return array{title: array<string, mixed>|null, avatar: array<string, mixed>|null}
      */
-    protected function resolveEquipped(User $user): array
+    public function resolveEquipped(User $user): array
     {
         return $this->buildEquipped($user, $this->fetchEquippedItems($this->equippedItemIds($user)));
     }
@@ -53,7 +53,7 @@ trait ResolvesEquippedItems
      * @param  Collection<int, StoreItem>  $equippedItems
      * @return array{title: array<string, mixed>|null, avatar: array<string, mixed>|null}
      */
-    protected function buildEquipped(User $user, Collection $equippedItems): array
+    public function buildEquipped(User $user, Collection $equippedItems): array
     {
         $prefs = $user->preferences ?? [];
         $titleId = $prefs['equipped_title'] ?? null;

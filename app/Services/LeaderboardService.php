@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use App\Concerns\ResolvesEquippedItems;
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
 
 class LeaderboardService
 {
-    use ResolvesEquippedItems;
+    public function __construct(
+        protected EquippedItemResolver $equippedItems,
+    ) {}
 
     /**
      * Top 50 ranked players for the scope plus the viewer's own rank/score, with
@@ -32,12 +33,12 @@ class LeaderboardService
         $enrichedUsers = User::whereIn('id', $ids)->get()->keyBy('id');
 
         $allEquippedIds = $enrichedUsers
-            ->flatMap(fn (User $u): array => $this->equippedItemIds($u))
+            ->flatMap(fn (User $u): array => $this->equippedItems->equippedItemIds($u))
             ->unique()->values()->all();
 
-        $equippedItems = $this->fetchEquippedItems($allEquippedIds);
+        $equippedItems = $this->equippedItems->fetchEquippedItems($allEquippedIds);
 
-        $mapEquipped = fn (User $u): array => $this->buildEquipped($u, $equippedItems);
+        $mapEquipped = fn (User $u): array => $this->equippedItems->buildEquipped($u, $equippedItems);
 
         $leaders = [];
         $rank = 1;

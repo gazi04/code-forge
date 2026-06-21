@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Concerns;
+namespace App\Services;
 
 use App\Models\Achievement;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
-trait BuildsAchievementList
+class AchievementListBuilder
 {
     /**
      * Build the full achievement list for a user, flagging which are unlocked.
      *
      * @return Collection<int, array{id: int, name: string, description: string, image_path: ?string, metric_type: string, threshold: int, unlocked: bool, unlocked_at: mixed}>
      */
-    protected function buildAchievementList(User $user): Collection
+    public function buildAchievementList(User $user): Collection
     {
         $earnedAchievements = $user->achievements()->withPivot('unlocked_at')->get()->keyBy('id');
 

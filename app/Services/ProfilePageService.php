@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Concerns\BuildsAchievementList;
-use App\Concerns\ResolvesEquippedItems;
 use App\Models\BlockSubmission;
 use App\Models\LessonSubmission;
 use App\Models\User;
@@ -12,11 +10,11 @@ use Illuminate\Support\Collection;
 
 class ProfilePageService
 {
-    use BuildsAchievementList, ResolvesEquippedItems;
-
     public function __construct(
         protected ProgressionService $progressionService,
         protected StoreService $storeService,
+        protected EquippedItemResolver $equippedItems,
+        protected AchievementListBuilder $achievementList,
     ) {}
 
     /**
@@ -31,7 +29,7 @@ class ProfilePageService
         return [
             'hero' => $this->hero($user),
             'ledger' => $this->recentLedger($user),
-            'achievements' => $this->buildAchievementList($user),
+            'achievements' => $this->achievementList->buildAchievementList($user),
             'inventory' => $this->storeService->listInventory($user),
             'equipped' => [
                 'title' => $prefs['equipped_title'] ?? null,
@@ -63,7 +61,7 @@ class ProfilePageService
             'xp_for_next_level' => $this->progressionService->getXpRequiredForLevel($user->level + 1),
             'coins' => $public ? null : $user->coins,
             'streak_count' => $user->streak_count,
-            'equipped' => $this->resolveEquipped($user),
+            'equipped' => $this->equippedItems->resolveEquipped($user),
             ...($public ? [] : ['public_url' => route('public.profile.show', $user)]),
         ];
     }

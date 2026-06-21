@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Concerns\BuildsAchievementList;
 use App\Models\User;
+use App\Services\AchievementListBuilder;
 use App\Services\ProfilePageService;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PublicProfileController extends Controller
 {
-    use BuildsAchievementList;
-
-    public function __construct(protected ProfilePageService $profilePage) {}
+    public function __construct(
+        protected ProfilePageService $profilePage,
+        protected AchievementListBuilder $achievements,
+    ) {}
 
     public function show(User $user): Response
     {
@@ -22,7 +23,7 @@ class PublicProfileController extends Controller
 
         return Inertia::render('Student/Profile/Public', [
             'hero' => $this->profilePage->hero($user, public: true),
-            'achievements' => $this->buildAchievementList($user),
+            'achievements' => $this->achievements->buildAchievementList($user),
             'certificates' => $this->profilePage->certificates($user),
         ]);
     }
