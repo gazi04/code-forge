@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Events\ProgressRegistered;
+use App\Events\WorldCompleted;
 use App\Models\BlockSubmission;
 use App\Models\Lesson;
 use App\Models\LessonSubmission;
@@ -56,8 +58,9 @@ class LessonProgressService
 
     /**
      * Award a lesson completion. Enforces the required-block gate and the atomic
-     * anti-double-reward unique index. Event dispatch and world-completion are
-     * orchestrated by the caller.
+     * anti-double-reward unique index. Owns the business events: dispatches
+     * ProgressRegistered, completes the world when finished, and reconciles the
+     * final level after any synchronous world-completion bonus.
      */
     public function submitLesson(User $user, Lesson $lesson): LessonResult
     {
@@ -113,12 +116,26 @@ class LessonProgressService
             return $result;
         });
 
+        ProgressRegistered::dispatch($user, 'lesson');
+
+        if ($world = $this->findWorldToComplete($user, $lesson)) {
+            WorldCompleted::dispatch($user, $world);
+        }
+
+        // The synchronous world-completion bonus (HandleWorldCompletion) may award XP
+        // after the lesson result was computed, crossing a level boundary the lesson
+        // reward alone didn't. Re-read the final level so a bonus-driven level-up still
+        // fires the level-up modal/confetti (which the layout keys off game_result).
+        $user->refresh();
+        $result['leveled_up'] = $user->level > $levelBefore;
+        $result['new_level'] = $user->level;
+
         return new LessonResult('success', $result, $levelBefore);
     }
 
     /**
      * Returns the World this submission just finished (and that the user has not
-     * already completed), or null. Pure query — the caller dispatches the event.
+     * already completed), or null. Pure query — submitLesson dispatches the event.
      */
     public function findWorldToComplete(User $user, Lesson $lesson): ?World
     {
@@ -144,8 +161,8 @@ class LessonProgressService
     }
 
     /**
-     * Validate and award a single block claim. Returns a typed status; reward
-     * dispatch is left to the caller.
+     * Validate and award a single block claim. Returns a typed status and
+     * dispatches ProgressRegistered on a genuine first claim.
      */
     public function claimBlock(User $user, Lesson $lesson, int $blockIndex, mixed $answer): BlockResult
     {
@@ -212,6 +229,8 @@ class LessonProgressService
 
             return $result;
         });
+
+        ProgressRegistered::dispatch($user, 'block');
 
         return new BlockResult('success', $result);
     }

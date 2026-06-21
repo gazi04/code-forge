@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ProgressRegistered;
-use App\Events\WorldCompleted;
 use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
 use App\Models\User;
@@ -55,27 +53,8 @@ class LessonController extends Controller
             ]);
         }
 
-        if ($result->status === 'already_completed') {
-            return back()->with('game_result', $result->gameResult);
-        }
-
-        ProgressRegistered::dispatch($user, 'lesson');
-
-        if ($world = $this->lessonProgress->findWorldToComplete($user, $lesson)) {
-            WorldCompleted::dispatch($user, $world);
-        }
-
-        // The synchronous world-completion bonus (HandleWorldCompletion) may award XP
-        // after the lesson result was computed, crossing a level boundary the lesson
-        // reward alone didn't. Re-read the final level so a bonus-driven level-up still
-        // fires the level-up modal/confetti (which the layout keys off game_result).
-        $user->refresh();
-        $gameResult = $result->gameResult;
-        $gameResult['leveled_up'] = $user->level > $result->levelBefore;
-        $gameResult['new_level'] = $user->level;
-
         // Flash the result payload to the session for Svelte to intercept
-        return back()->with('game_result', $gameResult);
+        return back()->with('game_result', $result->gameResult);
     }
 
     public function submitBlockClaim(Request $request, Lesson $lesson, int $blockIndex)
@@ -88,10 +67,6 @@ class LessonController extends Controller
 
         if ($result->status === 'out_of_bounds') {
             abort(404);
-        }
-
-        if ($result->status === 'success') {
-            ProgressRegistered::dispatch($user, 'block');
         }
 
         // Flashing this data means if this reward pushes them over the edge, the
