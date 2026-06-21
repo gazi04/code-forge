@@ -4,28 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\WorldResource;
 use App\Models\World;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\CertificateService;
+use App\Services\WorldQueryService;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class WorldController extends Controller
 {
+    public function __construct(
+        protected WorldQueryService $worlds,
+        protected CertificateService $certificates,
+    ) {}
+
     public function index()
     {
-        $worlds = World::published()
-            ->ordered()
-            ->with([
-                'themePack',
-                'courses' => fn ($query) => $query
-                    ->published()
-                    ->select(['id', 'world_id', 'name', 'slug', 'description', 'min_level_requirement']),
-            ])
-            ->get();
-
         return Inertia::render('Student/WorldMap', [
-            'worlds' => WorldResource::collection($worlds),
+            'worlds' => WorldResource::collection($this->worlds->publishedWithCourses()),
         ]);
     }
 
@@ -33,11 +28,8 @@ class WorldController extends Controller
     {
         abort_unless($world->is_published, 404);
 
-        // Load courses and their themes for the specific world view
-        $world->load(['themePack', 'courses' => fn ($query) => $query->published()]);
-
         return Inertia::render('Student/WorldDetail', [
-            'world' => new WorldResource($world),
+            'world' => new WorldResource($this->worlds->loadForDetail($world)),
         ]);
     }
 
@@ -45,28 +37,10 @@ class WorldController extends Controller
     {
         $user = Auth::user();
 
-        $completion = $user->worldCompletions()->where('world_id', $world->id)->first();
-
+        $completion = $this->certificates->completionFor($user, $world);
         abort_unless($completion !== null, 403, 'Certificate not yet earned for this world.');
 
-        $world->load('themePack', 'courses');
-        $primaryColor = $world->themePack?->config['palette']['primary'] ?? '#8b5cf6';
-
-        // The certificate is deterministic per (user, world) — a completion is a
-        // one-time event with a fixed completed_at — so cache the rendered PDF and
-        // serve from cache, avoiding a fresh DomPDF render (and abuse vector) on
-        // every request. The route is also throttled.
-        $pdf = Cache::remember(
-            "certificate-pdf:{$user->id}:{$world->id}",
-            now()->addDay(),
-            fn (): string => Pdf::loadView('certificates.world', [
-                'user' => $user,
-                'world' => $world,
-                'courses' => $world->courses,
-                'completedAt' => $completion->completed_at,
-                'primaryColor' => $primaryColor,
-            ])->setPaper('a4', 'landscape')->output(),
-        );
+        $pdf = $this->certificates->renderFor($user, $world, $completion);
 
         return response($pdf, 200, [
             'Content-Type' => 'application/pdf',
