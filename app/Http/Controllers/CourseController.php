@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\WorldResource;
-use App\Models\BlockSubmission;
-use App\Models\Course;
-use App\Models\LessonSubmission;
+use App\Services\CourseProgressService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -14,49 +12,19 @@ class CourseController extends Controller
 {
     use AuthorizesRequests;
 
+    public function __construct(protected CourseProgressService $courseProgress) {}
+
     public function show($slug)
     {
-        $course = Course::where('slug', $slug)
-            ->with([
-                'world.themePack',
-                'lessons' => function ($query): void {
-                    // Ship only lesson metadata — never the heavy `blocks` JSON
-                    // (hundreds of KB per page, and it leaks every answer key).
-                    $query->select([
-                        'id', 'course_id', 'name', 'slug', 'xp_reward',
-                        'coin_reward', 'estimated_duration', 'is_boss', 'sort_order',
-                    ])->orderBy('sort_order', 'asc');
-                },
-            ])
-            ->firstOrFail();
+        $course = $this->courseProgress->findForDetail($slug);
 
         $this->authorize('view', $course);
-
-        $user = Auth::user();
-        $lessonIds = $course->lessons->pluck('id');
-
-        $completedIds = LessonSubmission::where('user_id', $user->id)
-            ->whereIn('lesson_id', $lessonIds)
-            ->pluck('lesson_id');
-
-        $resumeLessonId = BlockSubmission::where('user_id', $user->id)
-            ->whereIn('lesson_id', $lessonIds)
-            ->whereNotIn('lesson_id', $completedIds)
-            ->latest()
-            ->value('lesson_id');
-
-        $resumeLessonSlug = $resumeLessonId
-            ? $course->lessons->find($resumeLessonId)?->slug
-            : null;
-
-        $completedSlugs = $course->lessons->whereIn('id', $completedIds)->pluck('slug')->toArray();
 
         return Inertia::render('Student/CourseDetail', [
             'course' => $course,
             'world' => new WorldResource($course->world),
             'lessons' => $course->lessons,
-            'resume_lesson_slug' => $resumeLessonSlug,
-            'completed_lesson_slugs' => $completedSlugs,
+            ...$this->courseProgress->getCourseProgress(Auth::user(), $course),
         ]);
     }
 }
