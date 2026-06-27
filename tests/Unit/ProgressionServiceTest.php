@@ -369,3 +369,20 @@ it('increments both leaderboards after the surrounding transaction commits', fun
 
     expect($user->fresh()->xp)->toBeGreaterThan(0);
 });
+
+// ─── processVictory — lost-update guard (D) ───────────────────────────────────
+
+it('builds on the latest persisted state, not a stale in-memory instance', function () {
+    Redis::shouldReceive('zincrby')->andReturn(0);
+
+    $user = User::factory()->create(['last_active_at' => now(), 'xp' => 0, 'level' => 1]);
+
+    // A concurrent writer commits XP after $user was loaded; $user is now stale.
+    DB::table('users')->where('id', $user->id)->update(['xp' => 1000]);
+
+    (new ProgressionService)->processVictory($user, 50, 0);
+
+    // Must add to the persisted 1000, not overwrite it from the stale 0.
+    expect($user->fresh()->xp)->toBe(1050)
+        ->and($user->xp)->toBe(1050); // committed state synced back onto the instance
+});

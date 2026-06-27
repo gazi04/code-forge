@@ -17,6 +17,16 @@ arch()->preset()->security()
     // shuffling (shuffle) — not security concerns.
     ->ignoring(['Database\Seeders', 'App\Support\BlockSanitizer']);
 
+arch('strict types')
+    ->expect([
+        'App\Http\Controllers',
+        'App\Models',
+        'App\Services',
+        'App\Enums',
+        'App\Providers',
+    ])
+    ->toUseStrictTypes();
+
 arch('no debug statements')
     ->expect(['dd', 'dump', 'ray', 'var_dump', 'var_export', 'die', 'exit'])
     ->not->toBeUsed();
