@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Listeners;
 
 use App\Events\ProgressRegistered;
@@ -21,7 +23,7 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
 
         $earnedIds = $user->achievements()->pluck('achievement_id');
 
-        $pending = Achievement::whereNotIn('id', $earnedIds)->get();
+        $pending = Achievement::query()->whereNotIn('id', $earnedIds)->get();
 
         if ($pending->isEmpty()) {
             return;
@@ -93,11 +95,11 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
             'daily_streak_count' => $user->streak_count,
             'total_coins_earned' => $user->total_coins_earned,
 
-            'total_lessons_completed' => LessonSubmission::where('user_id', $user->id)->count(),
+            'total_lessons_completed' => LessonSubmission::query()->where('user_id', $user->id)->count(),
 
             'specific_course_completed' => $this->resolveSpecificCourseCompleted($user, $achievements),
 
-            'total_blocks_completed' => BlockSubmission::where('user_id', $user->id)->count(),
+            'total_blocks_completed' => BlockSubmission::query()->where('user_id', $user->id)->count(),
 
             'specific_block_type_completed' => $this->resolveSpecificBlockTypeCompleted($user, $achievements),
 
@@ -120,7 +122,7 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
 
         // Two grouped queries for all target courses at once (portable selectRaw + groupBy),
         // instead of three queries per achievement.
-        $totals = Lesson::whereIn('course_id', $courseIds)
+        $totals = Lesson::query()->whereIn('course_id', $courseIds)
             ->selectRaw('course_id, COUNT(*) as c')
             ->groupBy('course_id')
             ->pluck('c', 'course_id');
@@ -155,7 +157,7 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
             return [];
         }
 
-        $submissions = BlockSubmission::where('user_id', $user->id)->get(['lesson_id', 'block_index']);
+        $submissions = BlockSubmission::query()->where('user_id', $user->id)->get(['lesson_id', 'block_index']);
 
         if ($submissions->isEmpty()) {
             return $targetTypes->mapWithKeys(fn ($type): array => [$type => 0])->all();
@@ -163,7 +165,7 @@ class EvaluateAchievements implements ShouldQueueAfterCommit
 
         // Resolve each submission's block type from the lesson's JSON payload in PHP,
         // so counting is driver-agnostic (no SQLite-only json_extract path expression).
-        $lessons = Lesson::whereIn('id', $submissions->pluck('lesson_id')->unique())
+        $lessons = Lesson::query()->whereIn('id', $submissions->pluck('lesson_id')->unique())
             ->get(['id', 'blocks'])
             ->keyBy('id');
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use App\Services\EquippedItemResolver;
@@ -52,7 +54,7 @@ class HandleInertiaRequests extends Middleware
                     'coins' => $request->user()->coins,
                     'streak_count' => $request->user()->streak_count,
                     'streak_at_risk' => $request->user()->isStreakAtRisk(),
-                    'equipped' => fn () => $this->equipped->resolveEquipped($request->user()),
+                    'equipped' => fn (): array => $this->equipped->resolveEquipped($request->user()),
                 ] : null,
             ],
             'flash' => [

@@ -28,14 +28,14 @@ class ThemePackForm
                         ->afterStateUpdated(fn (
                             Set $set,
                             ?string $state
-                        ) => $set('identifier', 'theme_'.Str::slug($state, '_'))),
+                        ): mixed => $set('identifier', 'theme_'.Str::slug($state, '_'))),
 
                     TextInput::make('identifier')
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->maxLength(64)
                         ->helperText('Auto-generated from name. Stable internal key — avoid changing after creation.')
-                        ->dehydrateStateUsing(fn (string $state) => Str::startsWith($state, 'theme_') ? $state : 'theme_'.$state
+                        ->dehydrateStateUsing(fn (string $state): string => Str::startsWith($state, 'theme_') ? $state : 'theme_'.$state
                         ),
                 ]),
 

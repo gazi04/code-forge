@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Enums\StoreItemType;
@@ -31,10 +33,10 @@ class StoreController extends Controller
         $result = $this->store->purchase(Auth::id(), $item);
 
         if (! $result->success) {
-            return redirect()->back()->with('store_result', $result->toArray());
+            return back()->with('store_result', $result->toArray());
         }
 
-        return redirect()->route('student.store.index', ['tab' => 'inventory'])
+        return to_route('student.store.index', ['tab' => 'inventory'])
             ->with('store_result', $result->toArray());
     }
 
@@ -50,7 +52,7 @@ class StoreController extends Controller
 
         $result = $this->store->activate($user, $inventory);
 
-        return redirect()->back()->with('store_result', $result->toArray());
+        return back()->with('store_result', $result->toArray());
     }
 
     public function equip(UserInventory $inventory): RedirectResponse
@@ -64,15 +66,15 @@ class StoreController extends Controller
 
         $this->store->equip($user, $inventory);
 
-        return redirect()->back();
+        return back();
     }
 
     public function unequip(string $type): RedirectResponse
     {
-        abort_unless(in_array($type, ['title', 'avatar']), 422);
+        abort_unless(in_array($type, ['title', 'avatar'], true), 422);
 
         $this->store->unequip(Auth::user(), $type);
 
-        return redirect()->back();
+        return back();
     }
 }

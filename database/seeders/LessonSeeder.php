@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Course;
@@ -15,27 +17,24 @@ class LessonSeeder extends Seeder
     public function run(): void
     {
         foreach ($this->lessons() as $courseSlug => $lessons) {
-            $course = Course::where('slug', $courseSlug)->first();
+            $course = Course::query()->where('slug', $courseSlug)->first();
 
             if ($course === null) {
-                $this->command->warn("Course [{$courseSlug}] not found, skipping its lessons. Run CourseSeeder first.");
+                $this->command->warn(sprintf('Course [%s] not found, skipping its lessons. Run CourseSeeder first.', $courseSlug));
 
                 continue;
             }
 
             foreach ($lessons as $lesson) {
-                Lesson::firstOrCreate(
-                    ['slug' => $lesson['slug']],
-                    [
-                        'course_id' => $course->id,
-                        'name' => $lesson['name'],
-                        'xp_reward' => $lesson['xp_reward'],
-                        'coin_reward' => $lesson['coin_reward'],
-                        'estimated_duration' => $lesson['estimated_duration'],
-                        'is_boss' => $lesson['is_boss'] ?? false,
-                        'blocks' => $lesson['blocks'],
-                    ],
-                );
+                Lesson::query()->firstOrCreate(['slug' => $lesson['slug']], [
+                    'course_id' => $course->id,
+                    'name' => $lesson['name'],
+                    'xp_reward' => $lesson['xp_reward'],
+                    'coin_reward' => $lesson['coin_reward'],
+                    'estimated_duration' => $lesson['estimated_duration'],
+                    'is_boss' => $lesson['is_boss'] ?? false,
+                    'blocks' => $lesson['blocks'],
+                ]);
             }
         }
     }
@@ -69,7 +68,7 @@ class LessonSeeder extends Seeder
                         The box on the left of the `=` is the **name**. The value on the right is what we put inside. Change the value any time you like — that is why we call it *variable*!
                         MD),
                         $this->quiz(
-                            'The Gatekeeper\'s Riddle',
+                            "The Gatekeeper's Riddle",
                             'What does `score = 10` do?',
                             [
                                 ['Stores the number 10 in a box named score', true, 'Exactly! The name points to the value.'],
@@ -151,9 +150,9 @@ class LessonSeeder extends Seeder
                             'The Sky Test',
                             'What is "the cloud" really made of?',
                             [
-                                ['Many servers in big buildings', true, 'Right! The cloud is just other people\'s computers.'],
+                                ['Many servers in big buildings', true, "Right! The cloud is just other people's computers."],
                                 ['Actual clouds in the sky', false, 'It only borrows the name from the sky.'],
-                                ['Your phone\'s battery', false, 'The cloud lives far away, not inside your phone.'],
+                                ["Your phone's battery", false, 'The cloud lives far away, not inside your phone.'],
                             ],
                         ),
                     ],
@@ -216,7 +215,7 @@ class LessonSeeder extends Seeder
                         - fix wrong formats (like `12-01-2026` vs `2026-01-12`)
                         MD),
                         $this->quiz(
-                            'The Janitor\'s Question',
+                            "The Janitor's Question",
                             'Why do we clean data before using it?',
                             [
                                 ['So results are accurate and trustworthy', true, 'Yes! Garbage in, garbage out.'],
@@ -295,7 +294,7 @@ class LessonSeeder extends Seeder
                         Show a model thousands of cat and dog photos, each with a label, and it slowly learns the patterns that tell them apart. We call these labelled examples the **training data**.
                         MD),
                         $this->quiz(
-                            'The Oracle\'s Riddle',
+                            "The Oracle's Riddle",
                             'How does a machine learning model figure things out?',
                             [
                                 ['By finding patterns in many labelled examples', true, 'Correct! More good examples means better learning.'],

@@ -36,7 +36,7 @@ class LessonsRelationManager extends RelationManager
                     TextInput::make('name')
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
+                        ->afterStateUpdated(fn (Set $set, ?string $state): mixed => $set('slug', Str::slug($state))),
 
                     TextInput::make('slug')
                         ->required()
@@ -83,7 +83,7 @@ class LessonsRelationManager extends RelationManager
             ->defaultSort('sort_order')
             ->columns([
                 TextColumn::make('name')
-                    ->description(fn ($record) => $record->is_boss ? '🔥 Boss Level' : null),
+                    ->description(fn ($record): ?string => $record->is_boss ? '🔥 Boss Level' : null),
 
                 TextColumn::make('xp_reward')
                     ->label('XP')

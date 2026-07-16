@@ -44,7 +44,7 @@ class StoreItemsTable
                 TextColumn::make('sold_count')
                     ->label('Sold / Stock')
                     ->formatStateUsing(fn (string $state, $record): string => $record->purchase_type === PurchaseType::OneTime
-                        ? "{$state} / {$record->stock_limit}"
+                        ? sprintf('%s / %s', $state, $record->stock_limit)
                         : $state)
                     ->alignCenter(),
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Enums\PurchaseType;
@@ -21,9 +23,9 @@ class StoreService
      */
     public function listStoreData(User $user): array
     {
-        $items = StoreItem::active()
+        $items = StoreItem::query()->active()
             ->get()
-            ->map(fn ($item) => [
+            ->map(fn ($item): array => [
                 ...$item->toArray(),
                 'image_url' => $item->image ? Storage::disk('public')->url($item->image) : null,
             ]);
@@ -46,10 +48,10 @@ class StoreService
      */
     public function listInventory(User $user): Collection
     {
-        return UserInventory::where('user_id', $user->id)
+        return UserInventory::query()->where('user_id', $user->id)
             ->with('storeItem')
             ->get()
-            ->map(fn ($inv) => [
+            ->map(fn ($inv): array => [
                 'id' => $inv->id,
                 'store_item_id' => $inv->store_item_id,
                 'quantity' => $inv->quantity,
@@ -69,16 +71,16 @@ class StoreService
      */
     public function purchase(int $userId, StoreItem $item): StoreResult
     {
-        return DB::transaction(function () use ($userId, $item) {
-            $lockedItem = StoreItem::whereKey($item->id)->lockForUpdate()->first();
-            $lockedUser = User::whereKey($userId)->lockForUpdate()->first();
+        return DB::transaction(function () use ($userId, $item): StoreResult {
+            $lockedItem = StoreItem::query()->whereKey($item->id)->lockForUpdate()->first();
+            $lockedUser = User::query()->whereKey($userId)->lockForUpdate()->first();
 
             if (! $lockedItem || ! $lockedItem->is_active) {
                 return StoreResult::error('This item is no longer available.');
             }
 
             if ($lockedItem->purchase_type === PurchaseType::Permanent
-                && UserInventory::where('user_id', $userId)->where('store_item_id', $lockedItem->id)->exists()) {
+                && UserInventory::query()->where('user_id', $userId)->where('store_item_id', $lockedItem->id)->exists()) {
                 return StoreResult::error('You already own this item.');
             }
 
@@ -95,14 +97,14 @@ class StoreService
             $lockedUser->decrement('coins', $lockedItem->price_coins);
             $lockedItem->increment('sold_count');
 
-            $existing = UserInventory::where('user_id', $userId)
+            $existing = UserInventory::query()->where('user_id', $userId)
                 ->where('store_item_id', $lockedItem->id)
                 ->first();
 
             if ($existing) {
                 $existing->increment('quantity');
             } else {
-                UserInventory::create([
+                UserInventory::query()->create([
                     'user_id' => $userId,
                     'store_item_id' => $lockedItem->id,
                     'quantity' => 1,
@@ -127,9 +129,9 @@ class StoreService
     {
         $item = $inventory->storeItem;
 
-        return DB::transaction(function () use ($inventory, $item, $user) {
-            $lockedInventory = UserInventory::whereKey($inventory->id)->lockForUpdate()->first();
-            $lockedUser = User::whereKey($user->id)->lockForUpdate()->first();
+        return DB::transaction(function () use ($inventory, $item, $user): StoreResult {
+            $lockedInventory = UserInventory::query()->whereKey($inventory->id)->lockForUpdate()->first();
+            $lockedUser = User::query()->whereKey($user->id)->lockForUpdate()->first();
 
             // A concurrent activation may have consumed the row between binding and lock.
             if (! $lockedInventory || $lockedInventory->quantity < 1) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\StoreItem;
@@ -60,7 +62,7 @@ class StoreItemSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            StoreItem::firstOrCreate(['name' => $item['name']], $item);
+            StoreItem::query()->firstOrCreate(['name' => $item['name']], $item);
         }
     }
 }

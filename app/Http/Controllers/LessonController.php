@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LessonResource;
@@ -65,9 +67,7 @@ class LessonController extends Controller
 
         $result = $this->lessonProgress->claimBlock($user, $lesson, $blockIndex, $request->input('answer'));
 
-        if ($result->status === 'out_of_bounds') {
-            abort(404);
-        }
+        abort_if($result->status === 'out_of_bounds', 404);
 
         // Flashing this data means if this reward pushes them over the edge, the
         // layout will pause the lesson, fire confetti, and show the Level Up modal.

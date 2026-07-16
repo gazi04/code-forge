@@ -26,12 +26,12 @@ class LessonFunnelWidget extends TableWidget
         return Lesson::query()
             ->select('lessons.*')
             ->selectSub(
-                BlockSubmission::selectRaw('COUNT(DISTINCT user_id)')
+                BlockSubmission::query()->selectRaw('COUNT(DISTINCT user_id)')
                     ->whereColumn('lesson_id', 'lessons.id'),
                 'starts_count'
             )
             ->selectSub(
-                LessonSubmission::selectRaw('COUNT(DISTINCT user_id)')
+                LessonSubmission::query()->selectRaw('COUNT(DISTINCT user_id)')
                     ->whereColumn('lesson_id', 'lessons.id'),
                 'completions_count'
             )
@@ -57,7 +57,7 @@ class LessonFunnelWidget extends TableWidget
                     ->numeric(),
                 TextColumn::make('completion_rate')
                     ->label('Completion Rate')
-                    ->state(fn (Lesson $record): string => self::formatRate($record->completions_count, $record->starts_count))
+                    ->state(fn (Lesson $record): string => $this->formatRate($record->completions_count, $record->starts_count))
                     ->badge()
                     ->color(fn (Lesson $record): string => match (true) {
                         $record->starts_count === 0 => 'gray',
@@ -67,11 +67,11 @@ class LessonFunnelWidget extends TableWidget
                     }),
                 TextColumn::make('abandonment_rate')
                     ->label('Abandonment Rate')
-                    ->state(fn (Lesson $record): string => self::formatRate($record->starts_count - $record->completions_count, $record->starts_count)),
+                    ->state(fn (Lesson $record): string => $this->formatRate($record->starts_count - $record->completions_count, $record->starts_count)),
             ]);
     }
 
-    private static function formatRate(int $part, int $whole): string
+    private function formatRate(int $part, int $whole): string
     {
         if ($whole === 0) {
             return '—';

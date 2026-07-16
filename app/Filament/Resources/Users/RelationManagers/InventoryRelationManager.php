@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Users\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;

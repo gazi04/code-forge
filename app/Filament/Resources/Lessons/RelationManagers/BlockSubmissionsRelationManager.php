@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Lessons\RelationManagers;
 
-use Carbon\Carbon;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Infolists\Components\TextEntry;
@@ -13,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Date;
 
 class BlockSubmissionsRelationManager extends RelationManager
 {
@@ -89,20 +89,18 @@ class BlockSubmissionsRelationManager extends RelationManager
                         DatePicker::make('created_from'),
                         DatePicker::make('created_until'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when($data['created_from'], fn (Builder $query, string $date) => $query->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'], fn (Builder $query, string $date) => $query->whereDate('created_at', '<=', $date));
-                    })
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when($data['created_from'], fn (Builder $query, string $date) => $query->whereDate('created_at', '>=', $date))
+                        ->when($data['created_until'], fn (Builder $query, string $date) => $query->whereDate('created_at', '<=', $date)))
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
 
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'From '.Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators[] = 'From '.Date::parse($data['created_from'])->toFormattedDateString();
                         }
 
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'Until '.Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators[] = 'Until '.Date::parse($data['created_until'])->toFormattedDateString();
                         }
 
                         return $indicators;

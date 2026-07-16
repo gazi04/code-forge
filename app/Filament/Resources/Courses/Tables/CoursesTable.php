@@ -43,7 +43,7 @@ class CoursesTable
 
                 TextColumn::make('estimated_duration')
                     ->label('Duration')
-                    ->formatStateUsing(fn ($state) => "{$state}m")
+                    ->formatStateUsing(fn ($state): string => $state.'m')
                     ->sortable(),
 
                 IconColumn::make('is_published')

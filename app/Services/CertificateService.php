@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\User;
@@ -32,7 +34,7 @@ class CertificateService
         $primaryColor = $world->themePack?->config['palette']['primary'] ?? '#8b5cf6';
 
         return Cache::remember(
-            "certificate-pdf:{$user->id}:{$world->id}",
+            sprintf('certificate-pdf:%s:%s', $user->id, $world->id),
             now()->addDay(),
             fn (): string => Pdf::loadView('certificates.world', [
                 'user' => $user,

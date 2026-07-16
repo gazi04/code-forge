@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Listeners;
 
 use App\Events\ProgressRegistered;
@@ -9,9 +11,9 @@ use App\Services\ProgressionService;
 
 class HandleWorldCompletion
 {
-    private const BONUS_XP = 500;
+    private const int BONUS_XP = 500;
 
-    private const BONUS_COINS = 250;
+    private const int BONUS_COINS = 250;
 
     public function __construct(private readonly ProgressionService $progressionService) {}
 
@@ -20,10 +22,7 @@ class HandleWorldCompletion
         $user = $event->user;
         $world = $event->world;
 
-        $completion = UserWorldCompletion::firstOrCreate(
-            ['user_id' => $user->id, 'world_id' => $world->id],
-            ['completed_at' => now(), 'xp_bonus_awarded' => 0, 'coins_bonus_awarded' => 0],
-        );
+        $completion = UserWorldCompletion::query()->firstOrCreate(['user_id' => $user->id, 'world_id' => $world->id], ['completed_at' => now(), 'xp_bonus_awarded' => 0, 'coins_bonus_awarded' => 0]);
 
         if (! $completion->wasRecentlyCreated) {
             return;
@@ -39,7 +38,7 @@ class HandleWorldCompletion
         // The bonus can cross an XP/level/total_coins achievement threshold; without
         // this the unlock would wait for the next ordinary claim. EvaluateAchievements
         // is idempotent, so re-dispatching here is safe.
-        ProgressRegistered::dispatch($user, 'lesson');
+        event(new ProgressRegistered($user, 'lesson'));
 
         session()->flash('world_completed', [
             'world_id' => $world->id,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\World;
@@ -15,7 +17,7 @@ class WorldQueryService
      */
     public function publishedWithCourses(): Collection
     {
-        return World::published()
+        return World::query()->published()
             ->ordered()
             ->with([
                 'themePack',

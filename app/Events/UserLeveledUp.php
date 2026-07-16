@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Events;
 
 use App\Models\User;
@@ -8,18 +10,8 @@ use Illuminate\Queue\SerializesModels;
 
 class UserLeveledUp
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
-    public User $user;
-
-    public int $oldLevel;
-
-    public int $newLevel;
-
-    public function __construct(User $user, int $oldLevel, int $newLevel)
-    {
-        $this->user = $user;
-        $this->oldLevel = $oldLevel;
-        $this->newLevel = $newLevel;
-    }
+    public function __construct(public User $user, public int $oldLevel, public int $newLevel) {}
 }

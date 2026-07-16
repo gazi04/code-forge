@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Widgets;
 
 use App\Models\UserInventory;
@@ -15,7 +17,7 @@ class StorePurchaseDistributionChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $purchases = UserInventory::join('store_items', 'store_items.id', '=', 'user_inventory.store_item_id')
+        $purchases = UserInventory::query()->join('store_items', 'store_items.id', '=', 'user_inventory.store_item_id')
             ->selectRaw('store_items.name as name, SUM(user_inventory.quantity) as total')
             ->groupBy('store_items.name')
             ->orderByDesc('total')

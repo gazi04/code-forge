@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ThemePacks\Tables;
 
 use App\Models\ThemePack;
@@ -70,7 +72,7 @@ class ThemePacksTable
                             Notification::make()
                                 ->danger()
                                 ->title('Cannot delete theme pack')
-                                ->body("This theme is used by {$record->worlds()->count()} world(s). Reassign them first.")
+                                ->body(sprintf('This theme is used by %d world(s). Reassign them first.', $record->worlds()->count()))
                                 ->send();
                         }
                     }),

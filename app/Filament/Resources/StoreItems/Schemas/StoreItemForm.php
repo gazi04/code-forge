@@ -95,7 +95,7 @@ class StoreItemForm
                 ->schema([
                     ColorPicker::make('display_config.color')
                         ->label('Title Color')
-                        ->helperText('Color shown for the title text under the student\'s name.')
+                        ->helperText("Color shown for the title text under the student's name.")
                         ->columnSpanFull(),
                 ])
                 ->visible(fn (Get $get): bool => self::typeValue($get) === StoreItemType::Title->value),

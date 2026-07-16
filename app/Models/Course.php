@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,6 +18,7 @@ use Spatie\EloquentSortable\SortableTrait;
 #[Fillable(['world_id', 'name', 'slug', 'description', 'age_tier', 'difficulty', 'min_level_requirement', 'estimated_duration', 'prerequisite_course_id', 'is_published'])]
 class Course extends Model implements Sortable
 {
+    use HasFactory;
     use SortableTrait;
 
     protected $sortable = [
@@ -57,7 +61,7 @@ class Course extends Model implements Sortable
         $frontier = [$this->id];
 
         while ($frontier !== []) {
-            $next = static::whereIn('prerequisite_course_id', $frontier)
+            $next = static::query()->whereIn('prerequisite_course_id', $frontier)
                 ->whereNotIn('id', array_merge($dependents, [$this->id]))
                 ->pluck('id')
                 ->all();
@@ -73,7 +77,7 @@ class Course extends Model implements Sortable
         return $dependents;
     }
 
-    public function scopePublished(Builder $query): void
+    protected function scopePublished(Builder $query): void
     {
         $query->where('is_published', true);
     }

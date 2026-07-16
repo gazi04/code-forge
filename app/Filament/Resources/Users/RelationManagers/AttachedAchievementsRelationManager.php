@@ -53,7 +53,7 @@ class AttachedAchievementsRelationManager extends RelationManager
                     ])
                     ->action(function (array $data): void {
                         $owner = $this->getOwnerRecord();
-                        $achievement = Achievement::find($data['achievement_id']);
+                        $achievement = Achievement::query()->find($data['achievement_id']);
 
                         $owner->achievements()->syncWithoutDetaching([
                             $data['achievement_id'] => ['unlocked_at' => now()],
@@ -63,7 +63,7 @@ class AttachedAchievementsRelationManager extends RelationManager
                             ->performedOn($owner)
                             ->causedBy(auth()->user())
                             ->event('admin.grant_achievement')
-                            ->log("Admin manually granted the \"{$achievement->name}\" achievement.");
+                            ->log(sprintf('Admin manually granted the "%s" achievement.', $achievement->name));
                     }),
             ])
             ->recordActions([
@@ -81,7 +81,7 @@ class AttachedAchievementsRelationManager extends RelationManager
                             ->performedOn($owner)
                             ->causedBy(auth()->user())
                             ->event('admin.revoke_achievement')
-                            ->log("Admin manually revoked the \"{$record->name}\" achievement.");
+                            ->log(sprintf('Admin manually revoked the "%s" achievement.', $record->name));
                     }),
             ])
             ->groupedBulkActions([]);

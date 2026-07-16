@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Events\UserLeveledUp;
 use App\Models\User;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
@@ -36,7 +38,7 @@ class ProgressionService
 
         // Polynomial steep scaling for Level 11+
         // Formula: (Level ^ 1.5) * 100
-        return (int) round(pow($level, 1.5) * 100);
+        return (int) round($level ** 1.5 * 100);
     }
 
     /**
@@ -45,7 +47,7 @@ class ProgressionService
      */
     public function processVictory(User $user, int $baseXp, int $baseCoins): array
     {
-        return DB::transaction(function () use ($user, $baseXp, $baseCoins) {
+        return DB::transaction(function () use ($user, $baseXp, $baseCoins): array {
             // Re-fetch the row under a lock and run every read/mutation against this
             // copy. Eloquent's save() writes dirty columns from the in-memory value,
             // so processing the passed-in (possibly stale) instance lets two
@@ -53,10 +55,10 @@ class ProgressionService
             // (lost update). lockForUpdate serializes them on MySQL/Postgres (no-op
             // on SQLite). The committed state is synced back onto $user at the end so
             // callers and downstream events see the fresh values.
-            $lockedUser = User::whereKey($user->id)->lockForUpdate()->first() ?? $user;
+            $lockedUser = User::query()->whereKey($user->id)->lockForUpdate()->first() ?? $user;
 
-            $today = Carbon::today();
-            $lastActive = $lockedUser->last_active_at ? Carbon::parse($lockedUser->last_active_at)->startOfDay() : null;
+            $today = Date::today();
+            $lastActive = $lockedUser->last_active_at ? Date::parse($lockedUser->last_active_at)->startOfDay() : null;
 
             // --- A. Streak & Daily Login Logic ---
             if (! $lastActive || $lastActive->isBefore($today)) {

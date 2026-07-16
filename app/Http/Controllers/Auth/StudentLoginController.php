@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -39,7 +43,7 @@ class StudentLoginController extends Controller
         ])->onlyInput('email');
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request): Redirector|RedirectResponse
     {
         Auth::guard('web')->logout();
         $request->session()->invalidate();

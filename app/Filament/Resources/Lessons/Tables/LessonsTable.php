@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Lessons\Tables;
 
 use Filament\Actions\BulkActionGroup;
@@ -21,7 +23,7 @@ class LessonsTable
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->description(fn ($record) => $record->is_boss ? '🏆 Boss Level' : null),
+                    ->description(fn ($record): ?string => $record->is_boss ? '🏆 Boss Level' : null),
 
                 TextColumn::make('course.name')
                     ->label('Course')

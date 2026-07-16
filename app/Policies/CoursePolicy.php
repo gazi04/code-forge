@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\Course;
@@ -41,21 +43,21 @@ class CoursePolicy
 
         // 4. Enforce your Horizontal Global Power Level Gating rule!
         if ($user->level < $course->min_level_requirement) {
-            return Response::deny("🔒 This world is restricted! Requires Adventure Level {$course->min_level_requirement}.");
+            return Response::deny(sprintf('🔒 This world is restricted! Requires Adventure Level %s.', $course->min_level_requirement));
         }
 
         // 5. Enforce the configured course prerequisite: the student must have
         // completed every lesson of the prerequisite course before this one opens.
         if ($course->prerequisite_course_id) {
-            $prereqLessonIds = Lesson::where('course_id', $course->prerequisite_course_id)->pluck('id');
+            $prereqLessonIds = Lesson::query()->where('course_id', $course->prerequisite_course_id)->pluck('id');
 
             if ($prereqLessonIds->isNotEmpty()) {
-                $completedCount = LessonSubmission::whereIn('lesson_id', $prereqLessonIds)
+                $completedCount = LessonSubmission::query()->whereIn('lesson_id', $prereqLessonIds)
                     ->where('user_id', $user->id)
                     ->count();
 
                 if ($completedCount < $prereqLessonIds->count()) {
-                    return Response::deny("Finish {$course->prerequisite->name} first.");
+                    return Response::deny(sprintf('Finish %s first.', $course->prerequisite->name));
                 }
             }
         }

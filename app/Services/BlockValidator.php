@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 class BlockValidator
@@ -46,7 +48,7 @@ class BlockValidator
         }
 
         $selected = is_array($answer)
-            ? array_values(array_unique(array_map('intval', $answer)))
+            ? array_values(array_unique(array_map(intval(...), $answer)))
             : [];
 
         sort($selected);

@@ -18,7 +18,7 @@ class DailyActiveUsersChartWidget extends ChartWidget
         $days = 30;
         $dates = collect(range(0, $days - 1))->map(fn (int $i): string => now()->subDays($days - 1 - $i)->format('Y-m-d'));
 
-        $raw = User::selectRaw('DATE(last_active_at) as date, COUNT(*) as count')
+        $raw = User::query()->selectRaw('DATE(last_active_at) as date, COUNT(*) as count')
             ->where('role', 'student')
             ->where('last_active_at', '>=', now()->subDays($days - 1)->startOfDay())
             ->groupBy('date')

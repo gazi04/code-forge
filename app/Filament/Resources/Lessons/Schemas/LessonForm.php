@@ -23,7 +23,7 @@ class LessonForm
                         TextInput::make('name')
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
+                            ->afterStateUpdated(fn (Set $set, ?string $state): mixed => $set('slug', Str::slug($state))),
 
                         Builder::make('blocks')->blocks(LessonBlocks::all())
                             ->collapsed(true)

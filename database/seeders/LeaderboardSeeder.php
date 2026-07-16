@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\User;
@@ -43,7 +45,7 @@ class LeaderboardSeeder extends Seeder
                 'coins' => $tier['coins'],
             ]);
 
-            $weeklyXp = (int) round($tier['xp'] * (rand(20, 80) / 100));
+            $weeklyXp = (int) round($tier['xp'] * (random_int(20, 80) / 100));
 
             Redis::zadd('leaderboard:all_time', $tier['xp'], $user->id);
             Redis::zadd('leaderboard:weekly', $weeklyXp, $user->id);

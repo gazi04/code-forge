@@ -21,19 +21,19 @@ class CoinEconomyChartWidget extends ChartWidget
         $dates = collect(range(0, $days - 1))->map(fn (int $i): string => now()->subDays($days - 1 - $i)->format('Y-m-d'));
         $since = now()->subDays($days - 1)->startOfDay();
 
-        $lessonEarned = LessonSubmission::selectRaw('DATE(created_at) as date, SUM(coins_rewarded) as total')
+        $lessonEarned = LessonSubmission::query()->selectRaw('DATE(created_at) as date, SUM(coins_rewarded) as total')
             ->where('created_at', '>=', $since)
             ->groupBy('date')
             ->pluck('total', 'date');
 
-        $blockEarned = BlockSubmission::selectRaw('DATE(created_at) as date, SUM(coins_rewarded) as total')
+        $blockEarned = BlockSubmission::query()->selectRaw('DATE(created_at) as date, SUM(coins_rewarded) as total')
             ->where('created_at', '>=', $since)
             ->groupBy('date')
             ->pluck('total', 'date');
 
         $earned = $dates->map(fn (string $d): int => (int) ($lessonEarned->get($d, 0) + $blockEarned->get($d, 0)));
 
-        $spent = UserInventory::join('store_items', 'store_items.id', '=', 'user_inventory.store_item_id')
+        $spent = UserInventory::query()->join('store_items', 'store_items.id', '=', 'user_inventory.store_item_id')
             ->selectRaw('DATE(user_inventory.acquired_at) as date, SUM(store_items.price_coins) as total')
             ->where('user_inventory.acquired_at', '>=', $since)
             ->groupBy('date')

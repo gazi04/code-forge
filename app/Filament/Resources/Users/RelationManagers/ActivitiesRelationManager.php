@@ -40,9 +40,11 @@ class ActivitiesRelationManager extends RelationManager
         if (is_null($value)) {
             return '—';
         }
+
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
+
         if (is_array($value)) {
             return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }

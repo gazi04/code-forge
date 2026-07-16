@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Resources\WorldResource;
+use App\Models\UserWorldCompletion;
 use App\Models\World;
 use App\Services\CertificateService;
 use App\Services\WorldQueryService;
@@ -38,7 +41,7 @@ class WorldController extends Controller
         $user = Auth::user();
 
         $completion = $this->certificates->completionFor($user, $world);
-        abort_unless($completion !== null, 403, 'Certificate not yet earned for this world.');
+        abort_unless($completion instanceof UserWorldCompletion, 403, 'Certificate not yet earned for this world.');
 
         $pdf = $this->certificates->renderFor($user, $world, $completion);
 

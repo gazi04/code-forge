@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\BlockSubmission;
@@ -15,7 +17,7 @@ class CourseProgressService
      */
     public function findForDetail(string $slug): Course
     {
-        return Course::where('slug', $slug)
+        return Course::query()->where('slug', $slug)
             ->with([
                 'world.themePack',
                 'lessons' => function ($query): void {
@@ -38,11 +40,11 @@ class CourseProgressService
     {
         $lessonIds = $course->lessons->pluck('id');
 
-        $completedIds = LessonSubmission::where('user_id', $user->id)
+        $completedIds = LessonSubmission::query()->where('user_id', $user->id)
             ->whereIn('lesson_id', $lessonIds)
             ->pluck('lesson_id');
 
-        $resumeLessonId = BlockSubmission::where('user_id', $user->id)
+        $resumeLessonId = BlockSubmission::query()->where('user_id', $user->id)
             ->whereIn('lesson_id', $lessonIds)
             ->whereNotIn('lesson_id', $completedIds)
             ->latest()

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Course;
@@ -53,27 +55,24 @@ class CourseSeeder extends Seeder
         ];
 
         foreach ($courses as $worldSlug => $course) {
-            $world = World::where('slug', $worldSlug)->first();
+            $world = World::query()->where('slug', $worldSlug)->first();
 
             if ($world === null) {
-                $this->command->warn("World [{$worldSlug}] not found, skipping course [{$course['name']}]. Run WorldSeeder first.");
+                $this->command->warn(sprintf('World [%s] not found, skipping course [%s]. Run WorldSeeder first.', $worldSlug, $course['name']));
 
                 continue;
             }
 
-            Course::firstOrCreate(
-                ['slug' => $course['slug']],
-                [
-                    'world_id' => $world->id,
-                    'name' => $course['name'],
-                    'description' => $course['description'],
-                    'age_tier' => $course['age_tier'],
-                    'difficulty' => $course['difficulty'],
-                    'min_level_requirement' => $course['min_level_requirement'],
-                    'estimated_duration' => $course['estimated_duration'],
-                    'is_published' => true,
-                ],
-            );
+            Course::query()->firstOrCreate(['slug' => $course['slug']], [
+                'world_id' => $world->id,
+                'name' => $course['name'],
+                'description' => $course['description'],
+                'age_tier' => $course['age_tier'],
+                'difficulty' => $course['difficulty'],
+                'min_level_requirement' => $course['min_level_requirement'],
+                'estimated_duration' => $course['estimated_duration'],
+                'is_published' => true,
+            ]);
         }
     }
 }

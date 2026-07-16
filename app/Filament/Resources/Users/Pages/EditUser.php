@@ -23,8 +23,8 @@ class EditUser extends EditRecord
                 ->icon('heroicon-o-arrow-path')
                 ->requiresConfirmation()
                 ->modalHeading('Reset Student Progression?')
-                ->modalDescription('This will completely wipe out this student\'s level, XP, coins, lesson submissions, block submissions, earned achievements, inventory, equipped items, and world completion certificates back to baseline defaults. This action is destructive and irreversible.')
-                ->visible(fn () => $this->record->role === 'student')
+                ->modalDescription("This will completely wipe out this student's level, XP, coins, lesson submissions, block submissions, earned achievements, inventory, equipped items, and world completion certificates back to baseline defaults. This action is destructive and irreversible.")
+                ->visible(fn (): bool => $this->record->role === 'student')
                 ->action(function (): void {
                     activity()
                         ->performedOn($this->record)

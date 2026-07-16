@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\ThemePacks;
 
 use App\Filament\Resources\ThemePacks\Pages\CreateThemePack;

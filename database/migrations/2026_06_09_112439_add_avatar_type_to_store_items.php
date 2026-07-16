@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +16,7 @@ return new class extends Migration
         if ($driver === 'mysql' || $driver === 'mariadb') {
             DB::statement("ALTER TABLE store_items MODIFY COLUMN type ENUM('title', 'avatar', 'streak_freeze', 'xp_boost') NOT NULL");
         } else {
-            Schema::table('store_items', function (Blueprint $table) {
+            Schema::table('store_items', function (Blueprint $table): void {
                 $table->enum('type', ['title', 'avatar', 'streak_freeze', 'xp_boost'])->change();
             });
         }
@@ -29,7 +31,7 @@ return new class extends Migration
         if ($driver === 'mysql' || $driver === 'mariadb') {
             DB::statement("ALTER TABLE store_items MODIFY COLUMN type ENUM('title', 'streak_freeze', 'xp_boost') NOT NULL");
         } else {
-            Schema::table('store_items', function (Blueprint $table) {
+            Schema::table('store_items', function (Blueprint $table): void {
                 $table->enum('type', ['title', 'streak_freeze', 'xp_boost'])->change();
             });
         }

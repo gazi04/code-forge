@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Support;
 
 class BlockSanitizer
@@ -15,7 +17,7 @@ class BlockSanitizer
      */
     public function sanitize(array $blocks): array
     {
-        return array_map(fn (array $block): array => $this->sanitizeBlock($block), $blocks);
+        return array_map($this->sanitizeBlock(...), $blocks);
     }
 
     /**

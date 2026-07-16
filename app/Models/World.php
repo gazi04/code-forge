@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,6 +18,7 @@ use Spatie\EloquentSortable\SortableTrait;
 #[Fillable(['name', 'slug', 'description', 'theme_pack_id', 'is_published'])]
 class World extends Model implements Sortable
 {
+    use HasFactory;
     use SortableTrait;
 
     protected $sortable = [
@@ -36,7 +40,7 @@ class World extends Model implements Sortable
         return $this->hasMany(Course::class)->orderBy('sort_order');
     }
 
-    public function scopePublished(Builder $query): void
+    protected function scopePublished(Builder $query): void
     {
         $query->where('is_published', true);
     }

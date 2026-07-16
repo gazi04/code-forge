@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Lessons\Schemas;
 
 use App\Filament\Forms\Components\DungeonGridBuilder;
-use Filament\Forms\Components\Builder;
+use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\CodeEditor;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Repeater;
@@ -15,9 +15,9 @@ use Filament\Schemas\Components\Grid;
 
 class LessonBlocks
 {
-    public static function textContent(): Builder\Block
+    public static function textContent(): Block
     {
-        return Builder\Block::make('text_content')
+        return Block::make('text_content')
             ->icon('heroicon-o-book-open')
             ->schema([
                 MarkdownEditor::make('content')
@@ -26,9 +26,9 @@ class LessonBlocks
             ]);
     }
 
-    public static function codeChallenge(): Builder\Block
+    public static function codeChallenge(): Block
     {
-        return Builder\Block::make('code_challenge')
+        return Block::make('code_challenge')
             ->label('Interactive Code Challenge')
             ->icon('heroicon-o-code-bracket')
             ->schema([
@@ -77,7 +77,7 @@ class LessonBlocks
 
                         CodeEditor::make('setup_code')
                             ->label('Setup / Injection Code (Optional)')
-                            ->helperText('Hidden code to run BEFORE evaluating the output. Good for calling the student\'s function.'),
+                            ->helperText("Hidden code to run BEFORE evaluating the output. Good for calling the student's function."),
 
                         Textarea::make('expected_output')
                             ->label('Expected Terminal Output')
@@ -106,16 +106,16 @@ class LessonBlocks
             ]);
     }
 
-    public static function quiz(): Builder\Block
+    public static function quiz(): Block
     {
-        return Builder\Block::make('quiz')
+        return Block::make('quiz')
             ->label('Knowledge Encounter (Quiz)')
             ->icon('heroicon-o-question-mark-circle')
             ->schema([
                 Grid::make(2)->schema([
                     TextInput::make('game_title')
                         ->label('Quiz Title')
-                        ->placeholder('e.g., The Gatekeeper\'s Riddle')
+                        ->placeholder("e.g., The Gatekeeper's Riddle")
                         ->required(),
 
                     TextInput::make('game_icon')
@@ -185,9 +185,9 @@ class LessonBlocks
             ]);
     }
 
-    public static function labyrinthGame(): Builder\Block
+    public static function labyrinthGame(): Block
     {
-        return Builder\Block::make('labyrinth_challenge')
+        return Block::make('labyrinth_challenge')
             ->label('Labyrinth of Logic (Grid Challenge)')
             ->icon('heroicon-o-map')
             ->schema([
@@ -235,9 +235,9 @@ class LessonBlocks
             ]);
     }
 
-    public static function sortingChallenge(): Builder\Block
+    public static function sortingChallenge(): Block
     {
-        return Builder\Block::make('sequence_challenge')
+        return Block::make('sequence_challenge')
             ->label('Universal Sequence Challenge')
             ->icon('heroicon-o-bars-arrow-down')
             ->schema([
@@ -293,9 +293,9 @@ class LessonBlocks
             ]);
     }
 
-    public static function bugHunting(): Builder\Block
+    public static function bugHunting(): Block
     {
-        return Builder\Block::make('bughunt_challenge')
+        return Block::make('bughunt_challenge')
             ->label('Bug Hunt (Code Debugger)')
             ->icon('heroicon-o-bug-ant')
             ->schema([
@@ -349,19 +349,19 @@ class LessonBlocks
                                 ->label('Correct Replacement Text')
                                 ->helperText('The absolute correct string matching the fix.')
                                 ->required()
-                                ->hidden(fn (callable $get) => $get('type') !== 'buggy'),
+                                ->hidden(fn (callable $get): bool => $get('type') !== 'buggy'),
 
                             TextInput::make('decoy_1')
                                 ->label('Decoy Option 1')
                                 ->helperText('Wrong alternative choice.')
                                 ->required()
-                                ->hidden(fn (callable $get) => $get('type') !== 'buggy'),
+                                ->hidden(fn (callable $get): bool => $get('type') !== 'buggy'),
 
                             TextInput::make('decoy_2')
                                 ->label('Decoy Option 2')
                                 ->helperText('Wrong alternative choice.')
                                 ->required()
-                                ->hidden(fn (callable $get) => $get('type') !== 'buggy'),
+                                ->hidden(fn (callable $get): bool => $get('type') !== 'buggy'),
                         ]),
                     ])
                     ->createItemButtonLabel('Add Code Line')
@@ -384,9 +384,9 @@ class LessonBlocks
             ]);
     }
 
-    public static function variableMatching(): Builder\Block
+    public static function variableMatching(): Block
     {
-        return Builder\Block::make('variable_matching_challenge')
+        return Block::make('variable_matching_challenge')
             ->label('Variable Matching (Pair Connector)')
             ->icon('heroicon-o-link')
             ->schema([

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Models\User;
@@ -59,7 +61,7 @@ class UserForm
 
                         TextInput::make('password')
                             ->password()
-                            ->dehydrated(fn ($state) => filled($state))
+                            ->dehydrated(fn ($state): bool => filled($state))
                             ->required(fn (string $context): bool => $context === 'create')
                             ->maxLength(255)
                             ->placeholder(fn (string $context): string => $context === 'edit' ? 'Leave blank to keep current password' : ''),
@@ -68,7 +70,7 @@ class UserForm
                 Section::make('Progression Metrics')
                     ->description('Direct adjustments to player level parameters')
                     ->columns(3)
-                    ->visible(fn (Form $form, ?User $record) => $record === null || $record->role === 'student')
+                    ->visible(fn (Form $form, ?User $record): bool => ! $record instanceof User || $record->role === 'student')
                     ->schema([
                         TextInput::make('level')
                             ->numeric()

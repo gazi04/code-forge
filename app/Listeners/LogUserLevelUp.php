@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Listeners;
 
 use App\Events\UserLeveledUp;
@@ -17,14 +19,14 @@ class LogUserLevelUp
         $user->increment('total_coins_earned', $coinBonus);
 
         // 2. Log it directly into your custom audit schema
-        ActivityLog::create([
+        ActivityLog::query()->create([
             'log_name' => 'progression',
-            'description' => "Student advanced from Level {$event->oldLevel} to Level {$event->newLevel} and claimed +{$coinBonus} bonus coins.",
+            'description' => sprintf('Student advanced from Level %d to Level %d and claimed +%d bonus coins.', $event->oldLevel, $event->newLevel, $coinBonus),
             'subject_id' => $user->id,
-            'subject_type' => get_class($user),
+            'subject_type' => $user::class,
             'event' => 'level_up',
             'causer_id' => $user->id,
-            'causer_type' => get_class($user),
+            'causer_type' => $user::class,
             'properties' => [
                 'old_level' => $event->oldLevel,
                 'new_level' => $event->newLevel,

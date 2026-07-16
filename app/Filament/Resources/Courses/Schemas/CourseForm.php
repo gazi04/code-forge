@@ -24,7 +24,7 @@ class CourseForm
                     TextInput::make('name')
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
+                        ->afterStateUpdated(fn (Set $set, ?string $state): mixed => $set('slug', Str::slug($state))),
 
                     Textarea::make('description')
                         ->rows(5)
@@ -73,11 +73,11 @@ class CourseForm
                     Select::make('prerequisite_course_id')
                         ->relationship(
                             name: 'prerequisite',
-                            titleAttribute: 'name',
-                            ignoreRecord: true, // a course can't require itself
-                            modifyQueryUsing: fn (Builder $query, ?Course $record): Builder => $record
+                            titleAttribute: 'name', // a course can't require itself
+                            modifyQueryUsing: fn (Builder $query, ?Course $record): Builder => $record instanceof Course
                                 ? $query->whereNotIn('id', $record->transitiveDependentIds())
                                 : $query,
+                            ignoreRecord: true,
                         )
                         ->label('Prerequisite')
                         ->placeholder('No prerequisite'),

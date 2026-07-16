@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Course;
@@ -29,7 +31,7 @@ class ContentSearchService
         $escape = '\\';
         $like = '%'.addcslashes($term, '%_\\').'%';
 
-        $worlds = World::where('is_published', true)
+        $worlds = World::query()->where('is_published', true)
             ->where(fn ($q) => $q->whereRaw('name LIKE ? ESCAPE ?', [$like, $escape])
                 ->orWhereRaw('description LIKE ? ESCAPE ?', [$like, $escape]))
             ->with('themePack')
@@ -43,7 +45,7 @@ class ContentSearchService
                 'primary_color' => $w->themePack?->config['palette']['primary'] ?? '#8b5cf6',
             ]);
 
-        $courses = Course::where('is_published', true)
+        $courses = Course::query()->where('is_published', true)
             ->whereHas('world', fn ($q) => $q->where('is_published', true))
             ->where(fn ($q) => $q->whereRaw('name LIKE ? ESCAPE ?', [$like, $escape])
                 ->orWhereRaw('description LIKE ? ESCAPE ?', [$like, $escape]))
@@ -66,7 +68,7 @@ class ContentSearchService
                 ];
             });
 
-        $lessons = Lesson::whereRaw('name LIKE ? ESCAPE ?', [$like, $escape])
+        $lessons = Lesson::query()->whereRaw('name LIKE ? ESCAPE ?', [$like, $escape])
             ->whereHas('course', fn ($q) => $q->where('is_published', true)
                 ->whereHas('world', fn ($q) => $q->where('is_published', true)))
             ->with('course.world', 'course.prerequisite')

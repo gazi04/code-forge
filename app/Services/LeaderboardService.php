@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\User;
@@ -30,7 +32,7 @@ class LeaderboardService
         });
 
         $ids = array_keys($rawEntries);
-        $enrichedUsers = User::whereIn('id', $ids)->get()->keyBy('id');
+        $enrichedUsers = User::query()->whereIn('id', $ids)->get()->keyBy('id');
 
         $allEquippedIds = $enrichedUsers
             ->flatMap(fn (User $u): array => $this->equippedItems->equippedItemIds($u))
@@ -61,7 +63,7 @@ class LeaderboardService
 
         if ($userRank === null) {
             if ($scope === 'all_time') {
-                $userRank = User::where('xp', '>', $user->xp)->where('is_shadowbanned', false)->count();
+                $userRank = User::query()->where('xp', '>', $user->xp)->where('is_shadowbanned', false)->count();
             } else {
                 $userRank = (int) $totalRanked; // weekly: ranked just below everyone with a weekly score
             }

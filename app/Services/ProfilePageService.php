@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\BlockSubmission;
@@ -73,26 +75,24 @@ class ProfilePageService
      */
     public function recentLedger(User $user): Collection
     {
-        $lessonEntries = LessonSubmission::where('user_id', $user->id)
-            ->with('lesson:id,name')
-            ->orderBy('created_at', 'desc')
+        $lessonEntries = LessonSubmission::query()->where('user_id', $user->id)
+            ->with('lesson:id,name')->latest()
             ->limit(10)
             ->get()
             ->map(fn (LessonSubmission $submission): array => [
                 'type' => 'lesson',
-                'label' => $submission->lesson?->name ?? "Lesson #{$submission->lesson_id}",
+                'label' => $submission->lesson?->name ?? 'Lesson #'.$submission->lesson_id,
                 'xp' => $submission->xp_rewarded,
                 'coins' => $submission->coins_rewarded,
                 'completed_at' => $submission->created_at,
             ]);
 
-        $blockEntries = BlockSubmission::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
+        $blockEntries = BlockSubmission::query()->where('user_id', $user->id)->latest()
             ->limit(10)
             ->get()
             ->map(fn (BlockSubmission $submission): array => [
                 'type' => 'block',
-                'label' => $submission->block_title ?? "Block #{$submission->block_index}",
+                'label' => $submission->block_title ?? 'Block #'.$submission->block_index,
                 'xp' => $submission->xp_rewarded,
                 'coins' => $submission->coins_rewarded,
                 'completed_at' => $submission->created_at,
@@ -113,7 +113,7 @@ class ProfilePageService
     {
         return $user->worldCompletions()
             ->with('world.themePack')
-            ->orderByDesc('completed_at')
+            ->latest('completed_at')
             ->get()
             ->map(fn (UserWorldCompletion $c): array => [
                 'world_name' => $c->world->name,

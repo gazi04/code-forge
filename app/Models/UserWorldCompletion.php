@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable(['user_id', 'world_id', 'xp_bonus_awarded', 'coins_bonus_awarded', 'completed_at'])]
+#[WithoutTimestamps]
 class UserWorldCompletion extends Model
 {
-    public $timestamps = false;
+    use HasFactory;
 
     protected function casts(): array
     {

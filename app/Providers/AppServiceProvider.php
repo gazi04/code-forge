@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Events\ProgressRegistered;
@@ -39,9 +41,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(WorldCompleted::class, HandleWorldCompletion::class);
         Event::listen(Registered::class, SendEmailVerificationNotification::class);
 
-        RateLimiter::for('certificate', function (Request $request) {
-            return Limit::perMinute(10)->by($request->user()->id);
-        });
+        RateLimiter::for('certificate', fn (Request $request) => Limit::perMinute(10)->by($request->user()->id));
     }
 
     /**

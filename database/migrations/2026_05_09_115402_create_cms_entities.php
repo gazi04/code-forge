@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         // Library of visual configurations for worlds
-        Schema::create('theme_packs', function (Blueprint $table) {
+        Schema::create('theme_packs', function (Blueprint $table): void {
             $table->id();
             $table->string('name'); // e.g., "Cyberpunk", "Dungeon"
             $table->string('identifier')->unique(); // e.g., "theme_cyberpunk"
@@ -20,7 +22,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('worlds', function (Blueprint $table) {
+        Schema::create('worlds', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
@@ -33,7 +35,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('courses', function (Blueprint $table) {
+        Schema::create('courses', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('world_id')->constrained()->cascadeOnDelete();
             $table->string('name');
@@ -48,7 +50,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('lessons', function (Blueprint $table) {
+        Schema::create('lessons', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
             $table->string('name');

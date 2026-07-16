@@ -77,8 +77,8 @@ class UsersTable
                     ->requiresConfirmation()
                     ->modalHeading(fn ($record): string => $record->is_shadowbanned ? 'Unban student?' : 'Shadowban student?')
                     ->modalDescription(fn ($record): string => $record->is_shadowbanned
-                        ? "Restore {$record->name} to the public leaderboard."
-                        : "Hide {$record->name} from the public leaderboard and remove them from all Redis sets. They will still be able to use the platform."
+                        ? sprintf('Restore %s to the public leaderboard.', $record->name)
+                        : sprintf('Hide %s from the public leaderboard and remove them from all Redis sets. They will still be able to use the platform.', $record->name)
                     )
                     ->action(function ($record): void {
                         $record->is_shadowbanned = ! $record->is_shadowbanned;

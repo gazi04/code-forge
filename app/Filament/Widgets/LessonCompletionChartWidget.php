@@ -18,7 +18,7 @@ class LessonCompletionChartWidget extends ChartWidget
         $days = 30;
         $dates = collect(range(0, $days - 1))->map(fn (int $i): string => now()->subDays($days - 1 - $i)->format('Y-m-d'));
 
-        $raw = LessonSubmission::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+        $raw = LessonSubmission::query()->selectRaw('DATE(created_at) as date, COUNT(*) as count')
             ->where('created_at', '>=', now()->subDays($days - 1)->startOfDay())
             ->groupBy('date')
             ->orderBy('date')

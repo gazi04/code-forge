@@ -30,7 +30,7 @@ class RebuildLeaderboard extends Command
                 }
             });
 
-        $this->info("Rebuilt all-time leaderboard from {$count} students.");
+        $this->info(sprintf('Rebuilt all-time leaderboard from %d students.', $count));
 
         return self::SUCCESS;
     }

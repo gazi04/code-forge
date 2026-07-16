@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\ThemePack;
@@ -168,10 +170,7 @@ class ThemePackSeeder extends Seeder
         ];
 
         foreach ($packs as $pack) {
-            ThemePack::firstOrCreate(
-                ['identifier' => $pack['identifier']],
-                $pack,
-            );
+            ThemePack::query()->firstOrCreate(['identifier' => $pack['identifier']], $pack);
         }
     }
 }

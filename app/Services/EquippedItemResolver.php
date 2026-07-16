@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\StoreItem;
@@ -32,8 +34,8 @@ class EquippedItemResolver
      */
     public function fetchEquippedItems(array $ids): Collection
     {
-        return $ids
-            ? StoreItem::whereIn('id', $ids)->select(['id', 'name', 'type', 'image', 'display_config'])->get()->keyBy('id')
+        return $ids !== []
+            ? StoreItem::query()->whereIn('id', $ids)->select(['id', 'name', 'type', 'image', 'display_config'])->get()->keyBy('id')
             : collect();
     }
 

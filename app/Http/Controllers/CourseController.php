@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Resources\WorldResource;
@@ -14,7 +16,7 @@ class CourseController extends Controller
 
     public function __construct(protected CourseProgressService $courseProgress) {}
 
-    public function show($slug)
+    public function show(string $slug)
     {
         $course = $this->courseProgress->findForDetail($slug);
 

@@ -36,7 +36,7 @@ class ActivityLogsTable
 
                 TextColumn::make('subject_type')
                     ->label('Target Resource')
-                    ->formatStateUsing(fn ($state) => class_basename($state) ?: 'System')
+                    ->formatStateUsing(fn ($state): string => class_basename($state) ?: 'System')
                     ->searchable(),
 
                 TextColumn::make('subject_id')

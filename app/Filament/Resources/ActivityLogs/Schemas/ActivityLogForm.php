@@ -25,9 +25,11 @@ class ActivityLogForm
         if (is_null($value)) {
             return '—';
         }
+
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
+
         if (is_array($value)) {
             return json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
@@ -111,7 +113,7 @@ class ActivityLogForm
 
                         TextEntry::make('subject_type')
                             ->label('Target Model')
-                            ->formatStateUsing(fn ($state) => class_basename($state) ?: '—'),
+                            ->formatStateUsing(fn ($state): string => class_basename($state) ?: '—'),
 
                         TextEntry::make('subject_id')
                             ->label('Target ID')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Events\ProgressRegistered;
@@ -29,22 +31,22 @@ class LessonProgressService
     {
         $course = $lesson->course;
 
-        $clearedBlockIndices = BlockSubmission::where('user_id', $user->id)
+        $clearedBlockIndices = BlockSubmission::query()->where('user_id', $user->id)
             ->where('lesson_id', $lesson->id)
             ->pluck('block_index')
             ->toArray();
 
-        $previousLesson = Lesson::where('course_id', $course->id)
+        $previousLesson = Lesson::query()->where('course_id', $course->id)
             ->where('sort_order', '<', $lesson->sort_order)
             ->orderBy('sort_order', 'desc')
             ->first();
 
-        $nextLesson = Lesson::where('course_id', $course->id)
+        $nextLesson = Lesson::query()->where('course_id', $course->id)
             ->where('sort_order', '>', $lesson->sort_order)
             ->orderBy('sort_order', 'asc')
             ->first();
 
-        $isCompleted = LessonSubmission::where('user_id', $user->id)
+        $isCompleted = LessonSubmission::query()->where('user_id', $user->id)
             ->where('lesson_id', $lesson->id)
             ->exists();
 
@@ -69,7 +71,7 @@ class LessonProgressService
             ->keys();
 
         if ($requiredBlockIndices->isNotEmpty()) {
-            $clearedBlockIndices = BlockSubmission::where('user_id', $user->id)
+            $clearedBlockIndices = BlockSubmission::query()->where('user_id', $user->id)
                 ->where('lesson_id', $lesson->id)
                 ->pluck('block_index');
 
@@ -82,10 +84,7 @@ class LessonProgressService
         // single source of truth. `createOrFirst` inserts the row in its own transaction
         // and, on a concurrent unique-constraint violation, returns the existing row —
         // so only the request that actually inserts proceeds to award XP.
-        $submission = LessonSubmission::createOrFirst(
-            ['user_id' => $user->id, 'lesson_id' => $lesson->id],
-            ['course_id' => $lesson->course_id, 'xp_rewarded' => 0, 'coins_rewarded' => 0],
-        );
+        $submission = LessonSubmission::query()->createOrFirst(['user_id' => $user->id, 'lesson_id' => $lesson->id], ['course_id' => $lesson->course_id, 'xp_rewarded' => 0, 'coins_rewarded' => 0]);
 
         if (! $submission->wasRecentlyCreated) {
             return new LessonResult('already_completed', [
@@ -101,7 +100,7 @@ class LessonProgressService
 
         $levelBefore = $user->level;
 
-        $result = DB::transaction(function () use ($user, $lesson, $submission) {
+        $result = DB::transaction(function () use ($user, $lesson, $submission): array {
             $result = $this->progressionService->processVictory(
                 $user,
                 $lesson->xp_reward,
@@ -116,10 +115,10 @@ class LessonProgressService
             return $result;
         });
 
-        ProgressRegistered::dispatch($user, 'lesson');
+        event(new ProgressRegistered($user, 'lesson'));
 
-        if ($world = $this->findWorldToComplete($user, $lesson)) {
-            WorldCompleted::dispatch($user, $world);
+        if (($world = $this->findWorldToComplete($user, $lesson)) instanceof World) {
+            event(new WorldCompleted($user, $world));
         }
 
         // The synchronous world-completion bonus (HandleWorldCompletion) may award XP
@@ -146,14 +145,14 @@ class LessonProgressService
             return null;
         }
 
-        $lessonIds = Lesson::whereHas('course', fn ($q) => $q->where('world_id', $world->id))
+        $lessonIds = Lesson::query()->whereHas('course', fn ($q) => $q->where('world_id', $world->id))
             ->pluck('id');
 
         if ($lessonIds->isEmpty()) {
             return null;
         }
 
-        $completedCount = LessonSubmission::where('user_id', $user->id)
+        $completedCount = LessonSubmission::query()->where('user_id', $user->id)
             ->whereIn('lesson_id', $lessonIds)
             ->count();
 
@@ -173,7 +172,7 @@ class LessonProgressService
         }
 
         // 1. Anti-Cheat: Did they already get the reward for this specific quiz/challenge?
-        $alreadySubmitted = BlockSubmission::where('user_id', $user->id)
+        $alreadySubmitted = BlockSubmission::query()->where('user_id', $user->id)
             ->where('lesson_id', $lesson->id)
             ->where('block_index', $blockIndex)
             ->exists();
@@ -202,10 +201,7 @@ class LessonProgressService
         // 4. Atomic anti-double-reward gate: the unique (user_id, lesson_id, block_index)
         // index is the source of truth. `createOrFirst` returns the existing row on a
         // concurrent insert, so only the genuine first claim awards XP/coins.
-        $submission = BlockSubmission::createOrFirst(
-            ['user_id' => $user->id, 'lesson_id' => $lesson->id, 'block_index' => $blockIndex],
-            ['block_title' => $reward['title'], 'xp_rewarded' => 0, 'coins_rewarded' => 0],
-        );
+        $submission = BlockSubmission::query()->createOrFirst(['user_id' => $user->id, 'lesson_id' => $lesson->id, 'block_index' => $blockIndex], ['block_title' => $reward['title'], 'xp_rewarded' => 0, 'coins_rewarded' => 0]);
 
         if (! $submission->wasRecentlyCreated) {
             return new BlockResult('already_completed', [
@@ -215,7 +211,7 @@ class LessonProgressService
         }
 
         // 5. Engine Processing: run the math and persist the rewards on the gate row.
-        $result = DB::transaction(function () use ($user, $reward, $submission) {
+        $result = DB::transaction(function () use ($user, $reward, $submission): array {
             $result = $this->progressionService->processVictory(
                 $user,
                 $reward['xp'],
@@ -230,7 +226,7 @@ class LessonProgressService
             return $result;
         });
 
-        ProgressRegistered::dispatch($user, 'block');
+        event(new ProgressRegistered($user, 'block'));
 
         return new BlockResult('success', $result);
     }

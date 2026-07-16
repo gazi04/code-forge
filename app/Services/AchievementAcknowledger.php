@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\User;
@@ -20,7 +22,7 @@ class AchievementAcknowledger
     {
         DB::transaction(function () use ($user, $acknowledgedIds): void {
             /** @var User $lockedUser */
-            $lockedUser = User::whereKey($user->id)->lockForUpdate()->first();
+            $lockedUser = User::query()->whereKey($user->id)->lockForUpdate()->first();
 
             $pending = $lockedUser->pending_achievements ?? [];
 

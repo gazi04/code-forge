@@ -15,18 +15,18 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $totalStudents = User::where('role', 'student')->count();
-        $activeToday = User::where('role', 'student')->whereDate('last_active_at', today())->count();
-        $activeThisWeek = User::where('role', 'student')->where('last_active_at', '>=', now()->subDays(7))->count();
+        $totalStudents = User::query()->where('role', 'student')->count();
+        $activeToday = User::query()->where('role', 'student')->whereDate('last_active_at', today())->count();
+        $activeThisWeek = User::query()->where('role', 'student')->where('last_active_at', '>=', now()->subDays(7))->count();
 
-        $lessonsCompleted = LessonSubmission::count();
-        $lessonsLast7 = LessonSubmission::where('created_at', '>=', now()->subDays(7))->count();
-        $lessonsPrev7 = LessonSubmission::whereBetween('created_at', [now()->subDays(14), now()->subDays(7)])->count();
+        $lessonsCompleted = LessonSubmission::query()->count();
+        $lessonsLast7 = LessonSubmission::query()->where('created_at', '>=', now()->subDays(7))->count();
+        $lessonsPrev7 = LessonSubmission::query()->whereBetween('created_at', [now()->subDays(14), now()->subDays(7)])->count();
         $lessonTrend = $lessonsPrev7 > 0
             ? (int) round((($lessonsLast7 - $lessonsPrev7) / $lessonsPrev7) * 100)
             : ($lessonsLast7 > 0 ? 100 : 0);
 
-        $coinsInCirculation = (int) User::where('role', 'student')->sum('coins');
+        $coinsInCirculation = (int) User::query()->where('role', 'student')->sum('coins');
 
         return [
             Stat::make('Total Students', number_format($totalStudents))

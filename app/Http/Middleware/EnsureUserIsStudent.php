@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -20,7 +22,7 @@ class EnsureUserIsStudent
 
         if ($user?->role !== 'student') {
             if ($user?->role === 'admin') {
-                return redirect()->route('filament.admin.pages.dashboard');
+                return to_route('filament.admin.pages.dashboard');
             }
 
             abort(403);

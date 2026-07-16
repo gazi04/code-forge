@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\Auth\StudentLoginController;
 use App\Http\Controllers\Auth\StudentRegisterController;
@@ -13,11 +15,9 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WorldController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('student.world.index')
-        : redirect()->route('login');
-})->name('home');
+Route::get('/', fn () => auth()->check()
+    ? to_route('student.world.index')
+    : to_route('login'))->name('home');
 
 Route::get('/login', [StudentLoginController::class, 'show'])->name('login');
 Route::post('/login/student', [StudentLoginController::class, 'store'])

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\ThemePack;
@@ -45,23 +47,20 @@ class WorldSeeder extends Seeder
         ];
 
         foreach ($worlds as $world) {
-            $themePack = ThemePack::where('identifier', $world['theme_identifier'])->first();
+            $themePack = ThemePack::query()->where('identifier', $world['theme_identifier'])->first();
 
             if ($themePack === null) {
-                $this->command->warn("Theme pack [{$world['theme_identifier']}] not found, skipping world [{$world['name']}]. Run ThemePackSeeder first.");
+                $this->command->warn(sprintf('Theme pack [%s] not found, skipping world [%s]. Run ThemePackSeeder first.', $world['theme_identifier'], $world['name']));
 
                 continue;
             }
 
-            World::firstOrCreate(
-                ['slug' => $world['slug']],
-                [
-                    'name' => $world['name'],
-                    'description' => $world['description'],
-                    'theme_pack_id' => $themePack->id,
-                    'is_published' => $world['is_published'],
-                ],
-            );
+            World::query()->firstOrCreate(['slug' => $world['slug']], [
+                'name' => $world['name'],
+                'description' => $world['description'],
+                'theme_pack_id' => $themePack->id,
+                'is_published' => $world['is_published'],
+            ]);
         }
     }
 }

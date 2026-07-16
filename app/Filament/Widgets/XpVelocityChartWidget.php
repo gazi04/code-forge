@@ -22,13 +22,13 @@ class XpVelocityChartWidget extends ChartWidget
         $dates = collect(range(0, $days - 1))->map(fn (int $i): string => now()->subDays($days - 1 - $i)->format('Y-m-d'));
         $since = now()->subDays($days - 1)->startOfDay();
 
-        $lessonXp = LessonSubmission::selectRaw('DATE(created_at) as date, SUM(xp_rewarded) as total, COUNT(DISTINCT user_id) as users')
+        $lessonXp = LessonSubmission::query()->selectRaw('DATE(created_at) as date, SUM(xp_rewarded) as total, COUNT(DISTINCT user_id) as users')
             ->where('created_at', '>=', $since)
             ->groupBy('date')
             ->get()
             ->keyBy('date');
 
-        $blockXp = BlockSubmission::selectRaw('DATE(created_at) as date, SUM(xp_rewarded) as total, COUNT(DISTINCT user_id) as users')
+        $blockXp = BlockSubmission::query()->selectRaw('DATE(created_at) as date, SUM(xp_rewarded) as total, COUNT(DISTINCT user_id) as users')
             ->where('created_at', '>=', $since)
             ->groupBy('date')
             ->get()

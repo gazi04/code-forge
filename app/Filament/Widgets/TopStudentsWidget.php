@@ -17,7 +17,7 @@ class TopStudentsWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn (): Builder => User::where('role', 'student')
+            ->query(fn (): Builder => User::query()->where('role', 'student')
                 ->withCount('lessonSubmissions')
                 ->orderByDesc('xp')
                 ->limit(10))

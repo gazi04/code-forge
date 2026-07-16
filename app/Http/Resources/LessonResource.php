@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 use App\Support\BlockSanitizer;
@@ -24,7 +26,7 @@ class LessonResource extends JsonResource
             'is_boss' => $this->is_boss,
             'estimated_duration' => $this->estimated_duration,
             // Filament's Builder data passed to Svelte, with answer keys stripped
-            'blocks' => app(BlockSanitizer::class)->sanitize($this->blocks ?? []),
+            'blocks' => resolve(BlockSanitizer::class)->sanitize($this->blocks ?? []),
             'sort_order' => $this->sort_order,
         ];
     }
