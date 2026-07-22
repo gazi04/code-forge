@@ -6,32 +6,27 @@ namespace App\Services;
 
 use App\Enums\PurchaseType;
 use App\Enums\StoreItemType;
+use App\Http\Resources\StoreItemResource;
 use App\Models\StoreItem;
 use App\Models\User;
 use App\Models\UserInventory;
 use App\Support\StoreResult;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class StoreService
 {
     /**
      * Everything the store page renders: active items, the user's inventory, and equipped cosmetics.
      *
-     * @return array{items: Collection<int, array<string, mixed>>, inventory: Collection<int, array<string, mixed>>, equipped: array{title: mixed, avatar: mixed}}
+     * @return array{items: array<int, array<string, mixed>>, inventory: Collection<int, array<string, mixed>>, equipped: array{title: mixed, avatar: mixed}}
      */
     public function listStoreData(User $user): array
     {
-        $items = StoreItem::query()->active()
-            ->get()
-            ->map(fn ($item): array => [
-                ...$item->toArray(),
-                'image_url' => $item->image ? Storage::disk('public')->url($item->image) : null,
-            ]);
+        $items = StoreItem::query()->active()->get();
 
         return [
-            'items' => $items,
+            'items' => StoreItemResource::collection($items)->resolve(),
             'inventory' => $this->listInventory($user),
             'equipped' => [
                 'title' => $user->preferences['equipped_title'] ?? null,
@@ -56,10 +51,7 @@ class StoreService
                 'store_item_id' => $inv->store_item_id,
                 'quantity' => $inv->quantity,
                 'acquired_at' => $inv->acquired_at,
-                'store_item' => [
-                    ...$inv->storeItem->toArray(),
-                    'image_url' => $inv->storeItem->image ? Storage::disk('public')->url($inv->storeItem->image) : null,
-                ],
+                'store_item' => (new StoreItemResource($inv->storeItem))->resolve(),
             ]);
     }
 
@@ -166,25 +158,39 @@ class StoreService
 
     /**
      * Equip a cosmetic item. Caller is responsible for the ownership + cosmetic-type guards.
+     *
+     * `preferences` is a single JSON column shared by the equipped slots and the
+     * settings toggles, so an unlocked read-modify-write lets a concurrent writer's
+     * keys be silently dropped by the last save. Re-fetch under a lock and merge into
+     * the locked copy instead (no-op on SQLite, correct on MySQL/Postgres).
      */
     public function equip(User $user, UserInventory $inventory): void
     {
         $item = $inventory->storeItem;
 
-        $user->preferences = array_merge($user->preferences ?? [], [
-            'equipped_'.$item->type->value => $item->id,
-        ]);
-        $user->save();
+        DB::transaction(function () use ($user, $item): void {
+            $lockedUser = User::query()->whereKey($user->id)->lockForUpdate()->first();
+
+            $lockedUser->preferences = array_merge($lockedUser->preferences ?? [], [
+                'equipped_'.$item->type->value => $item->id,
+            ]);
+            $lockedUser->save();
+        });
     }
 
     /**
      * Clear an equipped cosmetic slot. Caller is responsible for the type guard.
+     * Locked read-modify-write for the same reason as `equip`.
      */
     public function unequip(User $user, string $type): void
     {
-        $user->preferences = array_merge($user->preferences ?? [], [
-            'equipped_'.$type => null,
-        ]);
-        $user->save();
+        DB::transaction(function () use ($user, $type): void {
+            $lockedUser = User::query()->whereKey($user->id)->lockForUpdate()->first();
+
+            $lockedUser->preferences = array_merge($lockedUser->preferences ?? [], [
+                'equipped_'.$type => null,
+            ]);
+            $lockedUser->save();
+        });
     }
 }
