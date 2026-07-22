@@ -1,0 +1,59 @@
+name: CI
+
+on: ['push', 'pull_request']
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: redis
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # Wayfinder output (resources/js/{actions,routes,wayfinder}) is gitignored,
+      # so a fresh checkout has none of it. types:check and format:check both
+      # cover those paths — generate before the gate runs.
+      - name: Generate Wayfinder types
+        run: php artisan wayfinder:generate --with-form
+
+      - name: CI gate (lint + format + types + tests)
+        run: composer ci:check
+
+      - name: Build assets
+        run: npm run build
