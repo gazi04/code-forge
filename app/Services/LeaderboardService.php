@@ -31,6 +31,11 @@ class LeaderboardService
             $pipe->zcard($redisKey);
         });
 
+        // phpredis returns false (not null) from zRevRank/zScore for a member
+        // missing from the sorted set; normalize so the null checks below work.
+        $userRank = $userRank === false ? null : $userRank;
+        $userScore = $userScore === false ? null : $userScore;
+
         $ids = array_keys($rawEntries);
         $enrichedUsers = User::query()->whereIn('id', $ids)->get()->keyBy('id');
 

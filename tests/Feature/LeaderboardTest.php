@@ -80,6 +80,20 @@ it('ranks a weekly-unranked player just below everyone with a weekly score', fun
         );
 });
 
+it('falls back to the durable xp column for an all_time-unranked player', function () {
+    $alice = User::factory()->create(['name' => 'Alice']);
+    $newcomer = User::factory()->create(['name' => 'Newcomer', 'xp' => 42]);
+
+    Redis::zadd('leaderboard:all_time', 999, $alice->id);
+
+    $this->actingAs($newcomer)
+        ->get(route('student.leaderboard', ['scope' => 'all_time']))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('player.name', 'Newcomer')
+            ->where('player.xp', 42)
+        );
+});
+
 it('returns all_time leaderboard when scope query param is all_time', function () {
     $user = User::factory()->create(['name' => 'TimeUser', 'level' => 1]);
 
