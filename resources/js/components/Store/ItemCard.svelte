@@ -23,11 +23,10 @@
     };
 
     let isCosmetic = $derived(item.type === 'title' || item.type === 'avatar');
-    let isLimited = $derived(item.purchase_type === 'one_time');
-    let stockLeft = $derived(
-        isLimited ? item.stock_limit - item.sold_count : null,
-    );
-    let isSoldOut = $derived(isLimited && stockLeft !== null && stockLeft <= 0);
+    // null when the item is unlimited or not a one_time item — the server derives
+    // this so raw stock_limit/sold_count never reach the client.
+    let stockLeft = $derived(item.stock_remaining ?? null);
+    let isSoldOut = $derived(stockLeft !== null && stockLeft <= 0);
 </script>
 
 <div

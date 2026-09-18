@@ -5,6 +5,7 @@ use App\Enums\StoreItemType;
 use App\Models\StoreItem;
 use App\Models\User;
 use App\Models\UserInventory;
+use Inertia\Testing\AssertableInertia as Assert;
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -299,6 +300,107 @@ it('applies a quantity-1 consumable effect only once', function () {
     expect($user->fresh()->streak_freezes)->toBe(1);
 });
 
+// ─── Index serialization ─────────────────────────────────────────────────────
+
+it('never ships store item internals to the client', function () {
+    $user = User::factory()->create();
+    makeItem([
+        'name' => 'Frost Charm',
+        'type' => 'streak_freeze',
+        'purchase_type' => 'consumable',
+        'price_coins' => 250,
+        'effect_config' => ['quantity' => 3],
+        'display_config' => ['color' => '#ff0000'],
+        'stock_limit' => 40,
+        'sold_count' => 11,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('student.store.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('items', 1)
+            // Economy internals must not reach the browser.
+            ->missing('items.0.effect_config')
+            ->missing('items.0.display_config')
+            ->missing('items.0.is_active')
+            ->missing('items.0.stock_limit')
+            ->missing('items.0.sold_count')
+            // What the UI actually renders must survive the whitelist.
+            ->where('items.0.name', 'Frost Charm')
+            ->where('items.0.type', 'streak_freeze')
+            ->where('items.0.purchase_type', 'consumable')
+            ->where('items.0.price_coins', 250)
+            ->has('items.0.id')
+            ->has('items.0.image_url')
+        );
+});
+
+it('derives stock_remaining for a limited item instead of exposing the raw counts', function () {
+    $user = User::factory()->create();
+    makeItem([
+        'type' => 'title',
+        'purchase_type' => 'one_time',
+        'stock_limit' => 5,
+        'sold_count' => 2,
+        'effect_config' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('student.store.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('items.0.stock_remaining', 3));
+});
+
+it('reports no stock_remaining for an unlimited item', function () {
+    $user = User::factory()->create();
+    makeItem(['purchase_type' => 'consumable', 'stock_limit' => null]);
+
+    $this->actingAs($user)
+        ->get(route('student.store.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('items.0.stock_remaining', null));
+});
+
+it('clamps stock_remaining at zero for an oversold item', function () {
+    $user = User::factory()->create();
+    makeItem([
+        'type' => 'title',
+        'purchase_type' => 'one_time',
+        'stock_limit' => 5,
+        'sold_count' => 7,
+        'effect_config' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('student.store.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('items.0.stock_remaining', 0));
+});
+
+it('applies the same whitelist to inventory items as to shop items', function () {
+    $user = User::factory()->create();
+    $item = makeItem(['effect_config' => ['quantity' => 2], 'stock_limit' => 9, 'sold_count' => 4]);
+    UserInventory::create([
+        'user_id' => $user->id,
+        'store_item_id' => $item->id,
+        'quantity' => 1,
+        'acquired_at' => now(),
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('student.store.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('inventory', 1)
+            ->missing('inventory.0.store_item.effect_config')
+            ->missing('inventory.0.store_item.stock_limit')
+            ->missing('inventory.0.store_item.sold_count')
+            ->missing('inventory.0.store_item.is_active')
+            ->has('inventory.0.store_item.type')
+            ->has('inventory.0.store_item.image_url')
+            // The surrounding inventory keys the card reads must stay put.
+            ->has('inventory.0.id')
+            ->has('inventory.0.store_item_id')
+            ->where('inventory.0.quantity', 1)
+        );
+});
+
 // ─── Equip / Unequip ─────────────────────────────────────────────────────────
 
 it('equips a title item into user preferences', function () {
@@ -352,6 +454,54 @@ it('returns 422 when unequipping an invalid type', function () {
     $this->actingAs($user)
         ->delete(route('student.inventory.unequip', 'xp_boost'))
         ->assertStatus(422);
+});
+
+it('preserves unrelated preference keys when equipping', function () {
+    $user = User::factory()->create([
+        'preferences' => [
+            'background_audio' => false,
+            'accessibility_mode' => true,
+            'equipped_title' => 99,
+        ],
+    ]);
+    $item = makeItem(['type' => 'avatar', 'purchase_type' => 'permanent', 'effect_config' => null]);
+    $inventory = UserInventory::create([
+        'user_id' => $user->id,
+        'store_item_id' => $item->id,
+        'quantity' => 1,
+        'acquired_at' => now(),
+    ]);
+
+    $this->actingAs($user)
+        ->from(route('student.store.index'))
+        ->post(route('student.inventory.equip', $inventory));
+
+    $prefs = $user->fresh()->preferences;
+
+    expect($prefs['equipped_avatar'])->toBe($item->id)
+        ->and($prefs['equipped_title'])->toBe(99)
+        ->and($prefs['background_audio'])->toBeFalse()
+        ->and($prefs['accessibility_mode'])->toBeTrue();
+});
+
+it('preserves unrelated preference keys when unequipping', function () {
+    $user = User::factory()->create([
+        'preferences' => [
+            'background_audio' => false,
+            'equipped_title' => 99,
+            'equipped_avatar' => 42,
+        ],
+    ]);
+
+    $this->actingAs($user)
+        ->from(route('student.store.index'))
+        ->delete(route('student.inventory.unequip', 'title'));
+
+    $prefs = $user->fresh()->preferences;
+
+    expect($prefs['equipped_title'])->toBeNull()
+        ->and($prefs['equipped_avatar'])->toBe(42)
+        ->and($prefs['background_audio'])->toBeFalse();
 });
 
 it('returns 403 when equipping another user inventory item', function () {
