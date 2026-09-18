@@ -1,0 +1,52 @@
+name: linter
+
+on:
+  push:
+    branches: [main, dev]
+    paths-ignore: ["docs/**", "**/*.md", "LICENSE"]
+  pull_request:
+    paths-ignore: ["docs/**", "**/*.md", "LICENSE"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linter-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-app
+        with:
+          node: "true"
+
+      - name: Pint (code style)
+        run: composer lint:check
+
+      # Wayfinder output (resources/js/{actions,routes,wayfinder}) is gitignored,
+      # so a fresh checkout has none of it. types:check and format:check both
+      # cover those paths — generate before the gate runs.
+      - name: Generate Wayfinder types
+        run: php artisan wayfinder:generate --with-form
+
+      - name: ESLint
+        run: npm run lint:check
+
+      - name: Prettier (format check)
+        run: npm run format:check
+
+      - name: Svelte type check
+        run: npm run types:check
+
+      - name: actionlint (workflow YAML)
+        run: |
+          curl -sSfL "https://raw.githubusercontent.com/rhysd/actionlint/914e7df21a07ef503a81201c76d2b11c789d3fca/scripts/download-actionlint.bash" -o "${RUNNER_TEMP}/download-actionlint.bash"
+          bash "${RUNNER_TEMP}/download-actionlint.bash" 1.7.12
+          ./actionlint -color
