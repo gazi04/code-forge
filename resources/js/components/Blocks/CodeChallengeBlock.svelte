@@ -135,8 +135,7 @@
             <textarea
                 bind:value={userCode}
                 class="w-full h-40 sm:h-72 lg:h-[400px] bg-transparent p-4 sm:p-6 font-mono text-base sm:text-sm text-[var(--text-color)] focus:outline-none resize-none"
-                spellcheck="false"
-            ></textarea>
+                spellcheck="false"></textarea>
 
             <div class="absolute bottom-4 right-4">
                 <button
