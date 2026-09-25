@@ -43,6 +43,8 @@ jobs:
         run: npm run format:check
 
       - name: Svelte type check
+        env:
+          LARAVEL_BYPASS_ENV_CHECK: 1
         run: npm run types:check
 
       - name: actionlint (workflow YAML)
