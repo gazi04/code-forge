@@ -25,7 +25,7 @@
             <p
                 class="text-xs font-mono uppercase tracking-[0.3em] text-indigo-400/60 mb-3"
             >
-                Arcane.dev
+                CodeForge
             </p>
             <h1
                 class="text-2xl sm:text-3xl font-black text-white tracking-tight"

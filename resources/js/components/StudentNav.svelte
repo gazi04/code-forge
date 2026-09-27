@@ -44,7 +44,7 @@
             href={worldsIndex.url()}
             class="font-black tracking-widest uppercase text-sm text-[var(--text-color)] opacity-70 hover:text-[var(--primary-color)] hover:opacity-100 transition-colors shrink-0"
         >
-            Arcane.dev
+            CodeForge
         </Link>
 
         {#if user}
